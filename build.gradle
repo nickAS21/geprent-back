@@ -1,0 +1,67 @@
+def jUnitVer='5.4.2'
+def assertJVer = '3.12.2'
+def h2Ver = '1.4.197'
+def mysqlConnectorVer = '8.0.14'
+
+buildscript {
+
+    ext{
+        bootVer='2.1.1.RELEASE'
+    }
+
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$bootVer")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+application {
+    mainClassName = 'com.georent.GeoRentStarter'
+}
+
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.georent.GeoRentStarter'
+    }
+}
+
+dependencies {
+
+    implementation 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+//    implementation 'org.liquibase:liquibase-core'
+
+    runtime "com.h2database:h2:$h2Ver"
+    runtime "mysql:mysql-connector-java:$mysqlConnectorVer"
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation "org.junit.jupiter:junit-jupiter:$jUnitVer"
+    testImplementation "org.assertj:assertj-core:$assertJVer"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
