@@ -41,12 +41,7 @@ spring:
     password: admin
 
     hikari:
-      #      driver-class-name: com.mysql.cj.jdbc.Driver
-      #      jdbc-url: jdbc:mysql://test-asr-live.cpxzk4nm31oe.us-east-1.rds.amazonaws.com:3306/live_asr_server
-      #      username: asr_live_admin
-      #      password: perpetual-unfounded-wrath-kindly
       maximum-pool-size: 10
-    #      data-source-class-name: com.zaxxer.hikari.HikariDataSource
   jpa:
     database-platform: org.hibernate.dialect.MySQL5Dialect
     hibernate:
