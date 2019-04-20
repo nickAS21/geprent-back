@@ -2,7 +2,7 @@
 import lombok.Data;
 
 @Data
-public class CoordinateEntity {
+public class Coordinate{
     private float Latitude;
     private float Longtitude;
     private Long id;
