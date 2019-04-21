@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 //    implementation 'org.liquibase:liquibase-core'
 
-    implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.apache.commons:commons-text:1.6'
 
     runtime "com.h2database:h2:$h2Ver"
