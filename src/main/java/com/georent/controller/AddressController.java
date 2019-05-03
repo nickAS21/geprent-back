@@ -2,11 +2,19 @@ package com.georent.controller;
 
 import com.georent.domain.Address;
 import com.georent.dto.AddressDTO;
+import com.georent.service.AddressService;
 import org.apache.commons.lang3.RandomUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Random;
 
 /**
  * This is test controller.
@@ -19,6 +27,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("address-controller")
 public class AddressController {
 
+    private final AddressService addressService;
+
+    @Autowired
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
+
     /**
      * This method handles GET requests to endpoint: http://localhost:8080/address-controller/domain
      *
@@ -28,6 +43,25 @@ public class AddressController {
     public ResponseEntity<Address> getAddress(){
         Address address = generateAddress();
         return ResponseEntity.ok().body(address);
+    }
+
+    @GetMapping("/domain/{id}")
+    public ResponseEntity<AddressDTO> getAddressById(@PathVariable Long id) {
+        Address address = addressService.getById(id);
+        return ResponseEntity.ok().body(mapToDto(address));
+    }
+
+    @PostMapping("/domain")
+    public ResponseEntity<AddressDTO> saveAddress(@RequestBody AddressDTO addressDTO) {
+        Address address = mapFromDto(addressDTO);
+        Address savedAddress = addressService.save(address);
+        return ResponseEntity.ok().body(mapToDto(savedAddress));
+    }
+
+    @DeleteMapping("/domain/{id}")
+    public ResponseEntity<String> deleteAddressById(@PathVariable Long id) {
+        addressService.deleteById(id);
+        return ResponseEntity.ok().body("Address with id: " + id + " deleted");
     }
 
     /**
@@ -42,9 +76,9 @@ public class AddressController {
 
     private Address generateAddress() {
         Address address = new Address();
-        address.setId(RandomUtils.nextLong());
-        address.setUserId(RandomUtils.nextLong());
-        address.setCoordId(RandomUtils.nextLong());
+        address.setId(RandomUtils.nextLong(1, 100));
+        address.setUserId(RandomUtils.nextLong(1, 100));
+        address.setCoordId(RandomUtils.nextLong(1, 100));
         // TODO set user and coordinates
         return address;
     }
@@ -53,8 +87,16 @@ public class AddressController {
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setId(address.getId());
         addressDTO.setUserId(address.getUserId());
-        // TODO addressDTO.setCoordinatesDTO();
+        addressDTO.setCoordId(address.getCoordId());
         return addressDTO;
+    }
+
+    private Address mapFromDto(AddressDTO addressDTO) {
+        Address address = new Address();
+        address.setId(addressDTO.getId());
+        address.setUserId(addressDTO.getUserId());
+        address.setCoordId(addressDTO.getCoordId());
+        return address;
     }
 
 }
