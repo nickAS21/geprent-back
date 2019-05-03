@@ -11,7 +11,7 @@ public class Address {
 
     private Long id;
 
-    private GeorentUser user;
+    private Long userId;
 
-    private Coordinates coordinates;
+    private Long coordId;
 }

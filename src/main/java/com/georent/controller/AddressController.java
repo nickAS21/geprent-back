@@ -43,6 +43,8 @@ public class AddressController {
     private Address generateAddress() {
         Address address = new Address();
         address.setId(RandomUtils.nextLong());
+        address.setUserId(RandomUtils.nextLong());
+        address.setCoordId(RandomUtils.nextLong());
         // TODO set user and coordinates
         return address;
     }
@@ -50,7 +52,7 @@ public class AddressController {
     private AddressDTO mapToDto(Address address){
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setId(address.getId());
-        addressDTO.setUserId(address.getUser().getUserId());
+        addressDTO.setUserId(address.getUserId());
         // TODO addressDTO.setCoordinatesDTO();
         return addressDTO;
     }

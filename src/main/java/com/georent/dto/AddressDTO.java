@@ -13,5 +13,5 @@ public class AddressDTO {
 
     private Long userId;
 
-    private CoordinatesDTO coordinatesDTO;
+    private Long coordId;
 }
