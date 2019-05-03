@@ -31,6 +31,8 @@ spring:
         trace: false
         web-allow-others: false
 
+logging:
+  config: classpath:logback-local.xml
 ---
 spring:
   profiles: dev
@@ -59,3 +61,6 @@ spring:
     show-sql: false
 #  liquibase:
 #    change-log: classpath:db/changelog/db.changelog-master.json
+
+logging:
+  config: classpath:logback-dev.xml
