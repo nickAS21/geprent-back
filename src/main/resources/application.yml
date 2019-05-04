@@ -2,6 +2,10 @@ spring:
   profiles:
     active: test
 
+app:
+  jwt:
+    secretKey: %glutton-@oversight-#rare-!shine-&unchain-$unboxed
+    expiresIn: 3600000
 ---
 spring:
   profiles: test
@@ -30,7 +34,6 @@ spring:
       settings:
         trace: false
         web-allow-others: false
-
 ---
 spring:
   profiles: dev
@@ -42,6 +45,7 @@ spring:
 
     hikari:
       maximum-pool-size: 10
+
   jpa:
     database-platform: org.hibernate.dialect.MySQL5Dialect
     hibernate:
