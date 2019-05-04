@@ -1,14 +1,14 @@
 package com.georent.service;
 
+import com.georent.config.JwtConfigurationProperties;
 import com.georent.domain.GeoRentUser;
+import com.georent.domain.GeoRentUserDetails;
 import com.georent.domain.UserRole;
 import com.georent.dto.AuthenticationResponseDTO;
 import com.georent.dto.LoginRequestDTO;
 import com.georent.dto.RegistrationRequestDTO;
 import com.georent.exception.UserRegistrationException;
-import com.georent.config.JwtConfigurationProperties;
 import com.georent.message.Message;
-import com.georent.domain.GeoRentUserDetails;
 import com.georent.security.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +32,6 @@ public class AuthenticationService {
     private final transient JwtProvider jwtProvider;
     private final transient JwtConfigurationProperties jwtProperties;
     private final transient GeoRentUserService userService;
-
 
     @Autowired
     public AuthenticationService(final AuthenticationManager authManager,
