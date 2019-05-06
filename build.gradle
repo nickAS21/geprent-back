@@ -63,6 +63,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter:$jUnitVer"
     testImplementation "org.assertj:assertj-core:$assertJVer"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    compile 'com.amazonaws:aws-java-sdk:1.11.546'
 
 }
 
