@@ -2,6 +2,9 @@ def jUnitVer='5.4.2'
 def assertJVer = '3.12.2'
 def h2Ver = '1.4.197'
 def mysqlConnectorVer = '8.0.14'
+def logbackVersion = '1.2.3'
+def julToSlf4jVersion = '1.7.25'
+def log4jOverSlf4jVersion =  '1.7.25'
 
 buildscript {
 
@@ -63,6 +66,10 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter:$jUnitVer"
     testImplementation "org.assertj:assertj-core:$assertJVer"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+    compile group: 'org.slf4j', name: 'jul-to-slf4j', version: julToSlf4jVersion
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: log4jOverSlf4jVersion
 }
 
 test {

@@ -7,3 +7,9 @@ build
 # Ignore IntelliJ directories
 .idea
 out
+
+#Ignore all .iml files
+*.iml
+
+#Ignore all .log files
+*.log
