@@ -2,6 +2,10 @@ spring:
   profiles:
     active: test
 
+app:
+  jwt:
+    secretKey: glutton-oversight-rare-shine-unchain-unboxed
+    expiresIn: 3600000
 ---
 spring:
   profiles: test
