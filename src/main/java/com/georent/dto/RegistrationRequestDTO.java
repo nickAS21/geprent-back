@@ -20,5 +20,6 @@ public class RegistrationRequestDTO {
     @Size(min = 6, max = 100)
     private String password;
 
+    @Size(max = 12)
     private String phoneNumber;
 }
