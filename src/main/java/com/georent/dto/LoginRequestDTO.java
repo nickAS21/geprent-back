@@ -17,7 +17,7 @@ public class LoginRequestDTO {
     private String email;
 
     @NotBlank()
-    @Pattern(regexp="[A-Za-z0-9_-]+", message="Invalid email address!")
+    @Pattern(regexp="[A-Za-z0-9_-]+", message="Invalid password!")
     @Size(min = 8, max = 64)
     private String password;
 
