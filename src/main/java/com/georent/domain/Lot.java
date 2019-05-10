@@ -2,9 +2,7 @@ package com.georent.domain;
 
 import lombok.Data;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
     public class Lot {
@@ -12,7 +10,14 @@ import javax.persistence.Id;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
-        private  Long userId;
-        private Long addressId;
+
+    @ManyToOne
+        private  GeoRentUser userId;
+
+
+    @OneToOne(mappedBy = "id")
         private  Description description;
+
+//    @OneToOne
+//    private Coordinates coordinates;
 }
