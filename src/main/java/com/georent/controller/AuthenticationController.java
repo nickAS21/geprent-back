@@ -10,7 +10,6 @@ import com.georent.message.Message;
 import com.georent.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,15 +55,4 @@ public class AuthenticationController {
         dto.setLastName(user.getLastName());
         return dto;
     }
-
-//    /**
-//     * Initiating WebDataBinder for checking login form.
-//     *
-//     * @param binder new {@link DataBinder}
-//     */
-//    @InitBinder
-//    public void initBinder(final WebDataBinder binder) {
-//        binder.setValidator(new LoginRequestDTOValidator());
-//    }
-
 }
