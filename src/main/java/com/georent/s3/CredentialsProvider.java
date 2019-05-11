@@ -1,4 +1,4 @@
-package com.georent.amazonaws;
+package com.georent.s3;
 
 import com.amazonaws.auth.AWSCredentials;
 import org.springframework.stereotype.Component;

@@ -14,15 +14,15 @@ public class RegistrationRequestDTO {
 
     @Email()
     @NotBlank()
-    @Pattern(regexp="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message="Invalid email address!")
+    @Pattern(regexp="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message="Invalid email format")
     @Size(min = 6, max = 40)
     private String email;
 
     @NotBlank()
-    @Pattern(regexp="[A-Za-z0-9_-]+", message="Invalid password!")
+    @Pattern(regexp="[A-Za-z0-9_-]+", message="Invalid password format.")
     @Size(min = 8, max = 64)
     private String password;
 
-    @Size(max = 12)
+    @Size(min = 12, max = 12)
     private String phoneNumber;
 }
