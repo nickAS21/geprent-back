@@ -19,6 +19,8 @@ public class Coordinates {
 
     private Float latitude;
 
+    private String address;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     private Lot lot;

@@ -6,7 +6,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.georent.amazonaws.CredentialsProvider;
+import com.georent.s3.CredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /* is taken from https://www.baeldung.com/aws-s3-java */
