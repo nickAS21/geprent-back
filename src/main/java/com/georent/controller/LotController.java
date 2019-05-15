@@ -17,8 +17,8 @@ public class LotController {
     private final transient LotService lotService;
 
     @Autowired
-    public LotController(final LotService authService) {
-        this.lotService = authService;
+    public LotController(final LotService lotService) {
+        this.lotService = lotService;
     }
 
     @GetMapping

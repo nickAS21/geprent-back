@@ -22,15 +22,15 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("user")
-public class UserController {
+public class GeoRentUserController {
 
     private final GeoRentUserRepository userRepository;
 
     private final LotRepository lotRepository;
 
     @Autowired
-    public UserController(final GeoRentUserRepository userRepository,
-                          final LotRepository lotRepository) {
+    public GeoRentUserController(final GeoRentUserRepository userRepository,
+                                 final LotRepository lotRepository) {
         this.userRepository = userRepository;
         this.lotRepository = lotRepository;
     }
@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @GetMapping("lots")
-    public ResponseEntity<List<LotDTO>> getLots(Principal principal){
+    public ResponseEntity<?> getLots(Principal principal){
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         List<LotDTO> allByGeoRentUser_id = lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
                 .stream()
