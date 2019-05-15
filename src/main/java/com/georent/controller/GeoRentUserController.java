@@ -1,38 +1,34 @@
 package com.georent.controller;
 
-import com.georent.domain.Coordinates;
-import com.georent.domain.Description;
-import com.georent.domain.GeoRentUser;
-import com.georent.domain.Lot;
-import com.georent.dto.CoordinatesDTO;
-import com.georent.dto.DescriptionDTO;
-import com.georent.dto.LotDTO;
-import com.georent.repository.GeoRentUserRepository;
-import com.georent.repository.LotRepository;
-import org.apache.commons.lang3.RandomUtils;
+import com.georent.service.GeoRentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
+
+/*
+41-я
+Create lot controller and service methods to save new lot and show user lots
+GeoRentUserController -> /user/lot and /user/lot/{id} endpoints
+
+42-я
+Create controller and service methods to retrieve user info, delete user, delete lot and delete all lots.
+ */
+
 
 @Controller
 @RequestMapping("user")
 public class GeoRentUserController {
 
-    private final GeoRentUserRepository userRepository;
-
-    private final LotRepository lotRepository;
+    private final GeoRentUserService userService;
 
     @Autowired
-    public GeoRentUserController(final GeoRentUserRepository userRepository,
-                                 final LotRepository lotRepository) {
-        this.userRepository = userRepository;
-        this.lotRepository = lotRepository;
+    public GeoRentUserController(final GeoRentUserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
@@ -41,36 +37,14 @@ public class GeoRentUserController {
         return ResponseEntity.ok(String.format("Hello %s.", name));
     }
 
-    @GetMapping("lots")
-    public ResponseEntity<?> getLots(Principal principal){
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        List<LotDTO> allByGeoRentUser_id = lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
-                .stream()
-                .map(this::mapToLotDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(allByGeoRentUser_id);
+    @GetMapping("/lot")
+    public ResponseEntity<?> getUserLots(Principal principal){
+        return ResponseEntity.ok(userService.getUserLots(principal));
     }
 
-    private LotDTO mapToLotDTO(Lot lot){
-        Coordinates coordinates = lot.getCoordinates();
-        Description description = lot.getDescription();
-        Long id = lot.getId();
-
-        CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
-        coordinatesDTO.setLatitude(coordinates.getLatitude());
-        coordinatesDTO.setLongitude(coordinates.getLongitude());
-
-        DescriptionDTO descriptionDTO = new DescriptionDTO();
-        descriptionDTO.setItemName(description.getItemName());
-        descriptionDTO.setLotDescription(description.getLotDescription());
-        descriptionDTO.setPictureId(description.getPictureId());
-
-        LotDTO dto = new LotDTO();
-        dto.setPrice(Math.abs(RandomUtils.nextLong()));
-        dto.setId(id);
-        dto.setCoordinates(coordinatesDTO);
-        dto.setDescription(descriptionDTO);
-
-        return dto;
+    @GetMapping("/lot/{id}")
+    public ResponseEntity<?> getUserLotId(@PathVariable(value = "id") Long lotId, Principal principal){
+        return ResponseEntity.ok(userService.getUserLotId(principal, lotId));
     }
+
 }
