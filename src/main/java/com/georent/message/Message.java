@@ -21,5 +21,6 @@ public enum Message {
     SUCCESS_UPDATE_USER("User data updated successfully!"),
     SUCCESS_UPDATE_PASSWORD("Password updated successfully!");
 
+
     private String description;
 }

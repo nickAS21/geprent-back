@@ -24,5 +24,7 @@ public class RegistrationRequestDTO {
     private String password;
 
     @Size(min = 12, max = 12)
+    @Pattern(regexp="[0-9-]+", message="Invalid phoneNumber format.")
     private String phoneNumber;
+
 }
