@@ -2,6 +2,10 @@ spring:
   profiles:
     active: test
 
+aws:
+  secret-key: 0YEd7sI2PvzbFNcun/E6EcO9tUOey9O+xwK/nJtV
+  access-key: AKIA4BDR5OXQEJFE574O
+
 app:
   jwt:
     secretKey: glutton-oversight-rare-shine-unchain-unboxed
