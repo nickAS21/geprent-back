@@ -1,12 +1,22 @@
 package com.georent.service;
 
+import com.georent.domain.Coordinates;
+import com.georent.domain.Description;
 import com.georent.domain.Lot;
+import com.georent.dto.CoordinatesDTO;
+import com.georent.dto.DescriptionDTO;
+import com.georent.dto.LotDTO;
 import com.georent.repository.LotRepository;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Service
 public class LotService {
 
     private final transient LotRepository lotRepository;
@@ -16,16 +26,65 @@ public class LotService {
         this.lotRepository = lotRepository;
     }
 
-    public Optional<Lot> getLotById (final Long id) {
-        return lotRepository.findById(id);
+    public List<LotDTO> getLotsDto() {
+        return lotRepository.findAll()
+                .stream()
+                .map(this::mapToShortLotDTO)
+                .collect(Collectors.toList());
     }
 
-    public Boolean existsLotById (final Long id) {
-        return lotRepository.existsById(id);
+    public LotDTO getLotDto(Long id) {
+        Optional<Lot> lot = lotRepository.findById(id);
+        return mapToLotDTO(lot);
     }
 
     @Transactional
-    public Lot saveNewLot (final Lot lot) {
+    public Lot saveNewLot(final Lot lot) {
         return lotRepository.save(lot);
     }
+
+    private LotDTO mapToShortLotDTO(Lot lot) {
+        Coordinates coordinates = lot.getCoordinates();
+        Description description = lot.getDescription();
+        Long id = lot.getId();
+
+        CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
+        coordinatesDTO.setLatitude(coordinates.getLatitude());
+        coordinatesDTO.setLongitude(coordinates.getLongitude());
+
+        DescriptionDTO descriptionDTO = new DescriptionDTO();
+        descriptionDTO.setItemName(description.getItemName());
+
+        LotDTO dto = new LotDTO();
+        dto.setId(id);
+        dto.setCoordinates(coordinatesDTO);
+        dto.setDescription(descriptionDTO);
+        return dto;
+    }
+
+    private LotDTO mapToLotDTO(Optional<Lot> lot) {
+        if (!lot.isEmpty()) {
+            Coordinates coordinates = lot.get().getCoordinates();
+            Description description = lot.get().getDescription();
+            Long id = lot.get().getId();
+
+            CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
+            coordinatesDTO.setLatitude(coordinates.getLatitude());
+            coordinatesDTO.setLongitude(coordinates.getLongitude());
+
+            DescriptionDTO descriptionDTO = new DescriptionDTO();
+            descriptionDTO.setItemName(description.getItemName());
+            descriptionDTO.setLotDescription(description.getLotDescription());
+            descriptionDTO.setPictureId(description.getPictureId());
+
+            LotDTO dto = new LotDTO();
+            dto.setId(id);
+            dto.setCoordinates(coordinatesDTO);
+            dto.setPrice(Math.abs(RandomUtils.nextLong()));
+            dto.setDescription(descriptionDTO);
+            return dto;
+        }
+        return null;
+    }
+
 }
