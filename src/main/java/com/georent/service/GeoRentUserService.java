@@ -12,6 +12,7 @@ import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,26 +74,26 @@ public class GeoRentUserService {
 
     public LotDTO getUserLotId(Principal principal, long id){
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        Lot lot = lotRepository.findLotByUser_Id(geoRentUser.getId(), id);
+        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId());
         return mapToLotDTO(lot);
     }
 
+
+    @Transactional
     public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto){
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        Lot lot = new Lot();
+        lot.setGeoRentUser(geoRentUser);
         Coordinates coordinates = new Coordinates();
         coordinates.setLatitude(registrationLotDto.getLatitude());
         coordinates.setLongitude(registrationLotDto.getLongitude());
         coordinates.setAddress(registrationLotDto.getAddress());
-
+        lot.setCoordinates(coordinates);
         Description description = new Description();
         description.setItemName(registrationLotDto.getItemName());
         description.setLotDescription(registrationLotDto.getLotDescription());
 //        description.setPictureId(registrationLotDto.getItemPath());
         description.setPictureId(1L);
-
-        Lot lot = new Lot();
-        lot.setGeoRentUser(geoRentUser);
-        lot.setCoordinates(coordinates);
         lot.setDescription(description);
         lotRepository.save(lot);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
@@ -101,31 +102,72 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
+    @Transactional
+    public GenericResponseDTO  deleteUser(Principal principal){
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+        lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
+        userRepository.delete(geoRentUser);
+        responseDTO.setMessage(Message.SUCCESS_DELETE_USER.getDescription());
+        return responseDTO;
+    }
+
+
+    @Transactional
+    public GenericResponseDTO deleteteUserLotId(Principal principal, long id){
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId());
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+        if (lot != null) {
+            try {
+//                lotRepository.deleteById(id);
+                lotRepository.deleteLotsByIdAndGeoRentUser_Id(id, geoRentUser.getId());
+            }
+            catch (EmptyResultDataAccessException e) {
+                e.printStackTrace();
+            }
+            responseDTO.setMessage(Message.SUCCESS_DELETE_LOT.getDescription());
+
+        }
+        else {
+            responseDTO.setMessage(Message.INVALID_DELETE_LOT.getDescription() );
+        }
+        return responseDTO;
+    }
+
+    @Transactional
+    public GenericResponseDTO deleteteUserLotAll(Principal principal){
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_DELETE_LOTS.getDescription() );
+        return responseDTO;
+    }
+
     private LotDTO mapToLotDTO(Lot lot){
         if (lot == null) {
            return null;
         }
         else {
-            Coordinates coordinates = lot.getCoordinates();
-            Description description = lot.getDescription();
-            Long id = lot.getId();
-
-            CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
-            coordinatesDTO.setLatitude(coordinates.getLatitude());
-            coordinatesDTO.setLongitude(coordinates.getLongitude());
-            coordinatesDTO.setAddress(coordinates.getAddress());
-
-            DescriptionDTO descriptionDTO = new DescriptionDTO();
-            descriptionDTO.setItemName(description.getItemName());
-            descriptionDTO.setLotDescription(description.getLotDescription());
-            descriptionDTO.setPictureId(description.getPictureId());
-
             LotDTO dto = new LotDTO();
-            dto.setPrice(Math.abs(RandomUtils.nextLong()));
+            Long id = lot.getId();
             dto.setId(id);
-            dto.setCoordinates(coordinatesDTO);
-            dto.setDescription(descriptionDTO);
-
+            dto.setPrice(Math.abs(RandomUtils.nextLong()));
+            if (lot.getCoordinates() != null) {
+                Coordinates coordinates = lot.getCoordinates();
+                CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
+                coordinatesDTO.setLatitude(coordinates.getLatitude());
+                coordinatesDTO.setLongitude(coordinates.getLongitude());
+                coordinatesDTO.setAddress(coordinates.getAddress());
+                dto.setCoordinates(coordinatesDTO);
+            }
+            if (lot.getDescription() != null) {
+                Description description = lot.getDescription();
+                DescriptionDTO descriptionDTO = new DescriptionDTO();
+                descriptionDTO.setItemName(description.getItemName());
+                descriptionDTO.setLotDescription(description.getLotDescription());
+                descriptionDTO.setPictureId(description.getPictureId());
+                dto.setDescription(descriptionDTO);           }
             return dto;
         }
     }

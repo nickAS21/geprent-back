@@ -19,8 +19,12 @@ public enum Message {
 
     SUCCESS_REGISTRATION("User registered successfully!"),
     SUCCESS_UPDATE_USER("User data updated successfully!"),
+    SUCCESS_DELETE_USER("User deleteed successfully!"),
     SUCCESS_UPDATE_PASSWORD("Password updated successfully!"),
-    SUCCESS_SAVE_LOT("Lot saved successfully!");
+    SUCCESS_SAVE_LOT("Lot saved successfully!"),
+    SUCCESS_DELETE_LOT("Lot deleted successfully!"),
+    SUCCESS_DELETE_LOTS("All lots of user deleted successfully!"),
+    INVALID_DELETE_LOT("Lot not deleted!");
 
 
     private String description;
