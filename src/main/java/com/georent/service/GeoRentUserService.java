@@ -58,6 +58,11 @@ public class GeoRentUserService {
         return userRepository.save(user);
     }
 
+    public GeoRentUserInfoDto getUserInfo(Principal principal){
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        return mapToUserInfoDTO(geoRentUser);
+    }
+
     public List<LotDTO> getUserLots(Principal principal){
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         return lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
@@ -125,29 +130,14 @@ public class GeoRentUserService {
         }
     }
 
-
-    private LotDTO mapToLotDTO(Optional<Lot> lot) {
-        if (!lot.isEmpty()) {
-            Coordinates coordinates = lot.get().getCoordinates();
-            Description description = lot.get().getDescription();
-            Long id = lot.get().getId();
-
-            CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
-            coordinatesDTO.setLatitude(coordinates.getLatitude());
-            coordinatesDTO.setLongitude(coordinates.getLongitude());
-
-            DescriptionDTO descriptionDTO = new DescriptionDTO();
-            descriptionDTO.setItemName(description.getItemName());
-            descriptionDTO.setLotDescription(description.getLotDescription());
-            descriptionDTO.setPictureId(description.getPictureId());
-
-            LotDTO dto = new LotDTO();
-            dto.setId(id);
-            dto.setCoordinates(coordinatesDTO);
-            dto.setPrice(Math.abs(RandomUtils.nextLong()));
-            dto.setDescription(descriptionDTO);
-            return dto;
-        }
-        return null;
+    private GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser){
+        GeoRentUserInfoDto geoRentUserInfoDto = new GeoRentUserInfoDto();
+        geoRentUserInfoDto.setId(geoRentUser.getId());
+        geoRentUserInfoDto.setEmail(geoRentUser.getEmail());
+        geoRentUserInfoDto.setFirstName(geoRentUser.getFirstName());
+        geoRentUserInfoDto.setLastName(geoRentUser.getLastName());
+        geoRentUserInfoDto.setPhoneNumber(geoRentUser.getPhoneNumber());
+        geoRentUserInfoDto.setPassword(geoRentUser.getPassword());
+        return geoRentUserInfoDto;
     }
 }

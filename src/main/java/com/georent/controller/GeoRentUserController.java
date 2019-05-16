@@ -32,10 +32,15 @@ public class GeoRentUserController {
         this.userService = userService;
     }
 
+//    @GetMapping
+//    public ResponseEntity<String> getSecretResponse(Principal principal){
+//        String name = principal.getName();
+//        return ResponseEntity.ok(String.format("Hello %s.", name));
+//    }
+
     @GetMapping
-    public ResponseEntity<String> getSecretResponse(Principal principal){
-        String name = principal.getName();
-        return ResponseEntity.ok(String.format("Hello %s.", name));
+    public ResponseEntity<?> getUserInfo(Principal principal){
+        return ResponseEntity.ok(userService.getUserInfo(principal));
     }
 
     @GetMapping("/lot")
