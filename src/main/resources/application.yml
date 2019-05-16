@@ -5,6 +5,8 @@ spring:
 aws:
   secret-key: 0YEd7sI2PvzbFNcun/E6EcO9tUOey9O+xwK/nJtV
   access-key: AKIA4BDR5OXQEJFE574O
+  bucket-name: geo-rent-bucket
+  and-point-url: https://georent.ua/
 
 app:
   jwt:
