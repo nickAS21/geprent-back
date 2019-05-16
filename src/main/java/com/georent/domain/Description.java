@@ -2,12 +2,7 @@ package com.georent.domain;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -16,8 +11,9 @@ public class Description {
     @Id
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    //    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Lot lot;
 
     @Column(name = "picture_id")

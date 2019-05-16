@@ -2,16 +2,10 @@ package com.georent.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -22,22 +16,29 @@ public class Lot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
     private GeoRentUser geoRentUser;
 
-    @OneToOne(
-            mappedBy = "lot",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            optional = false)
+    //    @OneToOne(
+//            mappedBy = "lot",
+//            fetch = FetchType.LAZY,
+//            optional = false,
+//            cascade = CascadeType.ALL)
+//    @JoinColumn(unique = true)
+////    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(mappedBy = "lot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Description description;
-
-    @OneToOne(
-            mappedBy = "lot",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            optional = false)
+    //
+//            @OneToOne(
+//                    mappedBy = "lot",
+//                    fetch = FetchType.LAZY,
+//                    optional = false,
+//                    cascade = CascadeType.ALL)
+//            @JoinColumn(unique = true)
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(mappedBy = "lot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Coordinates coordinates;
 
     public void setDescription(Description description) {
@@ -45,8 +46,7 @@ public class Lot {
             if (this.description != null) {
                 this.description.setLot(null);
             }
-        }
-        else {
+        } else {
             description.setLot(this);
         }
         this.description = description;
@@ -57,8 +57,7 @@ public class Lot {
             if (this.coordinates != null) {
                 this.coordinates.setLot(null);
             }
-        }
-        else {
+        } else {
             coordinates.setLot(this);
         }
         this.coordinates = coordinates;
