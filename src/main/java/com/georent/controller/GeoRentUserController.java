@@ -1,13 +1,13 @@
 package com.georent.controller;
 
+import com.georent.dto.RegistrationLotDto;
 import com.georent.service.GeoRentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 /*
@@ -16,6 +16,7 @@ Create lot controller and service methods to save new lot and show user lots
 GeoRentUserController -> /user/lot and /user/lot/{id} endpoints
 
 42-я
+GeoRentUserController -> Post: /user/lot
 Create controller and service methods to retrieve user info, delete user, delete lot and delete all lots.
  */
 
@@ -45,6 +46,11 @@ public class GeoRentUserController {
     @GetMapping("/lot/{id}")
     public ResponseEntity<?> getUserLotId(@PathVariable(value = "id") Long lotId, Principal principal){
         return ResponseEntity.ok(userService.getUserLotId(principal, lotId));
+    }
+
+    @PostMapping("/lot")
+    public ResponseEntity<?> setUserLot(@Valid @RequestBody final RegistrationLotDto registrationLotDto, Principal principal){
+        return ResponseEntity.ok(userService.saveUserLot(principal, registrationLotDto));
     }
 
 }
