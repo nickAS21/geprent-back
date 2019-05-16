@@ -4,9 +4,10 @@ import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
-import com.georent.dto.CoordinatesDTO;
-import com.georent.dto.DescriptionDTO;
-import com.georent.dto.LotDTO;
+import com.georent.dto.*;
+import com.georent.message.Message;
+import com.georent.repository.CoordinatesRepository;
+import com.georent.repository.DescriptionRepository;
 import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
 import org.apache.commons.lang3.RandomUtils;
@@ -26,15 +27,21 @@ public class GeoRentUserService {
 
     private final transient GeoRentUserRepository userRepository;
     private final transient PasswordEncoder passwordEncoder;
-    private final LotRepository lotRepository;
+    private final transient LotRepository lotRepository;
+    private final transient CoordinatesRepository coordinatesRepository;
+    private final transient DescriptionRepository descriptionRepository;
 
     @Autowired
     public GeoRentUserService(final GeoRentUserRepository userRepository,
                               final PasswordEncoder passwordEncoder,
-                              final LotRepository lotRepository) {
+                              final LotRepository lotRepository,
+                              final CoordinatesRepository coordinatesRepository,
+                              final DescriptionRepository descriptionRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.lotRepository = lotRepository;
+        this.coordinatesRepository = coordinatesRepository;
+        this.descriptionRepository = descriptionRepository;
     }
 
     public Optional<GeoRentUser> getUserByEmail (final String email) {
@@ -65,6 +72,30 @@ public class GeoRentUserService {
         return mapToLotDTO(lot);
     }
 
+    public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto){
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        Coordinates coordinates = new Coordinates();
+        coordinates.setLatitude(registrationLotDto.getLatitude());
+        coordinates.setLongitude(registrationLotDto.getLongitude());
+        coordinates.setAddress(registrationLotDto.getAddress());
+
+        Description description = new Description();
+        description.setItemName(registrationLotDto.getItemName());
+        description.setLotDescription(registrationLotDto.getLotDescription());
+//        description.setPictureId(registrationLotDto.getItemPath());
+        description.setPictureId(1L);
+
+        Lot lot = new Lot();
+        lot.setGeoRentUser(geoRentUser);
+        lot.setCoordinates(coordinates);
+        lot.setDescription(description);
+        lotRepository.save(lot);
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
+        responseDTO.setBody(mapToLotDTO(lot));
+        return responseDTO;
+    }
+
     private LotDTO mapToLotDTO(Lot lot){
         if (lot == null) {
            return null;
@@ -77,6 +108,7 @@ public class GeoRentUserService {
             CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
             coordinatesDTO.setLatitude(coordinates.getLatitude());
             coordinatesDTO.setLongitude(coordinates.getLongitude());
+            coordinatesDTO.setAddress(coordinates.getAddress());
 
             DescriptionDTO descriptionDTO = new DescriptionDTO();
             descriptionDTO.setItemName(description.getItemName());
