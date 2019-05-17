@@ -64,7 +64,7 @@ public class GeoRentUserService {
 
     @Transactional
     public GenericResponseDTO updateUser(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
-        userRepository.save(mapToLotDTO(principal, geoRentUserUpdateDto));
+        userRepository.save(mapFromUpdateUserDTO(principal, geoRentUserUpdateDto));
         GenericResponseDTO<GeoRentUserUpdateDto> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_UPDATE_USER.getDescription());
         responseDTO.setBody(geoRentUserUpdateDto);
@@ -139,7 +139,7 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
-    private GeoRentUser mapToLotDTO(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
+    private GeoRentUser mapFromUpdateUserDTO(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         geoRentUser.setLastName(geoRentUserUpdateDto.getLastName());
         geoRentUser.setFirstName(geoRentUserUpdateDto.getFirstName());
