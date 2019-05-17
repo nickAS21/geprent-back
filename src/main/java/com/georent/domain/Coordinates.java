@@ -1,14 +1,21 @@
 package com.georent.domain;
 
 import lombok.Data;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
 @Data
 @Entity
 public class Coordinates {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Float longitude;
@@ -17,8 +24,7 @@ public class Coordinates {
 
     private String address;
 
-    //    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapsId
     private Lot lot;
 }

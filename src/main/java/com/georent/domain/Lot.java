@@ -5,7 +5,15 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
 @Getter
 @Setter
@@ -21,24 +29,16 @@ public class Lot {
     @JoinColumn(name = "user_id")
     private GeoRentUser geoRentUser;
 
-    //    @OneToOne(
-//            mappedBy = "lot",
-//            fetch = FetchType.LAZY,
-//            optional = false,
-//            cascade = CascadeType.ALL)
-//    @JoinColumn(unique = true)
-////    @OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToOne(mappedBy = "lot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "lot",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Description description;
-    //
-//            @OneToOne(
-//                    mappedBy = "lot",
-//                    fetch = FetchType.LAZY,
-//                    optional = false,
-//                    cascade = CascadeType.ALL)
-//            @JoinColumn(unique = true)
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToOne(mappedBy = "lot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToOne(mappedBy = "lot",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Coordinates coordinates;
 
     public void setDescription(Description description) {
@@ -62,20 +62,4 @@ public class Lot {
         }
         this.coordinates = coordinates;
     }
-
-//    public Long getLotId() {
-//        return lotId;
-//    }
-//
-//    public void setLotId(final Long lotId) {
-//        this.lotId = lotId;
-//    }
-//
-//    public GeoRentUser getGeoRentUser() {
-//        return geoRentUser;
-//    }
-//
-//    public void setGeoRentUser(final GeoRentUser geoRentUser) {
-//        this.geoRentUser = geoRentUser;
-//    }
 }
