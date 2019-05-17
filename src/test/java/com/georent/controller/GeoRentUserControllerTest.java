@@ -1,6 +1,9 @@
 package com.georent.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.georent.GeoRentStarter;
+import com.georent.dto.GeoRentUserUpdateDto;
+import com.georent.dto.RegistrationLotDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +27,7 @@ public class GeoRentUserControllerTest {
     @Autowired
     private GeoRentUserController controllerToTest;
 
+    ObjectMapper mapper = new ObjectMapper();
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -43,12 +47,16 @@ public class GeoRentUserControllerTest {
     }
 
     @Test
-    public void updateUser_mapping_patch_user_Return_Status_isBadRequest () throws Exception {
-        mockMvc.perform(patch("/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
+    public void updateUser_mapping_patch_user_Return_Status_ok () throws Exception {
+        GeoRentUserUpdateDto reqest = new GeoRentUserUpdateDto();
+        reqest.setFirstName("firstName");
+        reqest.setLastName("lastName");
+        reqest.setPhoneNumber("123456789012");
+
+        mockMvc.perform(patch("/user").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(reqest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
                 .andReturn();
     }
 
@@ -83,12 +91,20 @@ public class GeoRentUserControllerTest {
     }
 
     @Test
-    public void setUserLot_mapping_post_user_lot_Return_Status_isBadRequest() throws Exception {
+    public void setUserLot_mapping_post_user_lot_Return_Status_ok() throws Exception {
+        RegistrationLotDto reqest = new RegistrationLotDto();
+        reqest.setLatitude(801.800f);
+        reqest.setLongitude(901.900f);
+        reqest.setAddress("100 Киев 14");
+        reqest.setItemPath("d:tmp/dc/2.png");
+        reqest.setItemName("itemName2");
+        reqest.setLotDescription("lotDescription2 lotDescription lotDescription");
+
         mockMvc.perform(post("/user/lot")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
+                .content(mapper.writeValueAsString(reqest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
                 .andReturn();
     }
 
