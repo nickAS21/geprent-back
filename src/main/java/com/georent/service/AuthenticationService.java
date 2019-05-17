@@ -4,9 +4,7 @@ import com.georent.config.JwtConfigurationProperties;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.GeoRentUserDetails;
 import com.georent.domain.UserRole;
-import com.georent.dto.AuthenticationResponseDTO;
-import com.georent.dto.LoginRequestDTO;
-import com.georent.dto.RegistrationRequestDTO;
+import com.georent.dto.*;
 import com.georent.exception.UserRegistrationException;
 import com.georent.message.Message;
 import com.georent.security.JwtProvider;
@@ -81,5 +79,23 @@ public class AuthenticationService {
         user.setPhoneNumber(registerUserRequest.getPhoneNumber());
         return userService.saveNewUser(user);
     }
+
+    public GenericResponseDTO registerUser(final RegistrationRequestDTO registerUserRequest) {
+        GeoRentUser geoRentUser = registerNewUserAccount(registerUserRequest);
+        GenericResponseDTO<GeoRentUserDTO> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_REGISTRATION.getDescription());
+        responseDTO.setBody(mapToGeoRentUserDTO(geoRentUser));
+        return responseDTO;
+    }
+
+
+    private GeoRentUserDTO mapToGeoRentUserDTO(GeoRentUser user){
+        GeoRentUserDTO dto = new GeoRentUserDTO();
+        dto.setEmail(user.getEmail());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        return dto;
+    }
+
 
 }

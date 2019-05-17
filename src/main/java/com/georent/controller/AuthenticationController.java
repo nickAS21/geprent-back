@@ -41,18 +41,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody final RegistrationRequestDTO signUpRequest) {
-        GeoRentUser geoRentUser = authService.registerNewUserAccount(signUpRequest);
-        GenericResponseDTO<GeoRentUserDTO> responseDTO = new GenericResponseDTO<>();
-        responseDTO.setMessage(Message.SUCCESS_REGISTRATION.getDescription());
-        responseDTO.setBody(mapToGeoRentUserDTO(geoRentUser));
-        return status(CREATED).body(responseDTO);
+        return status(CREATED).body(authService.registerUser(signUpRequest));
     }
 
-    private GeoRentUserDTO mapToGeoRentUserDTO(GeoRentUser user){
-        GeoRentUserDTO dto = new GeoRentUserDTO();
-        dto.setEmail(user.getEmail());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        return dto;
-    }
 }
