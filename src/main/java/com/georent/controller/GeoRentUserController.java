@@ -32,6 +32,11 @@ public class GeoRentUserController {
         return ResponseEntity.ok(userService.updateUser(principal, geoRentUserUpdateDto));
     }
 
+    @DeleteMapping
+    public ResponseEntity<?> deletetUser(Principal principal){
+        return ResponseEntity.ok(userService.deleteUser(principal));
+    }
+
     @GetMapping("/lots")
     public ResponseEntity<?> getUserLots(Principal principal){
         return ResponseEntity.ok(userService.getUserLots(principal));
@@ -45,12 +50,6 @@ public class GeoRentUserController {
     @PostMapping("/lot")
     public ResponseEntity<?> setUserLot(@Valid @RequestBody final RegistrationLotDto registrationLotDto, Principal principal){
         return ResponseEntity.ok(userService.saveUserLot(principal, registrationLotDto));
-    }
-
-
-    @DeleteMapping
-    public ResponseEntity<?> deletetUser(Principal principal){
-        return ResponseEntity.ok(userService.deleteUser(principal));
     }
 
     @DeleteMapping ("/lot/{id}")
