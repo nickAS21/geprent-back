@@ -4,12 +4,7 @@ import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
-import com.georent.dto.GeoRentUserInfoDto;
-import com.georent.dto.LotDTO;
-import com.georent.dto.GenericResponseDTO;
-import com.georent.dto.RegistrationLotDto;
-import com.georent.dto.CoordinatesDTO;
-import com.georent.dto.DescriptionDTO;
+import com.georent.dto.*;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
 import com.georent.repository.DescriptionRepository;
@@ -65,6 +60,15 @@ public class GeoRentUserService {
     public GeoRentUserInfoDto getUserInfo(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         return mapToUserInfoDTO(geoRentUser);
+    }
+
+    @Transactional
+    public GenericResponseDTO updateUser(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
+        userRepository.save(mapToLotDTO(principal, geoRentUserUpdateDto));
+        GenericResponseDTO<GeoRentUserUpdateDto> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_UPDATE_USER.getDescription());
+        responseDTO.setBody(geoRentUserUpdateDto);
+        return responseDTO;
     }
 
     public List<LotDTO> getUserLots(Principal principal) {
@@ -133,6 +137,14 @@ public class GeoRentUserService {
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_DELETE_LOTS.getDescription());
         return responseDTO;
+    }
+
+    private GeoRentUser mapToLotDTO(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        geoRentUser.setLastName(geoRentUserUpdateDto.getLastName());
+        geoRentUser.setFirstName(geoRentUserUpdateDto.getFirstName());
+        geoRentUser.setPhoneNumber(geoRentUserUpdateDto.getPhoneNumber());
+        return geoRentUser;
     }
 
     private LotDTO mapToLotDTO(Lot lot) {

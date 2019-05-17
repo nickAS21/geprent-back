@@ -1,5 +1,6 @@
 package com.georent.controller;
 
+import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.RegistrationLotDto;
 import com.georent.service.GeoRentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class GeoRentUserController {
     @GetMapping
     public ResponseEntity<?> getUserInfo(Principal principal){
         return ResponseEntity.ok(userService.getUserInfo(principal));
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> updateUser(@RequestBody GeoRentUserUpdateDto geoRentUserUpdateDto, Principal principal) {
+        return ResponseEntity.ok(userService.updateUser(principal, geoRentUserUpdateDto));
     }
 
     @GetMapping("/lots")
