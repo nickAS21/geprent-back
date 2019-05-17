@@ -35,21 +35,21 @@ public class FileHandler {
     }
 
     private void uploadFileTos3bucket(String fileName, File file) {
-        awss3Service.s3client.putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file)
+        awss3Service.getS3client().putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-    public String uploadFile(MultipartFile multipartFile) {
-
+    public String uploadFile(MultipartFile multipartFile) throws IOException {
         String fileUrl = "";
-        try {
+        if(convertMultiPartToFile(multipartFile)==null){
+            throw new IOException("file does not exist!");
+        }
+        else{
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile);
             fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
             uploadFileTos3bucket(fileName, file);
             file.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return fileUrl;
     }

@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Data
 @Component
 @ConfigurationProperties(prefix = "aws")
 public class S3Properties {

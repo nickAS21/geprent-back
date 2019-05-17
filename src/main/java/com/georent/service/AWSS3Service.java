@@ -14,10 +14,16 @@ public class AWSS3Service {
     @Autowired
     private GeoRentS3Credentials credentials;
 
-    public AmazonS3 s3client = AmazonS3ClientBuilder
+    private AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials))
             .withRegion(Regions.EU_WEST_1)
             .build();
 
+    public AmazonS3 getS3client() {
+        return s3client;
+    }
 }
+
+
+
