@@ -13,8 +13,8 @@ import java.util.Date;
 
 public class FileHandler {
 
-    AWSS3Service awss3Service;
-    S3Properties s3Properties;
+    private final AWSS3Service awss3Service;
+    private final S3Properties s3Properties;
 
     @Autowired
     public FileHandler(AWSS3Service awss3Service, S3Properties s3Properties) {
@@ -39,7 +39,7 @@ public class FileHandler {
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-    public String uploadFile(MultipartFile multipartFile) throws IOException {
+    private String uploadFile(MultipartFile multipartFile) throws IOException {
         String fileUrl = "";
         if(convertMultiPartToFile(multipartFile)==null){
             throw new IOException("file does not exist!");
