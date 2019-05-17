@@ -4,7 +4,12 @@ import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
-import com.georent.dto.*;
+import com.georent.dto.GeoRentUserInfoDto;
+import com.georent.dto.LotDTO;
+import com.georent.dto.GenericResponseDTO;
+import com.georent.dto.RegistrationLotDto;
+import com.georent.dto.CoordinatesDTO;
+import com.georent.dto.DescriptionDTO;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
 import com.georent.repository.DescriptionRepository;
@@ -12,8 +17,6 @@ import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,26 +48,26 @@ public class GeoRentUserService {
         this.descriptionRepository = descriptionRepository;
     }
 
-    public Optional<GeoRentUser> getUserByEmail (final String email) {
+    public Optional<GeoRentUser> getUserByEmail(final String email) {
         return userRepository.findByEmail(email);
     }
 
-    public Boolean existsUserByEmail (final String email) {
+    public Boolean existsUserByEmail(final String email) {
         return userRepository.existsByEmail(email);
     }
 
     @Transactional
-    public GeoRentUser saveNewUser (final GeoRentUser user) {
+    public GeoRentUser saveNewUser(final GeoRentUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
-    public GeoRentUserInfoDto getUserInfo(Principal principal){
+    public GeoRentUserInfoDto getUserInfo(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         return mapToUserInfoDTO(geoRentUser);
     }
 
-    public List<LotDTO> getUserLots(Principal principal){
+    public List<LotDTO> getUserLots(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         return lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
                 .stream()
@@ -72,15 +75,15 @@ public class GeoRentUserService {
                 .collect(Collectors.toList());
     }
 
-    public LotDTO getUserLotId(Principal principal, long id){
+    public LotDTO getUserLotId(Principal principal, long id) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId());
+        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId()).orElseThrow(RuntimeException::new);
         return mapToLotDTO(lot);
     }
 
 
     @Transactional
-    public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto){
+    public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         Lot lot = new Lot();
         lot.setGeoRentUser(geoRentUser);
@@ -103,7 +106,7 @@ public class GeoRentUserService {
     }
 
     @Transactional
-    public GenericResponseDTO  deleteUser(Principal principal){
+    public GenericResponseDTO deleteUser(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
@@ -114,41 +117,25 @@ public class GeoRentUserService {
 
 
     @Transactional
-    public GenericResponseDTO deleteteUserLotId(Principal principal, long id){
+    public GenericResponseDTO deleteteUserLotId(Principal principal, long id) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId());
+        lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId()).orElseThrow(RuntimeException::new);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
-        if (lot != null) {
-            try {
-//                lotRepository.deleteById(id);
-                lotRepository.deleteLotsByIdAndGeoRentUser_Id(id, geoRentUser.getId());
-            }
-            catch (EmptyResultDataAccessException e) {
-                e.printStackTrace();
-            }
-            responseDTO.setMessage(Message.SUCCESS_DELETE_LOT.getDescription());
-
-        }
-        else {
-            responseDTO.setMessage(Message.INVALID_DELETE_LOT.getDescription() );
-        }
+        lotRepository.deleteLotsByIdAndGeoRentUser_Id(id, geoRentUser.getId());
+        responseDTO.setMessage(Message.SUCCESS_DELETE_LOT.getDescription());
         return responseDTO;
     }
 
     @Transactional
-    public GenericResponseDTO deleteteUserLotAll(Principal principal){
+    public GenericResponseDTO deleteteUserLotAll(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
-        responseDTO.setMessage(Message.SUCCESS_DELETE_LOTS.getDescription() );
+        responseDTO.setMessage(Message.SUCCESS_DELETE_LOTS.getDescription());
         return responseDTO;
     }
 
-    private LotDTO mapToLotDTO(Lot lot){
-        if (lot == null) {
-           return null;
-        }
-        else {
+    private LotDTO mapToLotDTO(Lot lot) {
             LotDTO dto = new LotDTO();
             Long id = lot.getId();
             dto.setId(id);
@@ -167,12 +154,12 @@ public class GeoRentUserService {
                 descriptionDTO.setItemName(description.getItemName());
                 descriptionDTO.setLotDescription(description.getLotDescription());
                 descriptionDTO.setPictureId(description.getPictureId());
-                dto.setDescription(descriptionDTO);           }
+                dto.setDescription(descriptionDTO);
+            }
             return dto;
-        }
     }
 
-    private GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser){
+    private GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
         GeoRentUserInfoDto geoRentUserInfoDto = new GeoRentUserInfoDto();
         geoRentUserInfoDto.setId(geoRentUser.getId());
         geoRentUserInfoDto.setEmail(geoRentUser.getEmail());

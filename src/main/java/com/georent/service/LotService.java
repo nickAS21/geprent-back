@@ -34,13 +34,8 @@ public class LotService {
     }
 
     public LotDTO getLotDto(Long id) {
-        Optional<Lot> lot = lotRepository.findById(id);
+        Lot lot = lotRepository.findById(id).orElseThrow(RuntimeException::new);
         return mapToLotDTO(lot);
-    }
-
-    @Transactional
-    public Lot saveNewLot(final Lot lot) {
-        return lotRepository.save(lot);
     }
 
     private LotDTO mapToShortLotDTO(Lot lot) {
@@ -62,11 +57,10 @@ public class LotService {
         return dto;
     }
 
-    private LotDTO mapToLotDTO(Optional<Lot> lot) {
-        if (!lot.isEmpty()) {
-            Coordinates coordinates = lot.get().getCoordinates();
-            Description description = lot.get().getDescription();
-            Long id = lot.get().getId();
+    private LotDTO mapToLotDTO(Lot lot) {
+            Coordinates coordinates = lot.getCoordinates();
+            Description description = lot.getDescription();
+            Long id = lot.getId();
 
             CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
             coordinatesDTO.setLatitude(coordinates.getLatitude());
@@ -83,8 +77,6 @@ public class LotService {
             dto.setPrice(Math.abs(RandomUtils.nextLong()));
             dto.setDescription(descriptionDTO);
             return dto;
-        }
-        return null;
     }
 
 }

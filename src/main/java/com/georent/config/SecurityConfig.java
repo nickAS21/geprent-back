@@ -77,7 +77,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/login**",
                         "/register**",
-                        "/lot**",
                         "/lot/**",
                         "/console/**",
                         "/v2/api-docs",

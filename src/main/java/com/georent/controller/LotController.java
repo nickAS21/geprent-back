@@ -14,7 +14,7 @@ import static org.springframework.http.ResponseEntity.status;
 @RequestMapping("lot")
 public class LotController {
 
-    private final transient LotService lotService;
+    private final LotService lotService;
 
     @Autowired
     public LotController(final LotService lotService) {

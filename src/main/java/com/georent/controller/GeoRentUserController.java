@@ -10,17 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.security.Principal;
 
-/*
-41-я
-Create lot controller and service methods to save new lot and show user lots
-GeoRentUserController -> /user/lot and /user/lot/{id} endpoints
-
-42-я
-GeoRentUserController -> Post: /user/lot
-Create controller and service methods to retrieve user info, delete user, delete lot and delete all lots.
- */
-
-
 @Controller
 @RequestMapping("user")
 public class GeoRentUserController {
@@ -31,12 +20,6 @@ public class GeoRentUserController {
     public GeoRentUserController(final GeoRentUserService userService) {
         this.userService = userService;
     }
-
-//    @GetMapping
-//    public ResponseEntity<String> getSecretResponse(Principal principal){
-//        String name = principal.getName();
-//        return ResponseEntity.ok(String.format("Hello %s.", name));
-//    }
 
     @GetMapping
     public ResponseEntity<?> getUserInfo(Principal principal){
