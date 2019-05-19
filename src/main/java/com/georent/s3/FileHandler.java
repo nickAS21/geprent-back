@@ -15,12 +15,12 @@ import java.util.Date;
 @Component
 public class FileHandler {
 
-    private final GeoRentS3Credentials geoRentS3Credentials;
+    private final AWSS3Service awss3Service;
     private final S3Properties s3Properties;
 
     @Autowired
-    public FileHandler(GeoRentS3Credentials geoRentS3Credentials, S3Properties s3Properties) {
-        this.geoRentS3Credentials = geoRentS3Credentials;
+    public FileHandler(AWSS3Service awss3Service, S3Properties s3Properties) {
+        this.awss3Service = awss3Service;
         this.s3Properties = s3Properties;
     }
 
@@ -37,7 +37,7 @@ public class FileHandler {
     }
 
     private void uploadFileTos3bucket(String fileName, File file) {
-        geoRentS3Credentials.getS3client().putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file)
+        awss3Service.getS3client().putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 

@@ -8,13 +8,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
 public class GeoRentS3Credentials implements AWSCredentials {
 
-    private final S3Properties properties;
+    private S3Properties properties;
 
 @Autowired
     public GeoRentS3Credentials(S3Properties properties) {
@@ -46,10 +47,14 @@ public class GeoRentS3Credentials implements AWSCredentials {
             getAWSSecretKey()
     );
 
-    private AmazonS3 s3client = AmazonS3ClientBuilder
-            .standard()
-            .withCredentials(new AWSStaticCredentialsProvider(credentials))
-            .withRegion(Regions.EU_WEST_1)
-            .build();
+//@Bean
+//public AmazonS3 createAmazonS3Client() {
+//    AmazonS3 s3client = AmazonS3ClientBuilder
+//            .standard()
+//            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+//            .withRegion(Regions.EU_WEST_1)
+//            .build();
+//    return s3client;
+//}
 
 }
