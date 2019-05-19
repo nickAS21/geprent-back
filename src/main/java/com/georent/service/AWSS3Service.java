@@ -15,8 +15,6 @@ public class AWSS3Service {
     @Autowired
     private GeoRentS3Credentials geoRentS3credentials;
 
-
-
     private AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
             .withCredentials(new AWSStaticCredentialsProvider(geoRentS3credentials.getCredentials()))
