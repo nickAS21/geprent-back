@@ -38,7 +38,7 @@ public class LotService {
         return mapToLotDTO(lot);
     }
 
-    private LotDTO mapToShortLotDTO(Lot lot) {
+    public LotDTO mapToShortLotDTO(Lot lot) {
         Coordinates coordinates = lot.getCoordinates();
         Description description = lot.getDescription();
         Long id = lot.getId();
@@ -57,7 +57,7 @@ public class LotService {
         return dto;
     }
 
-    private LotDTO mapToLotDTO(Lot lot) {
+    public LotDTO mapToLotDTO(Lot lot) {
             Coordinates coordinates = lot.getCoordinates();
             Description description = lot.getDescription();
             Long id = lot.getId();
