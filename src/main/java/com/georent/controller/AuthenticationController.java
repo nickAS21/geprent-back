@@ -1,12 +1,8 @@
 package com.georent.controller;
 
-import com.georent.domain.GeoRentUser;
 import com.georent.dto.AuthenticationResponseDTO;
-import com.georent.dto.GenericResponseDTO;
-import com.georent.dto.GeoRentUserDTO;
 import com.georent.dto.LoginRequestDTO;
 import com.georent.dto.RegistrationRequestDTO;
-import com.georent.message.Message;
 import com.georent.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

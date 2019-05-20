@@ -90,6 +90,7 @@ public class GeoRentUserService {
     public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         Lot lot = new Lot();
+        lot.setPrice(registrationLotDto.getPrice());
         lot.setGeoRentUser(geoRentUser);
         Coordinates coordinates = new Coordinates();
         coordinates.setLatitude(registrationLotDto.getLatitude());
@@ -151,7 +152,7 @@ public class GeoRentUserService {
             LotDTO dto = new LotDTO();
             Long id = lot.getId();
             dto.setId(id);
-            dto.setPrice(Math.abs(RandomUtils.nextLong()));
+            dto.setPrice(lot.getPrice());
             if (lot.getCoordinates() != null) {
                 Coordinates coordinates = lot.getCoordinates();
                 CoordinatesDTO coordinatesDTO = new CoordinatesDTO();

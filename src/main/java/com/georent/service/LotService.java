@@ -73,8 +73,8 @@ public class LotService {
 
             LotDTO dto = new LotDTO();
             dto.setId(id);
+            dto.setPrice(lot.getPrice());
             dto.setCoordinates(coordinatesDTO);
-            dto.setPrice(Math.abs(RandomUtils.nextLong()));
             dto.setDescription(descriptionDTO);
             return dto;
     }
