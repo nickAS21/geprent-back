@@ -10,11 +10,6 @@ import com.georent.repository.LotRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -25,25 +20,18 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
 public class LotServiceTest {
 
-    @MockBean
     LotService serviceToTest;
 
-    @Autowired
-    private LotController mockController;
+    private LotController mockController = mock(LotController.class);
 
-    @Autowired
-    private LotRepository mockRepository;
+    private LotRepository mockRepository = mock(LotRepository.class);
 
     private MockMvc mockMvc;
 
     @Before
     public void setup() {
-        mockController = mock(LotController.class);
-        mockRepository = mock(LotRepository.class);
         serviceToTest = new LotService(mockRepository);
         this.mockMvc = MockMvcBuilders.standaloneSetup(mockController).build();
     }
@@ -70,7 +58,7 @@ public class LotServiceTest {
         GeoRentUser user = new GeoRentUser();
         user.setId(1L);
         user.setFirstName("firstName");
-        user.setFirstName("lastName");
+        user.setLastName("lastName");
         user.setEmail("mkyong@gmail23.com.aa");
         user.setPassword("pass5678910");
         user.setPhoneNumber("123456789012");
