@@ -165,7 +165,6 @@ public class GeoRentUserService {
         geoRentUserInfoDto.setFirstName(geoRentUser.getFirstName());
         geoRentUserInfoDto.setLastName(geoRentUser.getLastName());
         geoRentUserInfoDto.setPhoneNumber(geoRentUser.getPhoneNumber());
-        geoRentUserInfoDto.setPassword(geoRentUser.getPassword());
         return geoRentUserInfoDto;
     }
 
