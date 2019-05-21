@@ -89,21 +89,7 @@ public class GeoRentUserService {
     @Transactional
     public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        Lot lot = new Lot();
-        lot.setPrice(registrationLotDto.getPrice());
-        lot.setGeoRentUser(geoRentUser);
-        Coordinates coordinates = new Coordinates();
-        coordinates.setLatitude(registrationLotDto.getLatitude());
-        coordinates.setLongitude(registrationLotDto.getLongitude());
-        coordinates.setAddress(registrationLotDto.getAddress());
-        lot.setCoordinates(coordinates);
-        Description description = new Description();
-        description.setItemName(registrationLotDto.getItemName());
-        description.setLotDescription(registrationLotDto.getLotDescription());
-//        description.setPictureId(registrationLotDto.getItemPath());
-        description.setPictureId(1L);
-        lot.setDescription(description);
-        lotRepository.save(lot);
+        Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
         responseDTO.setBody(mapToLotDTO(lot));
@@ -113,9 +99,9 @@ public class GeoRentUserService {
     @Transactional
     public GenericResponseDTO deleteUser(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
         userRepository.delete(geoRentUser);
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_DELETE_USER.getDescription());
         return responseDTO;
     }
@@ -125,8 +111,8 @@ public class GeoRentUserService {
     public GenericResponseDTO deleteteUserLotId(Principal principal, long id) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId()).orElseThrow(RuntimeException::new);
+        lotRepository.deleteById(id);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
-        lotRepository.deleteLotsByIdAndGeoRentUser_Id(id, geoRentUser.getId());
         responseDTO.setMessage(Message.SUCCESS_DELETE_LOT.getDescription());
         return responseDTO;
     }
@@ -148,7 +134,7 @@ public class GeoRentUserService {
         return geoRentUser;
     }
 
-    private LotDTO mapToLotDTO(Lot lot) {
+    public LotDTO mapToLotDTO(Lot lot) {
             LotDTO dto = new LotDTO();
             Long id = lot.getId();
             dto.setId(id);
@@ -172,7 +158,7 @@ public class GeoRentUserService {
             return dto;
     }
 
-    private GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
+    public GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
         GeoRentUserInfoDto geoRentUserInfoDto = new GeoRentUserInfoDto();
         geoRentUserInfoDto.setId(geoRentUser.getId());
         geoRentUserInfoDto.setEmail(geoRentUser.getEmail());
@@ -181,5 +167,23 @@ public class GeoRentUserService {
         geoRentUserInfoDto.setPhoneNumber(geoRentUser.getPhoneNumber());
         geoRentUserInfoDto.setPassword(geoRentUser.getPassword());
         return geoRentUserInfoDto;
+    }
+
+    private Lot mapRegistrationLotDtoToLot(RegistrationLotDto registrationLotDto, GeoRentUser geoRentUser) {
+        Lot lot = new Lot();
+        lot.setPrice(registrationLotDto.getPrice());
+        lot.setGeoRentUser(geoRentUser);
+        Coordinates coordinates = new Coordinates();
+        coordinates.setLatitude(registrationLotDto.getLatitude());
+        coordinates.setLongitude(registrationLotDto.getLongitude());
+        coordinates.setAddress(registrationLotDto.getAddress());
+        lot.setCoordinates(coordinates);
+        Description description = new Description();
+        description.setItemName(registrationLotDto.getItemName());
+        description.setLotDescription(registrationLotDto.getLotDescription());
+//        description.setPictureId(registrationLotDto.getItemPath());
+        description.setPictureId(1L);
+        lot.setDescription(description);
+        return lot;
     }
 }
