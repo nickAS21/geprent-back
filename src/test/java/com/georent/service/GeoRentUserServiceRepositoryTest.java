@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class GeoRentUserControllerServiceTest {
+public class GeoRentUserServiceRepositoryTest {
 
     GeoRentUserService userService;
 
