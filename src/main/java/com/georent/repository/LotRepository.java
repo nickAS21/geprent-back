@@ -10,6 +10,5 @@ public interface LotRepository extends JpaRepository<Lot, Long> {
 
     List<Lot> findAllByGeoRentUser_Id(Long userId);
     Optional<Lot> findByIdAndGeoRentUser_Id(Long id, Long userId);
-    void deleteLotsByIdAndGeoRentUser_Id(Long id, Long userId);
     void deleteAllByGeoRentUser_Id(Long userId);
 }
