@@ -1,16 +1,11 @@
 package com.georent.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.georent.GeoRentStarter;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.RegistrationLotDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -19,20 +14,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = GeoRentStarter.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GeoRentUserControllerTest {
 
-    @Autowired
-    private GeoRentUserController controllerToTest;
+    private GeoRentUserController controllerToTest = mock(GeoRentUserController.class);
 
     ObjectMapper mapper = new ObjectMapper();
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        controllerToTest = mock(GeoRentUserController.class);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controllerToTest).build();
     }
 
