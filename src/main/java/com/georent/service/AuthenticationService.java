@@ -24,7 +24,7 @@ import java.util.Collections;
 @Service
 public class AuthenticationService {
 
-    private static final String BEARER = "Bearer ";
+    public static final String BEARER = "Bearer ";
 
     private final transient AuthenticationManager authManager;
     private final transient JwtProvider jwtProvider;

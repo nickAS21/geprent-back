@@ -4,6 +4,7 @@ import com.georent.config.JwtConfigurationProperties;
 import com.georent.controller.AuthenticationController;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.GeoRentUserDetails;
+import com.georent.domain.UserRole;
 import com.georent.dto.AuthenticationResponseDTO;
 import com.georent.dto.GenericResponseDTO;
 import com.georent.dto.LoginRequestDTO;
@@ -31,11 +32,11 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.trim;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class AuthenticationServiceTest {
-
     private AuthenticationService authenticationService;
 
     private AuthenticationController mockAuthenticationController = mock(AuthenticationController.class);
@@ -46,6 +47,8 @@ public class AuthenticationServiceTest {
 
     private MockMvc mockMvc;
     private String passPrincipal = "$2a$10$2O/w2twGJFNoLcnlOyJp0..IeZ2Wn3JXNts2wC62FT/TgTlQ9oqO6";
+    private String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4NTM5MDQ0LCJleHAiOjE1NTg1NDI2NDN9.Kev4frNcpJNL6XhhFq5vdkN0qzsGfLPwTGGA7mLOtmv3e4YXMuXXnFMdhArxVV1qidu_7Z7wjQ2uxq6vyLJgTg";
+    private Long expiresIn = 3600000L;
 
     @Before
     public void setup() {
@@ -77,6 +80,7 @@ public class AuthenticationServiceTest {
             when(mockUserService.existsUserByEmail(any(String.class))).thenReturn(true);
             authenticationService.registerNewUserAccount(registerUserRequest);
         });
+        verify(mockUserService, times(1)).existsUserByEmail(any(String.class));
         Assert.assertEquals(userRegistrationException.getMessage(), Message.REGISTRATION_USER_ERROR.getDescription());
     }
 
@@ -90,13 +94,20 @@ public class AuthenticationServiceTest {
         HttpServletResponse response = getHttpServletResponse();
         Authentication authentication = getAuthentication(principal);
 
-        when(jwtProperties.getExpiresIn()).thenReturn(3600000L);
-        when(jwtProvider.generateAccessToken(any(GeoRentUserDetails.class))).thenReturn(passPrincipal);
+        when(jwtProperties.getExpiresIn()).thenReturn(expiresIn);
+        when(jwtProvider.generateAccessToken(any(GeoRentUserDetails.class))).thenReturn(accessToken);
         when(mockAuthManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()))).thenReturn(authentication);
         when(mockUserService.getUserByEmail(loginRequest.getEmail())).thenReturn(Optional.of(geoRentUser));
         AuthenticationResponseDTO authenticationResponseDTO = authenticationService.loginUser(loginRequest,
                 response);
+        verify(jwtProperties, times(1)).getExpiresIn();
+        verify(jwtProvider, times(1)).generateAccessToken(any(GeoRentUserDetails.class));
+        verify(mockUserService, times(1)).getUserByEmail(loginRequest.getEmail());
+        Assert.assertEquals(authenticationResponseDTO.getAccessToken(), accessToken);
+        Assert.assertEquals(authenticationResponseDTO.getTokenType(), trim(authenticationService.BEARER));
+        Assert.assertEquals(authenticationResponseDTO.getExpiresIn(), expiresIn);
+        Assert.assertEquals(authenticationResponseDTO.getRole().toArray()[0], UserRole.USER);
     }
 
     private RegistrationRequestDTO getRegistrationRequestDTO() {
