@@ -10,8 +10,6 @@ import com.georent.repository.LotRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,36 +20,31 @@ import static org.mockito.Mockito.*;
 
 public class LotServiceTest {
 
-    LotService serviceToTest;
-
-    private LotController mockController = mock(LotController.class);
+    LotService lotService;
 
     private LotRepository mockRepository = mock(LotRepository.class);
 
-    private MockMvc mockMvc;
-
     @Before
     public void setup() {
-        serviceToTest = new LotService(mockRepository);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(mockController).build();
+        lotService = new LotService(mockRepository);
     }
 
     @Test
     public void Wgen_Service_GetAllLots_Return_AllLotsDto() {
         List<Lot> lots = Arrays.asList(getLot ());
         when(mockRepository.findAll()).thenReturn(lots);
-        List<LotDTO> lotDTOSOut = serviceToTest.getLotsDto();
+        List<LotDTO> lotDTOSOut = lotService.getLotsDto();
         verify(mockRepository, times(1)).findAll();
-        List<LotDTO> lotDTOSIn = Arrays.asList(serviceToTest.mapToShortLotDTO(getLot()));
+        List<LotDTO> lotDTOSIn = Arrays.asList(lotService.mapToShortLotDTO(getLot()));
         Assert.assertEquals(lotDTOSIn,lotDTOSOut);
     }
 
     @Test
     public void When_Service_getLotDto_Id_One_Return_LotDto_Id_One() {
         when(mockRepository.findById(any(Long.class))).thenReturn(Optional.of(getLot()));
-        LotDTO lotDTO = serviceToTest.getLotDto(1L);
+        LotDTO lotDTO = lotService.getLotDto(1L);
         verify(mockRepository, times(1)).findById(any(Long.class));
-        Assert.assertEquals(lotDTO,serviceToTest.mapToLotDTO(getLot()));
+        Assert.assertEquals(lotDTO, lotService.mapToLotDTO(getLot()));
     }
 
     private Lot getLot () {

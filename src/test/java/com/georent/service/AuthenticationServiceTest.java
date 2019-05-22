@@ -1,7 +1,6 @@
 package com.georent.service;
 
 import com.georent.config.JwtConfigurationProperties;
-import com.georent.controller.AuthenticationController;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.GeoRentUserDetails;
 import com.georent.domain.UserRole;
@@ -20,8 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -39,13 +36,11 @@ import static org.mockito.Mockito.*;
 public class AuthenticationServiceTest {
     private AuthenticationService authenticationService;
 
-    private AuthenticationController mockAuthenticationController = mock(AuthenticationController.class);
     private AuthenticationManager mockAuthManager = mock(AuthenticationManager.class);
-    private JwtProvider jwtProvider = mock(JwtProvider.class);
-    private JwtConfigurationProperties jwtProperties = mock(JwtConfigurationProperties.class);
+    private JwtProvider mockJwtProvider = mock(JwtProvider.class);
+    private JwtConfigurationProperties mockJwtProperties = mock(JwtConfigurationProperties.class);
     private GeoRentUserService mockUserService = mock(GeoRentUserService.class);
 
-    private MockMvc mockMvc;
     private String passPrincipal = "$2a$10$2O/w2twGJFNoLcnlOyJp0..IeZ2Wn3JXNts2wC62FT/TgTlQ9oqO6";
     private String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4NTM5MDQ0LCJleHAiOjE1NTg1NDI2NDN9.Kev4frNcpJNL6XhhFq5vdkN0qzsGfLPwTGGA7mLOtmv3e4YXMuXXnFMdhArxVV1qidu_7Z7wjQ2uxq6vyLJgTg";
     private Long expiresIn = 3600000L;
@@ -54,10 +49,9 @@ public class AuthenticationServiceTest {
     public void setup() {
         authenticationService = new AuthenticationService(
                 this.mockAuthManager,
-                this.jwtProvider,
-                this.jwtProperties,
+                this.mockJwtProvider,
+                this.mockJwtProperties,
                 this.mockUserService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(mockAuthenticationController).build();
     }
 
     @Test
@@ -94,15 +88,15 @@ public class AuthenticationServiceTest {
         HttpServletResponse response = getHttpServletResponse();
         Authentication authentication = getAuthentication(principal);
 
-        when(jwtProperties.getExpiresIn()).thenReturn(expiresIn);
-        when(jwtProvider.generateAccessToken(any(GeoRentUserDetails.class))).thenReturn(accessToken);
+        when(mockJwtProperties.getExpiresIn()).thenReturn(expiresIn);
+        when(mockJwtProvider.generateAccessToken(any(GeoRentUserDetails.class))).thenReturn(accessToken);
         when(mockAuthManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()))).thenReturn(authentication);
         when(mockUserService.getUserByEmail(loginRequest.getEmail())).thenReturn(Optional.of(geoRentUser));
         AuthenticationResponseDTO authenticationResponseDTO = authenticationService.loginUser(loginRequest,
                 response);
-        verify(jwtProperties, times(1)).getExpiresIn();
-        verify(jwtProvider, times(1)).generateAccessToken(any(GeoRentUserDetails.class));
+        verify(mockJwtProperties, times(1)).getExpiresIn();
+        verify(mockJwtProvider, times(1)).generateAccessToken(any(GeoRentUserDetails.class));
         verify(mockUserService, times(1)).getUserByEmail(loginRequest.getEmail());
         Assert.assertEquals(authenticationResponseDTO.getAccessToken(), accessToken);
         Assert.assertEquals(authenticationResponseDTO.getTokenType(), trim(authenticationService.BEARER));
