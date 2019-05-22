@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.util.Date;
 
 @Component
-public class FileHandler {
+public class UploadObject {
 
     private final AWSS3Service awss3Service;
     private final S3Properties s3Properties;
 
     @Autowired
-    public FileHandler(AWSS3Service awss3Service, S3Properties s3Properties) {
+    public UploadObject(AWSS3Service awss3Service, S3Properties s3Properties) {
         this.awss3Service = awss3Service;
         this.s3Properties = s3Properties;
     }
@@ -37,16 +37,14 @@ public class FileHandler {
     }
 
     private void uploadFileTos3bucket(String fileName, File file) {
-        awss3Service.getS3client().putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        awss3Service.getS3client().putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         String fileUrl = "";
-        if(convertMultiPartToFile(multipartFile)==null){
+        if (convertMultiPartToFile(multipartFile) == null) {
             throw new IOException("file does not exist!");
-        }
-        else{
+        } else {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile);
             fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;

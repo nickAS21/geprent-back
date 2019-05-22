@@ -1,6 +1,5 @@
 package com.georent;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.georent.service.AWSS3Service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
