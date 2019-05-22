@@ -23,7 +23,7 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    private static final String TOKEN_PREFIX = "Bearer ";
+    public static final String TOKEN_PREFIX = "Bearer ";
 
     private final transient JwtConfigurationProperties jwtProperties;
 
