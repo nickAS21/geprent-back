@@ -1,7 +1,5 @@
 package com.georent.service;
 
-
-import com.georent.controller.GeoRentUserController;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
@@ -16,8 +14,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -32,13 +28,11 @@ public class GeoRentUserServiceRepositoryTest {
 
     GeoRentUserService userService;
 
-    private GeoRentUserController mockUserController = mock(GeoRentUserController.class);
     private GeoRentUserRepository mockUserRepository = mock(GeoRentUserRepository.class);
     private LotRepository mockLotRepository = mock(LotRepository.class);
     private CoordinatesRepository mockCordinatesRepository = mock(CoordinatesRepository.class);
     private DescriptionRepository mockDescriptionRepository = mock(DescriptionRepository.class);
 
-    private MockMvc mockMvc;
     private PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private String email = "mkyong@gmail23.com.aa";
     private String passPrincipal = "$2a$10$2O/w2twGJFNoLcnlOyJp0..IeZ2Wn3JXNts2wC62FT/TgTlQ9oqO6";
@@ -60,8 +54,6 @@ public class GeoRentUserServiceRepositoryTest {
                 mockCordinatesRepository,
                 mockDescriptionRepository
         );
-        this.mockMvc = MockMvcBuilders
-                .standaloneSetup(mockUserController).build();
         userPrincipal.setPassword(passPrincipal);
     }
 
