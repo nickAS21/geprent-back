@@ -207,7 +207,6 @@ public class GeoRentUserServiceRepositoryTest {
         return userUpdateDto;
     }
 
-
     private Lot getLot () {
         GeoRentUser user = getUser();
 

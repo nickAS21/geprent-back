@@ -89,7 +89,7 @@ public class AuthenticationService {
     }
 
 
-    private GeoRentUserDTO mapToGeoRentUserDTO(GeoRentUser user){
+    public GeoRentUserDTO mapToGeoRentUserDTO(GeoRentUser user){
         GeoRentUserDTO dto = new GeoRentUserDTO();
         dto.setEmail(user.getEmail());
         dto.setFirstName(user.getFirstName());
