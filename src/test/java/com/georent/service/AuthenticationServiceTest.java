@@ -73,17 +73,6 @@ public class AuthenticationServiceTest {
     @Test
     public void WhenRegisterUser_Err_Return_UserRegistrationException() {
         RegistrationRequestDTO registerUserRequest = getRegistrationRequestDTO();
-        when(mockUserService.existsUserByEmail(any(String.class))).thenReturn(true);
-        try {
-            authenticationService.registerNewUserAccount(registerUserRequest);
-        } catch (Exception ex) {
-            Assert.assertEquals(ex.getMessage(), Message.REGISTRATION_USER_ERROR.getDescription());
-        }
-    }
-
-    @Test
-    public void WhenRegisterUser_Err_Return_UserRegistrationException2() {
-        RegistrationRequestDTO registerUserRequest = getRegistrationRequestDTO();
         UserRegistrationException userRegistrationException = Assertions.assertThrows(UserRegistrationException.class, () -> {
             when(mockUserService.existsUserByEmail(any(String.class))).thenReturn(true);
             authenticationService.registerNewUserAccount(registerUserRequest);
