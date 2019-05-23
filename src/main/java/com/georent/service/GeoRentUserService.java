@@ -97,6 +97,14 @@ public class GeoRentUserService {
     }
 
     @Transactional
+    public GenericResponseDTO saveUserLotUpload() {
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
+//        responseDTO.setBody(mapToLotDTO(lot));
+        return responseDTO;
+    }
+
+    @Transactional
     public GenericResponseDTO deleteUser(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());

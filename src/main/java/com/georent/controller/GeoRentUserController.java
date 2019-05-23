@@ -7,8 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.security.Principal;
 
 @Controller
@@ -50,6 +54,25 @@ public class GeoRentUserController {
     @PostMapping("/lot")
     public ResponseEntity<?> setUserLot(@Valid @RequestBody final RegistrationLotDto registrationLotDto, Principal principal){
         return ResponseEntity.ok(userService.saveUserLot(principal, registrationLotDto));
+    }
+
+    @PostMapping("/lot/upload")
+    public String setUserLotUpload(@Valid @RequestBody @RequestParam("file") MultipartFile file){
+        String name = "test11";
+        if (!file.isEmpty()) {
+            try {
+                byte[] bytes = file.getBytes();
+                BufferedOutputStream stream =
+                        new BufferedOutputStream(new FileOutputStream(new File(name + "-uploaded")));
+                stream.write(bytes);
+                stream.close();
+                return "You successfully uploaded " + name + " into " + name + "-uploaded !";
+            } catch (Exception e) {
+                return "You failed to upload " + name + " => " + e.getMessage();
+            }
+        } else {
+            return "You failed to upload " + name + " because the file was empty.";
+        }
     }
 
     @DeleteMapping ("/lot/{id}")
