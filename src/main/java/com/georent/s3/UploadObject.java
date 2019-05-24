@@ -24,7 +24,7 @@ public class UploadObject {
         this.s3Properties = s3Properties;
     }
 
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
+    protected File convertMultiPartToFile(MultipartFile file) throws IOException {
         File convFile = new File(file.getOriginalFilename());
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
@@ -32,15 +32,16 @@ public class UploadObject {
         return convFile;
     }
 
-    private String generateFileName(MultipartFile multiPart) {
+    protected String generateFileName(MultipartFile multiPart) {
         return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
     }
 
-    private void uploadFileTos3bucket(String fileName, File file) {
-        awss3Service.getS3client().putObject(new PutObjectRequest(s3Properties.getBucketName(), fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
+    protected void uploadFileTos3bucket(String fileName, File file) {
+        awss3Service.getS3client().putObject(new PutObjectRequest
+                (s3Properties.getBucketName(), fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-    private String uploadFile(MultipartFile multipartFile) throws IOException {
+    protected String uploadFile(MultipartFile multipartFile) throws IOException {
         String fileUrl = "";
         if (convertMultiPartToFile(multipartFile) == null) {
             throw new IOException("file does not exist!");
