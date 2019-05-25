@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d2859aeb-8aa8-4b0a-adb5-412c50ae19b1",
+		"_postman_id": "b038b2f3-9a23-44a3-b2ee-8fbb7b3ef9cc",
 		"name": "procat_radom",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\",\n    \"phoneNumber\": \"123456789012\"\n}\n\n<!-- comment\nRegister a new USER\n1) When registering each USER - validity is checked.\n2) There is only one unique value: email.\n3) If you need to register a new USER for the test, all you have to do is change the email only.\nValidation check:\nemail field (standard email input is used):\n- allowed Latin characters, numbers, lower underscores, dot, signs \"[] @\";\n- min = 6, max  = 40;\npassword field:\n- Latin characters, numbers, underscores are allowed;\n- min = 8, max  = 64;\nphoneNumber field:\n- only numbers are allowed;\n- min = 12, max  = 12;-->"
+							"raw": "{\n    \"firstName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\",\n    \"phoneNumber\": \"123456789012\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8080/register",
@@ -420,9 +420,6 @@
 				},
 				{
 					"name": "Get user information",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -443,10 +440,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "      {\n        \"firstName\":\"firstName2\",\n        \"lastName\":\"lastName\",\n         \"email\":null,\n         \"password\":\"password\",\n         \"phoneNumber\":\"106\"\n    }\n\n\n "
-						},
 						"url": {
 							"raw": "http://localhost:8080/user",
 							"protocol": "http",
@@ -521,7 +514,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "      {\n    \"firstName\": \"first23\",\n    \"lastName\": \"last23\",\n    \"phoneNumber\": \"222256789012\"\n         \n    }\n\n\n "
+							"raw": "{\n\t\"firstName\": \"first23\",\n\t\"lastName\": \"last23\",\n\t\"phoneNumber\": \"222256789012\"\n}\n "
 						},
 						"url": {
 							"raw": "http://localhost:8080/user",

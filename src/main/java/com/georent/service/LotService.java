@@ -6,6 +6,7 @@ import com.georent.domain.Lot;
 import com.georent.dto.CoordinatesDTO;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotDTO;
+import com.georent.exception.LotNotFoundException;
 import com.georent.repository.LotRepository;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class LotService {
     }
 
     public LotDTO getLotDto(Long id) {
-        Lot lot = lotRepository.findById(id).orElseThrow(RuntimeException::new);
+        Lot lot = lotRepository.findById(id).orElseThrow(() -> new LotNotFoundException("No lot with id " + id + " found"));
         return mapToLotDTO(lot);
     }
 
