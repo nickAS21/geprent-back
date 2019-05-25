@@ -1,6 +1,7 @@
 package com.georent.service;
 
 import com.georent.domain.GeoRentUser;
+import com.georent.message.Message;
 import com.georent.repository.GeoRentUserRepository;
 import com.georent.domain.GeoRentUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,13 @@ public class GeoRentUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String email) {
         GeoRentUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No user with email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + email));
         return GeoRentUserDetails.create(user);
     }
 
     public UserDetails loadUserById(final Long userId) {
         GeoRentUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("No user with ID: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_ID.getDescription() + Long.toString(userId)));
         return GeoRentUserDetails.create(user);
     }
 }
