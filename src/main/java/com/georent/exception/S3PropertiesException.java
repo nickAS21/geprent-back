@@ -1,4 +1,4 @@
-package com.georent.s3;
+package com.georent.exception;
 
 import com.amazonaws.AbortedException;
 

@@ -1,7 +1,6 @@
-package com.georent.s3;
+package com.georent.config;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.georent.config.S3ConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

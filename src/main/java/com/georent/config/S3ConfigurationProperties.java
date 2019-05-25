@@ -1,4 +1,4 @@
-package com.georent.s3;
+package com.georent.config;
 
 import lombok.Data;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "aws")
-public class S3Properties {
+public class S3ConfigurationProperties {
 
     private String secretKey;
     private String accessKey;
