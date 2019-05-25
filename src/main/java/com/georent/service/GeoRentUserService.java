@@ -1,27 +1,46 @@
 package com.georent.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
-import com.georent.dto.*;
+import com.georent.dto.GeoRentUserInfoDto;
+import com.georent.dto.GeoRentUserUpdateDto;
+import com.georent.dto.GenericResponseDTO;
+import com.georent.dto.LotDTO;
+import com.georent.dto.RegistrationLotDto;
+import com.georent.dto.CoordinatesDTO;
+import com.georent.dto.DescriptionDTO;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
 import com.georent.repository.DescriptionRepository;
 import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.ResponseEntity.status;
+
 
 @Service
 public class GeoRentUserService {
@@ -102,6 +121,36 @@ public class GeoRentUserService {
         responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
         responseDTO.setBody(mapToLotDTO(lot));
         return responseDTO;
+    }
+
+
+    @Transactional
+    public ResponseEntity<?> saveUserLotUploadPicture(MultipartFile multipartFile, Principal principal, String registrationLotDtoStr) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationLotDto registrationLotDto = null;
+        try {
+            registrationLotDto = mapper.readValue(registrationLotDtoStr, RegistrationLotDto.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_LOT.getDescription() + " " + e.getMessage());
+        }
+        Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+
+
+        String originalFilename = multipartFile.getOriginalFilename();
+        try(InputStream inputStream = multipartFile.getInputStream()) {
+            Path tempFile = Files.createTempFile("tmp_", originalFilename);
+            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_FILE.getDescription());
+        }
+
+        responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
+        responseDTO.setBody(mapToLotDTO(lot));
+        return status(OK).body(responseDTO);
     }
 
     @Transactional

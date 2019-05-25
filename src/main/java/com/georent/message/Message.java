@@ -23,14 +23,14 @@ public enum Message {
     INVALID_GET_USER_EMAIL("No user with email:  "),
     INVALID_GET_USER_ID("No user with ID: "),
 
-
-
     SUCCESS_UPDATE_PASSWORD("Password updated successfully!"),
     SUCCESS_SAVE_LOT("Lot saved successfully!"),
+    INVALID_SAVE_LOT("Not saved lot !"),
     SUCCESS_DELETE_LOT("Lot deleted successfully!"),
     SUCCESS_DELETE_LOTS("All lots of user deleted successfully!"),
     INVALID_GET_LOT_ID("Not found lot with ID: "),
-    INVALID_GET_LOT_ID_USER(" for user with ID: " );
+    INVALID_GET_LOT_ID_USER(" for user with ID: " ),
+    INVALID_SAVE_FILE("Unable to save the file." );
 
     private String description;
 }
