@@ -48,15 +48,20 @@ public class GeoRentUserController {
         return ResponseEntity.ok(userService.getUserLotId(principal, lotId));
     }
 
+    @GetMapping("/lot/upload-picture/{id}")
+    public ResponseEntity<?> getUploadPicture(@PathVariable(value = "id") Long lotId, Principal principal){
+        return ResponseEntity.ok(userService.getUserLotIdUploadPicture(principal, lotId));
+    }
+
     @PostMapping("/lot")
     public ResponseEntity<?> setUserLot(@Valid @RequestBody final RegistrationLotDto registrationLotDto, Principal principal){
         return ResponseEntity.ok(userService.saveUserLot(principal, registrationLotDto));
     }
 
     @PostMapping("/lot/upload-picture")
-    public ResponseEntity<?> uploadPicture(@Valid @RequestParam(name = "file") MultipartFile multipartFile,
-                                           @RequestParam(name = "testDto") String registrationLotDtoStr,
-                                           Principal principal)  {
+    public ResponseEntity<?> setUploadPicture(@Valid @RequestParam(name = "file") MultipartFile multipartFile,
+                                              @RequestParam(name = "testDto") String registrationLotDtoStr,
+                                              Principal principal)  {
         return userService.saveUserLotUploadPicture(multipartFile, principal, registrationLotDtoStr);
     }
 

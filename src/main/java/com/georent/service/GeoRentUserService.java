@@ -50,18 +50,21 @@ public class GeoRentUserService {
     private final transient LotRepository lotRepository;
     private final transient CoordinatesRepository coordinatesRepository;
     private final transient DescriptionRepository descriptionRepository;
+    private final transient AWSS3Service awss3Service;
 
     @Autowired
     public GeoRentUserService(final GeoRentUserRepository userRepository,
                               final PasswordEncoder passwordEncoder,
                               final LotRepository lotRepository,
                               final CoordinatesRepository coordinatesRepository,
-                              final DescriptionRepository descriptionRepository) {
+                              final DescriptionRepository descriptionRepository,
+                              final AWSS3Service awss3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.lotRepository = lotRepository;
         this.coordinatesRepository = coordinatesRepository;
         this.descriptionRepository = descriptionRepository;
+        this.awss3Service = awss3Service;
     }
 
     public Optional<GeoRentUser> getUserByEmail(final String email) {
@@ -111,6 +114,23 @@ public class GeoRentUserService {
         return mapToLotDTO(lot);
     }
 
+    public LotDTO getUserLotIdUploadPicture(Principal principal, long id) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId())
+                .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID.getDescription() + Long.toString(id)
+                        + Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
+        String keyUrl = lot.getDescription().getItemName();
+        String keyFile= keyUrl.substring(keyUrl.lastIndexOf("/")+1);
+        try {
+            Path filePath =  Files.createTempFile("tmp_", keyFile);
+            awss3Service.getS3Object(keyFile, filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return mapToLotDTO(lot);
+    }
+
 
     @Transactional
     public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto) {
@@ -123,7 +143,30 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
+    /**
+     picture for lot
+     1) fileName = {userId}/{lotId}/{index in list picture}/"MultipartFile.getOriginalFilename()"
 
+     index in list picture -> gjrf == "0" если до отьезда не успею переделсть сущность Lot
+
+     2) Перед записью - проверяем наличие по:
+
+     {userId}/{lotId}/{index in list picture}
+
+     и если есть - удаляем
+
+     3) запсиь нового
+
+     4) fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
+
+     5) fileUrl нового храним в :
+
+     Description -> itemName (котрый потом переделаем в List <String>
+     * @param multipartFile
+     * @param principal
+     * @param registrationLotDtoStr
+     * @return
+     */
     @Transactional
     public ResponseEntity<?> saveUserLotUploadPicture(MultipartFile multipartFile, Principal principal, String registrationLotDtoStr) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
@@ -137,17 +180,19 @@ public class GeoRentUserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_LOT.getDescription() + " " + e.getMessage());
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
-        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
-
-
-        String originalFilename = multipartFile.getOriginalFilename();
-        try(InputStream inputStream = multipartFile.getInputStream()) {
-            Path tempFile = Files.createTempFile("tmp_", originalFilename);
-            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_FILE.getDescription());
+        String url = this.awss3Service.uploadFile(multipartFile);
+        if (!url.isEmpty()) {
+            lot.getDescription().setItemName(url);
+            lotRepository.save(lot);
         }
-
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+//        String originalFilename = multipartFile.getOriginalFilename();
+//        try(InputStream inputStream = multipartFile.getInputStream()) {
+//            Path tempFile = Files.createTempFile("tmp_", originalFilename);
+//            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_FILE.getDescription());
+//        }
         responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
         responseDTO.setBody(mapToLotDTO(lot));
         return status(OK).body(responseDTO);

@@ -13,6 +13,7 @@ import com.georent.repository.LotRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.security.Principal;
@@ -32,6 +33,7 @@ public class GeoRentUserServiceRepositoryTest {
     private LotRepository mockLotRepository = mock(LotRepository.class);
     private CoordinatesRepository mockCordinatesRepository = mock(CoordinatesRepository.class);
     private DescriptionRepository mockDescriptionRepository = mock(DescriptionRepository.class);
+    private AWSS3Service mockDAWSS3Service = mock(AWSS3Service.class);
 
     private PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private String email = "mkyong@gmail23.com.aa";
@@ -52,7 +54,8 @@ public class GeoRentUserServiceRepositoryTest {
                 passwordEncoder,
                 mockLotRepository,
                 mockCordinatesRepository,
-                mockDescriptionRepository
+                mockDescriptionRepository,
+                mockDAWSS3Service
         );
         userPrincipal.setPassword(passPrincipal);
     }
