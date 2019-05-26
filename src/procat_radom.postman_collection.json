@@ -593,6 +593,38 @@
 							"body": ""
 						}
 					]
+				},
+				{
+					"name": "Get one user loat with picture",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4ODUzNjc4LCJleHAiOjE1NTg4NTcyNzh9.6PPA_s-DZb31hqpGx9-EnaVEzPaLiVGhPv1RJgQy2zbdQ3_huQ3jQS--kvLSWzE-8GS8B_yzrrm6n5rSRgPnlQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/lot/upload-picture/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"lot",
+								"upload-picture",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
