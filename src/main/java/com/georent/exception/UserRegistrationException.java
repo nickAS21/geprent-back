@@ -3,13 +3,13 @@ package com.georent.exception;
 public class UserRegistrationException extends RuntimeException {
 
     /**
-     * Constructs a <code>LotNotFoundException</code>.
+     * Constructs a <code>UserRegistrationException</code>.
      */
     public UserRegistrationException() {
     }
 
     /**
-     * Constructs a <code>LotNotFoundException</code> with the specified message.
+     * Constructs a <code>UserRegistrationException</code> with the specified message.
      *
      * @param message the detail message.
      */
@@ -18,7 +18,7 @@ public class UserRegistrationException extends RuntimeException {
     }
 
     /**
-     * Constructs a {@code UsernameNotFoundException} with the specified message and root
+     * Constructs a {@code UserRegistrationException} with the specified message and root
      * cause.
      *
      * @param message the detail message.
