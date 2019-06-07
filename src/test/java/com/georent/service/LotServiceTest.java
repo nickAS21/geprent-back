@@ -1,9 +1,5 @@
 package com.georent.service;
 
-import com.georent.controller.LotController;
-import com.georent.domain.Coordinates;
-import com.georent.domain.Description;
-import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
 import com.georent.dto.LotDTO;
 import com.georent.repository.LotRepository;
@@ -15,13 +11,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.georent.service.ServiceTestUtils.createTestLot;
+import static com.georent.service.ServiceTestUtils.createTestLotDTO;
+import static com.georent.service.ServiceTestUtils.createTestShortLotDTO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class LotServiceTest {
+    private static final Lot    TEST_LOT = createTestLot();
+    private static final LotDTO TEST_LOT_DTO = createTestLotDTO();
+    private static final LotDTO TEST_SHORT_LOT_DTO = createTestShortLotDTO();
 
-    LotService lotService;
-
+    private LotService lotService;
     private LotRepository mockRepository = mock(LotRepository.class);
 
     @Before
@@ -30,50 +31,29 @@ public class LotServiceTest {
     }
 
     @Test
-    public void Wgen_Service_GetAllLots_Return_AllLotsDto() {
-        List<Lot> lots = Arrays.asList(getLot ());
-        when(mockRepository.findAll()).thenReturn(lots);
-        List<LotDTO> lotDTOSOut = lotService.getLotsDto();
+    public void When_Service_GetAllLots_Return_AllLotsDto() {
+        // given
+        List<Lot> testLots = Arrays.asList(TEST_LOT);
+        when(mockRepository.findAll()).thenReturn(testLots);
+        List<LotDTO> expectedLotDTOS = Arrays.asList(TEST_SHORT_LOT_DTO);
+        // when
+        List<LotDTO> actualLotDTOS = lotService.getLotsDto();
         verify(mockRepository, times(1)).findAll();
-        List<LotDTO> lotDTOSIn = Arrays.asList(lotService.mapToShortLotDTO(getLot()));
-        Assert.assertEquals(lotDTOSIn,lotDTOSOut);
+        // then
+        Assert.assertEquals(expectedLotDTOS, actualLotDTOS);
     }
 
     @Test
     public void When_Service_getLotDto_Id_One_Return_LotDto_Id_One() {
-        when(mockRepository.findById(any(Long.class))).thenReturn(Optional.of(getLot()));
-        LotDTO lotDTO = lotService.getLotDto(1L);
+        // given
+        when(mockRepository.findById(any(Long.class))).thenReturn(Optional.of(TEST_LOT));
+        // when
+        LotDTO actualLotDTO = lotService.getLotDto(TEST_LOT.getId());
         verify(mockRepository, times(1)).findById(any(Long.class));
-        Assert.assertEquals(lotDTO, lotService.mapToLotDTO(getLot()));
+        // then
+        Assert.assertEquals(TEST_LOT_DTO, actualLotDTO);
     }
 
-    private Lot getLot () {
-        GeoRentUser user = new GeoRentUser();
-        user.setId(1L);
-        user.setFirstName("firstName");
-        user.setLastName("lastName");
-        user.setEmail("mkyong@gmail23.com.aa");
-        user.setPassword("pass5678910");
-        user.setPhoneNumber("123456789012");
 
-        Coordinates coordinates = new Coordinates();
-        coordinates.setId(1L);
-        coordinates.setLongitude(801.800f);
-        coordinates.setLatitude(901.900f);
-        coordinates.setAddress("100 Киев 14");
 
-        Description description = new Description();
-        description.setId(1L);
-        description.setPictureId(1L);
-        description.setItemName("itemName2");
-        description.setLotDescription("lotDescription2 lotDescription lotDescription");
-
-        Lot lot = new Lot();
-        lot.setId(1L);
-        lot.setPrice(345L);
-        lot.setGeoRentUser(user);
-        lot.setCoordinates(coordinates);
-        lot.setDescription(description);
-        return lot;
-    }
 }

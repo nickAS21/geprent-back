@@ -27,7 +27,8 @@ public class LotService {
 
     /**
      * Reads the list of all lots of all users from the database,
-     * and transform them to list of short dto objects, i.e. list of coordinates.
+     * and transforms them to the list of dto objects, using short form mapping.
+     * Only lot id, coordinates and item name are set.
      * @return the list of coordinates of all lots from the database.
      */
     public List<LotDTO> getLotsDto() {
@@ -51,7 +52,7 @@ public class LotService {
         return mapToLotDTO(lot);
     }
 
-    LotDTO mapToShortLotDTO(Lot lot) {
+    private LotDTO mapToShortLotDTO(Lot lot) {
         Coordinates coordinates = lot.getCoordinates();
         Description description = lot.getDescription();
         Long id = lot.getId();
@@ -70,7 +71,7 @@ public class LotService {
         return dto;
     }
 
-    LotDTO mapToLotDTO(Lot lot) {
+    private LotDTO mapToLotDTO(Lot lot) {
         Coordinates coordinates = lot.getCoordinates();
         Description description = lot.getDescription();
         Long id = lot.getId();
@@ -92,5 +93,4 @@ public class LotService {
         dto.setDescription(descriptionDTO);
         return dto;
     }
-
 }
