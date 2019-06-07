@@ -78,6 +78,7 @@ public class LotService {
         CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
         coordinatesDTO.setLatitude(coordinates.getLatitude());
         coordinatesDTO.setLongitude(coordinates.getLongitude());
+        coordinatesDTO.setAddress(coordinates.getAddress());
 
         DescriptionDTO descriptionDTO = new DescriptionDTO();
         descriptionDTO.setItemName(description.getItemName());
