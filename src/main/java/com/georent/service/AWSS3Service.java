@@ -13,13 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
 
-import static com.sun.activation.registries.LogSupport.log;
 
 @Slf4j
 @Service
@@ -35,97 +33,63 @@ public class AWSS3Service {
         this.s3Properties = s3ConfigurationProperties;
     }
 
-//    public void getS3Object(String bucketName,
-    public void getS3Object(String s3FolderPathAdnFileName,
-                            Path saveFilePath) throws IOException {
-//        S3Object s3Object = s3Client.getObject(new GetObjectRequest(bucketName, s3FolderPathAdnFileName));
-//        s3FolderPathAdnFileName = "1558853689584-drel.png";
+    /*
+     * return S3object and save it in saveFilePath
+     * */
+    //TODO change the way we pass file to client.
+    public S3Object getS3Object(String keyFile,
+                                Path saveFilePath) throws IOException {
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
         ObjectListing objectListing = s3Client.listObjects(listObjectsRequest);
-        s3FolderPathAdnFileName = "shurup.jpg";
-        S3Object s3Object = s3Client.getObject(new GetObjectRequest(s3Properties.getBucketName(), s3FolderPathAdnFileName));
+        S3Object s3Object = s3Client.getObject(new GetObjectRequest(s3Properties.getBucketName(), keyFile));
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
-//        FileUtils.copyInputStreamToFile(inputStream, new File(saveFilePath));
         Files.copy(inputStream, saveFilePath, StandardCopyOption.REPLACE_EXISTING);
+        //S3Object s3Object = s3Client.getObject(new GetObjectRequest(s3Properties.getBucketName(), keyFile));
+        return s3Object;
     }
 
-   private Path convertMultiPartToFile(MultipartFile file) {
-       Assert.notNull(file, "File must not be empty!");
-        //TODO jpeg files
-       String originalFilename = file.getOriginalFilename();
 
-        //TODO somehow validate size (up to 200kb)
+    //TODO jpeg files AND write exception
+    //TODO somehow validate size (up to 200kb) AND write exception
+    private File convertMultiPartToFile(MultipartFile file) {
+        Assert.notNull(file, "File must not be empty!");
+        if (!file.getContentType().equals("image/jpeg")) {
+            throw new RuntimeException("Only JPG images are accepted");
+        }
         long size = file.getSize();
-       Path tempFile = null;
-       try(InputStream inputStream = file.getInputStream()) {
-            tempFile = Files.createTempFile("tmp_", originalFilename);
-            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        if (size > 200000) {
+            throw new RuntimeException("Size is too big");
+        }
+        Path tempFile = null;
+        String filename = file.getOriginalFilename();
+        try {
+            tempFile = Files.createTempFile("tmp_", filename);
         } catch (IOException e) {
-            e.getMessage();
+            log.error("Unable to save file.", e);
+            throw new FileException("Unable to save file.", e);
         }
-        return tempFile;
+        return tempFile.toFile();
     }
 
-//    private String generateFileName(MultipartFile multiPart) {
-//        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
-//    }
+    private String generateFileName(MultipartFile multiPart) {
+        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+    }
 
-    private void uploadFileTos3bucket(String fileName, File file) { // file name = 1558853689584-drel.png
-        log("SecretKey = " + s3Properties.getSecretKey());
-        log("AccessKey = " + s3Properties.getAccessKey());
-//        PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest
-//                (s3Properties.getBucketName(), fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
+    //TODO what will be an identifier of a file
+    private void uploadFileTos3bucket(String fileName, File file) {
         PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest
-                (s3Properties.getBucketName(), fileName, file));
-
-        //TODO what will be an identifier of a file
-        ObjectMetadata metadata = putObjectResult.getMetadata();
-        putObjectResult.getETag();
+                (s3Properties.getBucketName(), fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-
-    /**
-     1) fileName = {userId}/{lotId}/{index in list picture}/"MultipartFile.getOriginalFilename()"
-
-     index in list picture -> gjrf == "0" если до отьезда не успею переделсть сущность Lot
-
-     2) Перед записью - проверяем наличие по:
-
-     {userId}/{lotId}/{index in list picture}
-
-     и если есть - удаляем
-
-     3) запсиь нового
-
-     4) fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
-
-     5) fileUrl нового храним в :
-
-     Description -> itemName (котрый потом переделаем в List <String>
-     * @param multipartFile
-     * @return
-     */
-
+    /*
+     * upload file to S3Bucket, return fileUrl, which is the key to get the file */
     public String uploadFile(MultipartFile multipartFile) {
-
         String fileUrl = "";
-//        File file = convertMultiPartToFile(multipartFile);
-        Path filePath = convertMultiPartToFile(multipartFile);
-        if ( !(filePath == null) ) {
-//            String fileName = generateFileName(multipartFile);
-            String fileName =  multipartFile.getOriginalFilename();
-
-            //TODO change the way we pass file to client.
-            fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
-            //uploadFileTos3bucket(fileName, file);
-            File file = filePath.toFile();
-            uploadFileTos3bucket(fileName, file);
-            file.delete();
-        }
+        String fileName = generateFileName(multipartFile);
+        fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
+        File file = convertMultiPartToFile(multipartFile);
+        uploadFileTos3bucket(fileName, file);
+        file.delete();
         return fileUrl;
     }
-
 }
-
-
-
