@@ -7,7 +7,10 @@ import com.georent.domain.Lot;
 import com.georent.dto.CoordinatesDTO;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.GeoRentUserDTO;
+import com.georent.dto.GeoRentUserInfoDto;
+import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.LotDTO;
+import com.georent.dto.RegistrationLotDto;
 
 public class ServiceTestUtils {
     public static GeoRentUser createTestUser() {
@@ -21,7 +24,6 @@ public class ServiceTestUtils {
         return user;
     }
 
-
     public static Coordinates createTestCoordinates() {
         Coordinates coordinates = new Coordinates();
         coordinates.setId(1L);
@@ -30,8 +32,6 @@ public class ServiceTestUtils {
         coordinates.setAddress("100 Киев 14");
         return coordinates;
     }
-
-
 
     public static Description createTestDescription() {
         Description description = new Description();
@@ -117,5 +117,37 @@ public class ServiceTestUtils {
         lotDTO.setPrice(lot.getPrice());
 
         return lotDTO;
+    }
+
+    public static GeoRentUserUpdateDto createUserUpdateDto() {
+        GeoRentUser user = createTestUser();
+        GeoRentUserUpdateDto userUpdateDto = new GeoRentUserUpdateDto();
+        userUpdateDto.setFirstName(user.getFirstName());
+        userUpdateDto.setLastName(user.getLastName());
+        userUpdateDto.setPhoneNumber(user.getPhoneNumber());
+        return userUpdateDto;
+    }
+
+    public static GeoRentUserInfoDto createTestUserInfoDTO() {
+        final GeoRentUser testUser = createTestUser();
+        GeoRentUserInfoDto infoDto = new GeoRentUserInfoDto();
+        infoDto.setId(testUser.getId());
+        infoDto.setEmail(testUser.getEmail());
+        infoDto.setFirstName(testUser.getFirstName());
+        infoDto.setLastName(testUser.getLastName());
+        infoDto.setPhoneNumber(testUser.getPhoneNumber());
+        return infoDto;
+    }
+
+    public static RegistrationLotDto registrationLotDto (Lot lot){
+        RegistrationLotDto registrationLotDto = new RegistrationLotDto();
+        registrationLotDto.setPrice(lot.getPrice());
+        registrationLotDto.setLongitude(lot.getCoordinates().getLongitude());
+        registrationLotDto.setLatitude(lot.getCoordinates().getLatitude());
+        registrationLotDto.setAddress(lot.getCoordinates().getAddress());
+        registrationLotDto.setItemPath(Long.toString(lot.getDescription().getPictureId()));
+        registrationLotDto.setItemName(lot.getDescription().getItemName());
+        registrationLotDto.setLotDescription(lot.getDescription().getLotDescription());
+        return registrationLotDto;
     }
 }

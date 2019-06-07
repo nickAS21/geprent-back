@@ -99,7 +99,8 @@ public class GeoRentUserService {
      * @return The generic response, containing the proper message and incoming GeoRentUserUpdateDto object.
      */
     @Transactional
-    public GenericResponseDTO updateUser(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
+    public GenericResponseDTO<GeoRentUserUpdateDto> updateUser(Principal principal,
+                                                               final GeoRentUserUpdateDto geoRentUserUpdateDto) {
         userRepository.save(mapFromUpdateUserDTO(principal, geoRentUserUpdateDto));
         GenericResponseDTO<GeoRentUserUpdateDto> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_UPDATE_USER.getDescription());
@@ -292,7 +293,7 @@ public class GeoRentUserService {
         return geoRentUser;
     }
 
-    public LotDTO mapToLotDTO(Lot lot) {
+    private LotDTO mapToLotDTO(Lot lot) {
             LotDTO dto = new LotDTO();
             Long id = lot.getId();
             dto.setId(id);
@@ -316,7 +317,7 @@ public class GeoRentUserService {
             return dto;
     }
 
-    public GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
+    private GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
         GeoRentUserInfoDto geoRentUserInfoDto = new GeoRentUserInfoDto();
         geoRentUserInfoDto.setId(geoRentUser.getId());
         geoRentUserInfoDto.setEmail(geoRentUser.getEmail());
