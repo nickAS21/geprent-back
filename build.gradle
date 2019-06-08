@@ -51,6 +51,8 @@ dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.548'
     implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 
 
 //    implementation 'org.liquibase:liquibase-core'
