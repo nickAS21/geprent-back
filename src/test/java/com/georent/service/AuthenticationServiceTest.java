@@ -8,7 +8,7 @@ import com.georent.dto.AuthenticationResponseDTO;
 import com.georent.dto.GenericResponseDTO;
 import com.georent.dto.LoginRequestDTO;
 import com.georent.dto.RegistrationRequestDTO;
-import com.georent.exception.UserRegistrationException;
+import com.georent.exception.RegistrationSuchUserExistsException;
 import com.georent.message.Message;
 import com.georent.security.JwtProvider;
 import org.junit.Assert;
@@ -70,12 +70,12 @@ public class AuthenticationServiceTest {
     @Test
     public void WhenRegisterUser_Err_Return_UserRegistrationException() {
         RegistrationRequestDTO registerUserRequest = getRegistrationRequestDTO();
-        UserRegistrationException userRegistrationException = Assertions.assertThrows(UserRegistrationException.class, () -> {
+        RegistrationSuchUserExistsException registrationSuchUserExistsException = Assertions.assertThrows(RegistrationSuchUserExistsException.class, () -> {
             when(mockUserService.existsUserByEmail(any(String.class))).thenReturn(true);
             authenticationService.registerNewUserAccount(registerUserRequest);
         });
         verify(mockUserService, times(1)).existsUserByEmail(any(String.class));
-        Assert.assertEquals(userRegistrationException.getMessage(), Message.REGISTRATION_USER_ERROR.getDescription());
+        Assert.assertEquals(registrationSuchUserExistsException.getMessage(), Message.REGISTRATION_USER_ERROR.getDescription());
     }
 
     @Test

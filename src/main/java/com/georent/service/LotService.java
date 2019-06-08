@@ -7,14 +7,12 @@ import com.georent.dto.CoordinatesDTO;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotDTO;
 import com.georent.exception.LotNotFoundException;
+import com.georent.message.Message;
 import com.georent.repository.LotRepository;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +25,12 @@ public class LotService {
         this.lotRepository = lotRepository;
     }
 
+    /**
+     * Reads the list of all lots of all users from the database,
+     * and transforms them to the list of dto objects, using short form mapping.
+     * Only lot id, coordinates and item name are set.
+     * @return the list of coordinates of all lots from the database.
+     */
     public List<LotDTO> getLotsDto() {
         return lotRepository.findAll()
                 .stream()
@@ -34,12 +38,21 @@ public class LotService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Reads the lot with provided id from the database, and transforms it to the dto object.
+     * If the lot was not found in the database, throws LotNotFoundException.
+     * @param id the id of the lot.
+     * @return dto of the lot with provided id.
+     */
     public LotDTO getLotDto(Long id) {
-        Lot lot = lotRepository.findById(id).orElseThrow(() -> new LotNotFoundException("No lot with id " + id + " found"));
+        Lot lot = lotRepository.findById(id)
+                .orElseThrow(() -> new LotNotFoundException(
+                        Message.INVALID_GET_LOT_ID.getDescription() + " " + id)
+                );
         return mapToLotDTO(lot);
     }
 
-    public LotDTO mapToShortLotDTO(Lot lot) {
+    private LotDTO mapToShortLotDTO(Lot lot) {
         Coordinates coordinates = lot.getCoordinates();
         Description description = lot.getDescription();
         Long id = lot.getId();
@@ -58,26 +71,26 @@ public class LotService {
         return dto;
     }
 
-    public LotDTO mapToLotDTO(Lot lot) {
-            Coordinates coordinates = lot.getCoordinates();
-            Description description = lot.getDescription();
-            Long id = lot.getId();
+    private LotDTO mapToLotDTO(Lot lot) {
+        Coordinates coordinates = lot.getCoordinates();
+        Description description = lot.getDescription();
+        Long id = lot.getId();
 
-            CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
-            coordinatesDTO.setLatitude(coordinates.getLatitude());
-            coordinatesDTO.setLongitude(coordinates.getLongitude());
+        CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
+        coordinatesDTO.setLatitude(coordinates.getLatitude());
+        coordinatesDTO.setLongitude(coordinates.getLongitude());
+        coordinatesDTO.setAddress(coordinates.getAddress());
 
-            DescriptionDTO descriptionDTO = new DescriptionDTO();
-            descriptionDTO.setItemName(description.getItemName());
-            descriptionDTO.setLotDescription(description.getLotDescription());
-            descriptionDTO.setPictureId(description.getPictureId());
+        DescriptionDTO descriptionDTO = new DescriptionDTO();
+        descriptionDTO.setItemName(description.getItemName());
+        descriptionDTO.setLotDescription(description.getLotDescription());
+        descriptionDTO.setPictureId(description.getPictureId());
 
-            LotDTO dto = new LotDTO();
-            dto.setId(id);
-            dto.setPrice(lot.getPrice());
-            dto.setCoordinates(coordinatesDTO);
-            dto.setDescription(descriptionDTO);
-            return dto;
+        LotDTO dto = new LotDTO();
+        dto.setId(id);
+        dto.setPrice(lot.getPrice());
+        dto.setCoordinates(coordinatesDTO);
+        dto.setDescription(descriptionDTO);
+        return dto;
     }
-
 }

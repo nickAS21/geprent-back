@@ -1,25 +1,46 @@
 package com.georent.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
-import com.georent.dto.*;
+import com.georent.dto.GeoRentUserInfoDto;
+import com.georent.dto.GeoRentUserUpdateDto;
+import com.georent.dto.GenericResponseDTO;
+import com.georent.dto.LotDTO;
+import com.georent.dto.RegistrationLotDto;
+import com.georent.dto.CoordinatesDTO;
+import com.georent.dto.DescriptionDTO;
+import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
 import com.georent.repository.DescriptionRepository;
 import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.ResponseEntity.status;
+
 
 @Service
 public class GeoRentUserService {
@@ -29,18 +50,21 @@ public class GeoRentUserService {
     private final transient LotRepository lotRepository;
     private final transient CoordinatesRepository coordinatesRepository;
     private final transient DescriptionRepository descriptionRepository;
+    private final transient AWSS3Service awss3Service;
 
     @Autowired
     public GeoRentUserService(final GeoRentUserRepository userRepository,
                               final PasswordEncoder passwordEncoder,
                               final LotRepository lotRepository,
                               final CoordinatesRepository coordinatesRepository,
-                              final DescriptionRepository descriptionRepository) {
+                              final DescriptionRepository descriptionRepository,
+                              final AWSS3Service awss3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.lotRepository = lotRepository;
         this.coordinatesRepository = coordinatesRepository;
         this.descriptionRepository = descriptionRepository;
+        this.awss3Service = awss3Service;
     }
 
     public Optional<GeoRentUser> getUserByEmail(final String email) {
@@ -57,13 +81,26 @@ public class GeoRentUserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Reads user info from the database and maps it to GeoRentUserInfoDto object.
+     * @param principal Current user identifier.
+     * @return The user info in the format of GeoRentUserInfoDto.
+     */
     public GeoRentUserInfoDto getUserInfo(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         return mapToUserInfoDTO(geoRentUser);
     }
 
+    /**
+     * Updates user info in the database.
+     * @param principal Current user identifier.
+     * @param geoRentUserUpdateDto Information to update.
+     * @return The generic response, containing the proper message and incoming GeoRentUserUpdateDto object.
+     */
     @Transactional
-    public GenericResponseDTO updateUser(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
+    public GenericResponseDTO<GeoRentUserUpdateDto> updateUser(Principal principal,
+                                                               final GeoRentUserUpdateDto geoRentUserUpdateDto) {
         userRepository.save(mapFromUpdateUserDTO(principal, geoRentUserUpdateDto));
         GenericResponseDTO<GeoRentUserUpdateDto> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_UPDATE_USER.getDescription());
@@ -71,24 +108,69 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
+    /**
+     * Reads the list of user lots from the database and maps them to the LotDTO format.
+     * @param principal Current user identifier.
+     * @return The list of user lots in the LotDTO format.
+     */
     public List<LotDTO> getUserLots(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         return lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
                 .stream()
                 .map(this::mapToLotDTO)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Reads the lot with specified id from the database and maps it to the LotDTO format.
+     * @param principal Current user identifier.
+     * @param id - The id of the specified lot.
+     * @return The requested lot in the LotDTO format.
+     */
     public LotDTO getUserLotId(Principal principal, long id) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId()).orElseThrow(RuntimeException::new);
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId())
+                .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID.getDescription() + Long.toString(id)
+                        + Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
+        return mapToLotDTO(lot);
+    }
+
+    /**
+     * Downloads the lot picture from pictures repository to the temp file.
+     * @param principal Current user identifier.
+     * @param id The id of the specified lot.
+     * @return The lot with specified id in the format of LotDTO.
+     */
+    public LotDTO getUserLotIdUploadPicture(Principal principal, long id) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId())
+                .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID.getDescription() + Long.toString(id)
+                        + Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
+        String keyUrl = lot.getDescription().getItemName();
+        String keyFile= keyUrl.substring(keyUrl.lastIndexOf("/")+1);
+        try {
+            Path filePath =  Files.createTempFile("tmp_", keyFile);
+            awss3Service.getS3Object(keyFile, filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return mapToLotDTO(lot);
     }
 
 
+    /**
+     * Saves the provided lot to the database.
+     * @param principal Current user identifier.
+     * @param registrationLotDto The lot to save in the registrationLotDto format.
+     * @return The saved lot in the LotDTO format.
+     */
     @Transactional
-    public GenericResponseDTO saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+    public GenericResponseDTO<LotDTO> saveUserLot(Principal principal, final RegistrationLotDto registrationLotDto) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
@@ -96,9 +178,70 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
+    /**
+     picture for lot
+     1) fileName = {userId}/{lotId}/{index in list picture}/"MultipartFile.getOriginalFilename()"
+
+     index in list picture -> gjrf == "0" если до отьезда не успею переделсть сущность Lot
+
+     2) Перед записью - проверяем наличие по:
+
+     {userId}/{lotId}/{index in list picture}
+
+     и если есть - удаляем
+
+     3) запсиь нового
+
+     4) fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
+
+     5) fileUrl нового храним в :
+
+     Description -> itemName (котрый потом переделаем в List <String>
+     * @param multipartFile
+     * @param principal
+     * @param registrationLotDtoStr
+     * @return
+     */
     @Transactional
-    public GenericResponseDTO deleteUser(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+    public ResponseEntity<?> saveUserLotUploadPicture(MultipartFile multipartFile, Principal principal, String registrationLotDtoStr) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationLotDto registrationLotDto = null;
+        try {
+            registrationLotDto = mapper.readValue(registrationLotDtoStr, RegistrationLotDto.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_LOT.getDescription() + " " + e.getMessage());
+        }
+        Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
+        String url = this.awss3Service.uploadFile(multipartFile);
+        if (!url.isEmpty()) {
+            lot.getDescription().setItemName(url);
+            lotRepository.save(lot);
+        }
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+//        String originalFilename = multipartFile.getOriginalFilename();
+//        try(InputStream inputStream = multipartFile.getInputStream()) {
+//            Path tempFile = Files.createTempFile("tmp_", originalFilename);
+//            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_FILE.getDescription());
+//        }
+        responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
+        responseDTO.setBody(mapToLotDTO(lot));
+        return status(OK).body(responseDTO);
+    }
+
+    /**
+     * Deletes the specified user and all its lots from the database.
+     * @param principal Current user identifier.
+     * @return Generic response, containing  the proper message.
+     */
+    @Transactional
+    public GenericResponseDTO<LotDTO> deleteUser(Principal principal) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
         userRepository.delete(geoRentUser);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
@@ -107,19 +250,34 @@ public class GeoRentUserService {
     }
 
 
+    /**
+     * Deletes the user lot with the specified id.
+     * @param principal Current user identifier.
+     * @param id - The id of the lot to delete.
+     * @return Generic response, containing the proper message.
+     */
     @Transactional
-    public GenericResponseDTO deleteteUserLotId(Principal principal, long id) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
-        lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId()).orElseThrow(RuntimeException::new);
+    public GenericResponseDTO<LotDTO> deleteteUserLotId(Principal principal, long id) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId())
+                .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID + Long.toString(id) +
+                        Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
         lotRepository.deleteById(id);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_DELETE_LOT.getDescription());
         return responseDTO;
     }
 
+    /**
+     * Deletes all lots of the current user from the database.
+     * @param principal Current user identifier.
+     * @return Generic response, containing the proper message.
+     */
     @Transactional
-    public GenericResponseDTO deleteteUserLotAll(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+    public GenericResponseDTO<LotDTO> deleteteUserLotAll(Principal principal) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_DELETE_LOTS.getDescription());
@@ -127,14 +285,15 @@ public class GeoRentUserService {
     }
 
     private GeoRentUser mapFromUpdateUserDTO(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName()).orElseThrow(RuntimeException::new);
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         geoRentUser.setLastName(geoRentUserUpdateDto.getLastName());
         geoRentUser.setFirstName(geoRentUserUpdateDto.getFirstName());
         geoRentUser.setPhoneNumber(geoRentUserUpdateDto.getPhoneNumber());
         return geoRentUser;
     }
 
-    public LotDTO mapToLotDTO(Lot lot) {
+    private LotDTO mapToLotDTO(Lot lot) {
             LotDTO dto = new LotDTO();
             Long id = lot.getId();
             dto.setId(id);
@@ -158,7 +317,7 @@ public class GeoRentUserService {
             return dto;
     }
 
-    public GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
+    private GeoRentUserInfoDto mapToUserInfoDTO(GeoRentUser geoRentUser) {
         GeoRentUserInfoDto geoRentUserInfoDto = new GeoRentUserInfoDto();
         geoRentUserInfoDto.setId(geoRentUser.getId());
         geoRentUserInfoDto.setEmail(geoRentUser.getEmail());

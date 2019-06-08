@@ -3,8 +3,8 @@ spring:
     active: test
 
 aws:
-  secret-key: 0YEd7sI2PvzbFNcun/E6EcO9tUOey9O+xwK/nJtV
-  access-key: AKIA4BDR5OXQEJFE574O
+  secret-key: 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
+  access-key: AKIA4BDR5OXQH2D4ZQCQ
   bucket-name: geo-rent-bucket
   and-point-url: https://georent.ua/
 
