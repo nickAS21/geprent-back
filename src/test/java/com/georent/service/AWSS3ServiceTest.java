@@ -51,6 +51,6 @@ class AWSS3ServiceTest {
         when(mockMultipartFile.getContentType()).thenReturn("image/jpeg");
         when(mockMultipartFile.getOriginalFilename()).thenReturn(string);
         when(mockS3Properties.getBucketName()).thenReturn("TestBucketName");
-        assertNotNull(awss3Service.uploadFile(mockMultipartFile));
+        assertNotNull(awss3Service.uploadFile(mockMultipartFile, "/1/1/1"));
     }
 }

@@ -116,10 +116,10 @@ public class GeoRentUserController {
      * @return ???
      */
     @PostMapping("/lot/upload-picture")
-    public ResponseEntity<?> setUploadPicture(@Valid @RequestParam(name = "file") MultipartFile multipartFile,
+    public ResponseEntity<?> setUploadPicture(@Valid @RequestParam("files") MultipartFile[] multipartFiles,
                                               @RequestParam(name = "testDto") String registrationLotDtoStr,
                                               Principal principal)  {
-        return userService.saveUserLotUploadPicture(multipartFile, principal, registrationLotDtoStr);
+        return userService.saveUserLotUploadPicture(multipartFiles, principal, registrationLotDtoStr);
     }
 
     /**
