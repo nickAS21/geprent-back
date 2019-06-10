@@ -1,11 +1,13 @@
 package com.georent.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.georent.config.S3ConfigurationProperties;
 import com.georent.exception.FileException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -13,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -44,26 +47,24 @@ public class AWSS3Service {
         S3Object s3Object = s3Client.getObject(new GetObjectRequest(s3Properties.getBucketName(), keyFile));
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
         Files.copy(inputStream, saveFilePath, StandardCopyOption.REPLACE_EXISTING);
-        //S3Object s3Object = s3Client.getObject(new GetObjectRequest(s3Properties.getBucketName(), keyFile));
         return s3Object;
     }
 
 
     //TODO jpeg files AND write exception
     //TODO somehow validate size (up to 200kb) AND write exception
-    private File convertMultiPartToFile(MultipartFile file) {
-        Assert.notNull(file, "File must not be empty!");
-        if (!file.getContentType().equals("image/jpeg")) {
+    private File convertMultiPartToFile(MultipartFile multipart) {
+        Assert.notNull(multipart, "File must not be empty!");
+        if (!multipart.getContentType().equals("image/jpeg")) {
             throw new RuntimeException("Only JPG images are accepted");
         }
-        long size = file.getSize();
-        if (size > 200000) {
+        if (multipart.getSize() > 200000) {
             throw new RuntimeException("Size is too big");
         }
         Path tempFile = null;
-        String filename = file.getOriginalFilename();
         try {
-            tempFile = Files.createTempFile("tmp_", filename);
+            tempFile = Files.createTempFile("tmp_", multipart.getOriginalFilename());
+            multipart.transferTo(tempFile);
         } catch (IOException e) {
             log.error("Unable to save file.", e);
             throw new FileException("Unable to save file.", e);
@@ -71,25 +72,52 @@ public class AWSS3Service {
         return tempFile.toFile();
     }
 
-    private String generateFileName(MultipartFile multiPart) {
+    private String generateKeyFileName(MultipartFile multiPart) {
         return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
     }
 
     //TODO what will be an identifier of a file
-    private void uploadFileTos3bucket(String fileName, File file) {
-        PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest
-                (s3Properties.getBucketName(), fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
+    private void uploadFileTos3bucket(String keyFileName, File file) {
+        PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, file));
+            // Test
+        URL url = GeneratePresignedURL(keyFileName);
     }
 
     /*
      * upload file to S3Bucket, return fileUrl, which is the key to get the file */
     public String uploadFile(MultipartFile multipartFile) {
-        String fileUrl = "";
-        String fileName = generateFileName(multipartFile);
-        fileUrl = s3Properties.getAndPointUrl() + "/" + s3Properties.getBucketName() + "/" + fileName;
+        String keyFileName = generateKeyFileName(multipartFile);
         File file = convertMultiPartToFile(multipartFile);
-        uploadFileTos3bucket(fileName, file);
+        uploadFileTos3bucket(keyFileName, file);
         file.delete();
-        return fileUrl;
+        return keyFileName;
+    }
+
+    public URL GeneratePresignedURL(String objectKey) {
+        URL url = null;
+        try {
+            // Set the presigned URL to expire after one hour.
+            java.util.Date expiration = new java.util.Date();
+            expiration.setTime(expiration.getTime() + Long.valueOf(s3Properties.getExpiresIn()));
+
+            // Generate the presigned URL.
+            System.out.println("Generating pre-signed URL.");
+            GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                    new GeneratePresignedUrlRequest(s3Properties.getBucketName(), objectKey)
+                            .withMethod(HttpMethod.GET)
+                            .withExpiration(expiration);
+            url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+            System.out.println("Pre-Signed URL: " + url.toString());
+        } catch (AmazonServiceException e) {
+            // The call was transmitted successfully, but Amazon S3 couldn't process
+            // it, so it returned an error response.
+            e.printStackTrace();
+        } catch (SdkClientException e) {
+            // Amazon S3 couldn't be contacted for a response, or the client
+            // couldn't parse the response from Amazon S3.
+            e.printStackTrace();
+            return url;
+        }
+        return url;
     }
 }
