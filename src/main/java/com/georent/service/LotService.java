@@ -12,6 +12,7 @@ import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,8 @@ public class LotService {
         DescriptionDTO descriptionDTO = new DescriptionDTO();
         descriptionDTO.setItemName(description.getItemName());
         descriptionDTO.setLotDescription(description.getLotDescription());
-        descriptionDTO.setPictureId(description.getPictureId());
+//        descriptionDTO.setPictureId(description.getPictureId());
+        Collections.copy(description.getPictureIds(), descriptionDTO.getPictureIds());
 
         LotDTO dto = new LotDTO();
         dto.setId(id);

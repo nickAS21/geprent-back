@@ -36,7 +36,7 @@ public class ServiceTestUtils {
     public static Description createTestDescription() {
         Description description = new Description();
         description.setId(1L);
-        description.setPictureId(1L);
+//        description.setPictureId(1L);
         description.setItemName("itemName2");
         description.setLotDescription("lotDescription2 lotDescription lotDescription");
         return description;
@@ -80,7 +80,7 @@ public class ServiceTestUtils {
 
         descDTO.setItemName(description.getItemName());
         descDTO.setLotDescription(description.getLotDescription());
-        descDTO.setPictureId(description.getPictureId());
+//        descDTO.setPictureId(description.getPictureId());
 
         return descDTO;
     }
@@ -145,7 +145,7 @@ public class ServiceTestUtils {
         registrationLotDto.setLongitude(lot.getCoordinates().getLongitude());
         registrationLotDto.setLatitude(lot.getCoordinates().getLatitude());
         registrationLotDto.setAddress(lot.getCoordinates().getAddress());
-        registrationLotDto.setItemPath(Long.toString(lot.getDescription().getPictureId()));
+//        registrationLotDto.setItemPath(Long.toString(lot.getDescription().getPictureId()));
         registrationLotDto.setItemName(lot.getDescription().getItemName());
         registrationLotDto.setLotDescription(lot.getDescription().getLotDescription());
         return registrationLotDto;

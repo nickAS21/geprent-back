@@ -34,6 +34,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -180,19 +182,20 @@ public class GeoRentUserService {
 
     /**
      picture for lot
-     1) keyFileName = {userId}/{lotId}/{index in list picture}/"MultipartFile.getOriginalFilename()"
+     1) keyFileName = {userId}/{lotId}/{index in list picture}"
      index in list picture -> start == "0" если до отьезда не успею переделсть сущность Lot
      2) Перед записью - проверяем наличие по Path == {userId}/{lotId}/{index in list picture}/
      если есть - удаляем
-     3) keyFileName (для fileUrl) нового храним в list picture - > itemKey (old itemName) in Description
+     3) keyFileName (для fileUrl) нового храним в list pictureIds - >  in Description
 
-     * @param multipartFile
+
+     * @param multipartFiles
      * @param principal
      * @param registrationLotDtoStr
      * @return
      */
     @Transactional
-    public ResponseEntity<?> saveUserLotUploadPicture(MultipartFile multipartFile, Principal principal, String registrationLotDtoStr) {
+    public ResponseEntity<?> saveUserLotUploadPicture(MultipartFile[] multipartFiles, Principal principal, String registrationLotDtoStr) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         ObjectMapper mapper = new ObjectMapper();
@@ -204,11 +207,16 @@ public class GeoRentUserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_LOT.getDescription() + " " + e.getMessage());
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
-        String keyFileName = this.awss3Service.uploadFile(multipartFile);
-        if (!keyFileName.isEmpty()) {
-            lot.getDescription().setItemName(keyFileName);
-            lotRepository.save(lot);
+        for (MultipartFile multipartFile : multipartFiles) {
+            int index = lot.getDescription().getPictureIds().size()+1;
+            String keyFileName = Long.toString(geoRentUser.getId()) + "/" + Long.toString(lot.getId()) + "/" + Integer.toString(index);
+            String keyFileNameS3 = this.awss3Service.uploadFile(multipartFile, keyFileName);
+            if (!keyFileName.isEmpty()) {
+                lot.getDescription().getPictureIds().add(Long.valueOf(index));
+
+            }
         }
+        lotRepository.save(lot);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
         responseDTO.setBody(mapToLotDTO(lot));
@@ -293,7 +301,7 @@ public class GeoRentUserService {
                 DescriptionDTO descriptionDTO = new DescriptionDTO();
                 descriptionDTO.setItemName(description.getItemName());
                 descriptionDTO.setLotDescription(description.getLotDescription());
-                descriptionDTO.setPictureId(description.getPictureId());
+                descriptionDTO.setPictureIds(new ArrayList<Long>(description.getPictureIds()));
                 dto.setDescription(descriptionDTO);
             }
             return dto;
@@ -322,7 +330,7 @@ public class GeoRentUserService {
         description.setItemName(registrationLotDto.getItemName());
         description.setLotDescription(registrationLotDto.getLotDescription());
 //        description.setPictureId(registrationLotDto.getItemPath());
-        description.setPictureId(1L);
+//        Collections.copy(registrationLotDto.getPictureIds(), description.getPictureIds());
         lot.setDescription(description);
         return lot;
     }
