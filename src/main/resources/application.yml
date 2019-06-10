@@ -7,6 +7,7 @@ aws:
   access-key: AKIA4BDR5OXQH2D4ZQCQ
   bucket-name: geo-rent-bucket
   and-point-url: https://georent.ua/
+  expires-in: 60000
 
 app:
   jwt:
