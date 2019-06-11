@@ -238,7 +238,8 @@
 								"lot",
 								"upload-picture"
 							]
-						}
+						},
+						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request:\n\nFor example:\n\n\"tokenType\": \"Bearer\", \n\n \"accessToken\": \n \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTU4Njk2MTk0LCJleHAiOjE1NTg2OTk3OTR9.4WlO568k_8WMbzz_VZPQcML5OwjrpHQOrBQPJwnmzKinBneSIp60j4VTK6plAXSTJ3oQcvphHE7rC-Y5kY3fhg\"\n\n2)Add Body from-data:\n\n2.1) KEY: files\n\nvalue: path for read file/files for tne lot\n\n2.2) KEY: lot\n\nvalue: Example: \n\n{\"price\":\"120\",\"longitude\":\"80800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"newLotName With Picture\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}"
 					},
 					"response": [
 						{
@@ -595,7 +596,7 @@
 					]
 				},
 				{
-					"name": "Get one user loat with picture",
+					"name": "Get one user lot with picture",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -622,7 +623,8 @@
 								"upload-picture",
 								"1"
 							]
-						}
+						},
+						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request.\n\n2) Output: one lot with:\n\n- link to picture from S3 (expires-in: 60000 == 1 min)"
 					},
 					"response": []
 				}
