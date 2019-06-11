@@ -31,8 +31,8 @@ public class Description {
     @CollectionTable(name="picture_ids")
     private ArrayList<Long> pictureIds = new ArrayList<Long>();
 
-    @Column(name = "item_name")
-    private String itemName;
+    @Column(name = "lot_name")
+    private String lotName;
 
     @Column(name = "lot_description")
     private String lotDescription;

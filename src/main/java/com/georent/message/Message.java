@@ -35,7 +35,10 @@ public enum Message {
     INVALID_FILE_EXTENSION_JPG("Only JPG images are accepted."),
     INVALID_FILE_NULL("File must not be empty!"),
     INVALID_FILE_SIZE("Size is too big."),
-    INVALID_FILE_SAVE_TMP("Unable to save file tmp.");
+    INVALID_FILE_SAVE_TMP("Unable to save file tmp."),
+
+    INVALID_PICTURE_LOAD_AMAZONE_SERVICES("Amazon S3 couldn't process."),
+    INVALID_PICTURE_LOAD_SDK_CLIENT("Client couldn't parse the response from Amazon S3.");
 
     private String description;
 }

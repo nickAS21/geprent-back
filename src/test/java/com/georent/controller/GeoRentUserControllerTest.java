@@ -83,11 +83,11 @@ public class GeoRentUserControllerTest {
     @Test
     public void setUserLot_mapping_post_user_lot_Return_Status_ok() throws Exception {
         RegistrationLotDto reqest = new RegistrationLotDto();
+        reqest.setPrice(200L);
         reqest.setLatitude(801.800f);
         reqest.setLongitude(901.900f);
         reqest.setAddress("100 Киев 14");
-        reqest.setItemPath("d:tmp/dc/2.png");
-        reqest.setItemName("itemName2");
+        reqest.setLotName("New Lot Name");
         reqest.setLotDescription("lotDescription2 lotDescription lotDescription");
 
         mockMvc.perform(post("/user/lot")

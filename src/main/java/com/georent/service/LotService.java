@@ -63,7 +63,7 @@ public class LotService {
         coordinatesDTO.setLongitude(coordinates.getLongitude());
 
         DescriptionDTO descriptionDTO = new DescriptionDTO();
-        descriptionDTO.setItemName(description.getItemName());
+        descriptionDTO.setLotName(description.getLotName());
 
         LotDTO dto = new LotDTO();
         dto.setId(id);
@@ -83,7 +83,7 @@ public class LotService {
         coordinatesDTO.setAddress(coordinates.getAddress());
 
         DescriptionDTO descriptionDTO = new DescriptionDTO();
-        descriptionDTO.setItemName(description.getItemName());
+        descriptionDTO.setLotName(description.getLotName());
         descriptionDTO.setLotDescription(description.getLotDescription());
 //        descriptionDTO.setPictureId(description.getPictureId());
         Collections.copy(description.getPictureIds(), descriptionDTO.getPictureIds());

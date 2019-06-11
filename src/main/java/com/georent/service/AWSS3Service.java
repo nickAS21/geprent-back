@@ -4,8 +4,19 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsResult;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ListObjectsRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.georent.config.S3ConfigurationProperties;
+import com.georent.domain.Lot;
 import com.georent.exception.FileException;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +31,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -55,6 +67,7 @@ public class AWSS3Service {
      * if file null - exception
      * if file extension not jpeg - exception
      * if size file more 200 kb - - exception
+     *
      * @param multipart
      * @return
      */
@@ -83,39 +96,43 @@ public class AWSS3Service {
 //    }
 
     /**
-     *
      * @param keyFileName
      * @param file
-     * @throws SdkClientException
-     *             If any errors are encountered in the client while making the
-     *             request or handling the response.
-     * @throws AmazonServiceException
-     *             If any errors occurred in Amazon S3 while processing the
-     *             request.
+     * @throws SdkClientException     If any errors are encountered in the client while making the
+     *                                request or handling the response.
+     * @throws AmazonServiceException If any errors occurred in Amazon S3 while processing the
+     *                                request.
      */
-    private void uploadFileTos3bucket(String keyFileName, File file) {
-        PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, file));
-            // Test
-        GeneratePresignedURL(keyFileName);
-    }
-
-    /**
-     *
-     * upload file to S3Bucket, return fileName, which is the key to get the file
-     * @param multipartFile
-     * @return keyFileName for the Picture from S3
-     *
-     */
-    public String uploadFile(MultipartFile multipartFile, String keyFileName) {
-//        String keyFileName = generateKeyFileName(multipartFile);
-        File file = convertMultiPartToFileTmp(multipartFile);
-        uploadFileTos3bucket(keyFileName, file);
-        file.delete();
+    private String uploadFileTos3bucket(String keyFileName, File file) {
+        try {
+            PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, file));
+        } catch (AmazonServiceException e) {
+            // The call was transmitted successfully, but Amazon S3 couldn't process
+            // it, so it returned an error response.
+            e.printStackTrace();
+            return null;
+        } catch (SdkClientException e) {
+            // Amazon S3 couldn't be contacted for a response, or the client
+            // couldn't parse the response from Amazon S3.
+            e.printStackTrace();
+            return null;
+        }
         return keyFileName;
     }
 
     /**
+     * upload file to S3Bucket, return fileName, which is the key to get the file
      *
+     * @param multipartFile
+     */
+    public String uploadFile(MultipartFile multipartFile, String keyFileName) {
+        File file = convertMultiPartToFileTmp(multipartFile);
+        String keyFileNameS3 = uploadFileTos3bucket(keyFileName, file);
+        file.delete();
+        return keyFileNameS3;
+    }
+
+    /**
      * @param objectKey
      * @return url for the Picture from S3
      */
@@ -133,17 +150,50 @@ public class AWSS3Service {
                             .withMethod(HttpMethod.GET)
                             .withExpiration(expiration);
             url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
-            // Test
-            System.out.println("Pre-Signed URL: " + url.toString());
         } catch (AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
+//            throw new FileException(Message.INVALID_PICTURE_LOAD_AMAZONE_SERVICES.getDescription(), e);
             e.printStackTrace();
+            return null;
         } catch (SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
+//            throw new FileException(Message.INVALID_PICTURE_LOAD_SDK_CLIENT.getDescription(), e);
             e.printStackTrace();
+            return null;
         }
         return url;
     }
+
+    /**
+     *
+     * @param lot
+     * @return successfulDeletes - count of deleted files by prefix
+     */
+
+    public int deleteLotPictures(String keyPrefix) {
+        ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName())
+                .withPrefix(keyPrefix);
+        ListObjectsRequest listObjectsRequestTest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
+        ObjectListing objectListing = s3Client.listObjects(listObjectsRequestTest);
+
+        ObjectListing objects = s3Client.listObjects(listObjectsRequest);
+        List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
+        for (S3ObjectSummary objectSummarie  : objectSummaries) {
+            // Gather the new object keys without version IDs.
+            keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+        }
+
+        // Delete the sample objects without specifying versions.
+        DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest(this.s3Properties.getBucketName()).withKeys(keys)
+                .withQuiet(false);
+        //  Verify that delete markers were successfully added to the objects.
+        DeleteObjectsResult delObjRes =  s3Client.deleteObjects(multiObjectDeleteRequest);
+        int successfulDeletes = delObjRes.getDeletedObjects().size();
+        objectListing = s3Client.listObjects(listObjectsRequestTest);
+        return successfulDeletes;
+    }
+
 }
