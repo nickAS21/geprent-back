@@ -153,7 +153,7 @@ public class GeoRentUserServiceRepositoryTest {
         RegistrationLotDto registrationLotDto = ServiceTestUtils.registrationLotDto (TEST_LOT);
         when(mockLotRepository.save(any(Lot.class))).thenReturn(TEST_LOT);
         // when
-        GenericResponseDTO responseDTO = userService.saveUserLot (principal, registrationLotDto);
+        GenericResponseDTO responseDTO = userService.saveUserLotWithoutPicture(principal, registrationLotDto);
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));
         verify(mockLotRepository, times(1)).save(any(Lot.class));
         // then

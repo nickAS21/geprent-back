@@ -37,7 +37,7 @@ public class ServiceTestUtils {
         Description description = new Description();
         description.setId(1L);
 //        description.setPictureId(1L);
-        description.setItemName("itemName2");
+        description.setLotName("itemName2");
         description.setLotDescription("lotDescription2 lotDescription lotDescription");
         return description;
     }
@@ -78,7 +78,7 @@ public class ServiceTestUtils {
         final Description description = createTestDescription();
         DescriptionDTO descDTO = new DescriptionDTO();
 
-        descDTO.setItemName(description.getItemName());
+        descDTO.setLotName(description.getLotName());
         descDTO.setLotDescription(description.getLotDescription());
 //        descDTO.setPictureId(description.getPictureId());
 
@@ -95,7 +95,7 @@ public class ServiceTestUtils {
         coordDTO.setLongitude(testCoord.getLongitude());
 
         DescriptionDTO descriptionDTO = new DescriptionDTO();
-        descriptionDTO.setItemName(testDescr.getItemName());
+        descriptionDTO.setLotName(testDescr.getLotName());
 
         LotDTO lotDTO = new LotDTO();
 
@@ -145,8 +145,7 @@ public class ServiceTestUtils {
         registrationLotDto.setLongitude(lot.getCoordinates().getLongitude());
         registrationLotDto.setLatitude(lot.getCoordinates().getLatitude());
         registrationLotDto.setAddress(lot.getCoordinates().getAddress());
-//        registrationLotDto.setItemPath(Long.toString(lot.getDescription().getPictureId()));
-        registrationLotDto.setItemName(lot.getDescription().getItemName());
+        registrationLotDto.setLotName(lot.getDescription().getLotName());
         registrationLotDto.setLotDescription(lot.getDescription().getLotDescription());
         return registrationLotDto;
     }
