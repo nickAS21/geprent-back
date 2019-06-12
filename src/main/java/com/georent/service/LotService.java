@@ -1,17 +1,24 @@
 package com.georent.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.Lot;
 import com.georent.dto.CoordinatesDTO;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotDTO;
+import com.georent.dto.LotPageDTO;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +27,13 @@ import java.util.stream.Collectors;
 public class LotService {
 
     private final transient LotRepository lotRepository;
+    private final transient AWSS3Service awss3Service;
 
     @Autowired
-    public LotService(LotRepository lotRepository) {
+    public LotService(LotRepository lotRepository,
+                      final AWSS3Service awss3Service) {
         this.lotRepository = lotRepository;
+        this.awss3Service = awss3Service;
     }
 
     /**
@@ -51,6 +61,21 @@ public class LotService {
                         Message.INVALID_GET_LOT_ID.getDescription() + " " + id)
                 );
         return mapToLotDTO(lot);
+    }
+
+    /**
+     *
+     * @param numberPage
+     * @param count
+     * @return List<LotDTO>
+     */
+
+    public List<LotPageDTO> getPage(int numberPage, int count) {
+        Page<Lot> page = lotRepository.findAll(PageRequest.of(numberPage, count));
+        List<Lot> lots = page.getContent();
+        return lots.stream()
+                .map(this::mapToPageLotDTO)
+                .collect(Collectors.toList());
     }
 
     private LotDTO mapToShortLotDTO(Lot lot) {
@@ -85,14 +110,34 @@ public class LotService {
         DescriptionDTO descriptionDTO = new DescriptionDTO();
         descriptionDTO.setLotName(description.getLotName());
         descriptionDTO.setLotDescription(description.getLotDescription());
-//        descriptionDTO.setPictureId(description.getPictureId());
         Collections.copy(description.getPictureIds(), descriptionDTO.getPictureIds());
-
         LotDTO dto = new LotDTO();
+            //  add URLs picture
+        List<DeleteObjectsRequest.KeyVersion> keys =  this.awss3Service.getKeysLot(lot.getId());
+        for (DeleteObjectsRequest.KeyVersion keyFileName: keys) {
+            URL url = this.awss3Service.GeneratePresignedURL(keyFileName.getKey());
+            if (url != null) dto.getDescription().getURLs().add(url);
+        }
+
         dto.setId(id);
         dto.setPrice(lot.getPrice());
         dto.setCoordinates(coordinatesDTO);
         dto.setDescription(descriptionDTO);
+        return dto;
+    }
+
+
+    private LotPageDTO mapToPageLotDTO(Lot lot) {
+        LotPageDTO dto = new LotPageDTO();
+        dto.setId(lot.getId());
+        dto.setPrice(lot.getPrice());
+        dto.setAddress(lot.getCoordinates().getAddress());
+        dto.setLotName(lot.getDescription().getLotName());
+        List<DeleteObjectsRequest.KeyVersion> keys =  this.awss3Service.getKeysLot(lot.getId());
+        if (keys.size() > 0) {
+            URL url = this.awss3Service.GeneratePresignedURL(keys.get(0).getKey());
+            dto.setUrl(url);
+        }
         return dto;
     }
 }

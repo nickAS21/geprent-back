@@ -3,6 +3,8 @@ package com.georent.controller;
 
 import com.georent.service.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +36,25 @@ public class LotController {
     }
 
     /**
-     * Processes the GET request to "/lot{id}" URI.
+     * Processes the GET request to "/lot/{id}" URI.
      * @param lotId the id of the lot, specified in the request path.
      * @return Response, containing the requested lot in the format of LotDTO.
      */
    @GetMapping ("/{id}")
     public ResponseEntity<?> getLotId(@PathVariable(value = "id") Long lotId) {
         return status(OK).body(lotService.getLotDto(lotId));
+    }
+
+
+    /**
+     * Processes the GET request to "/lot/page/{number}/{count}" URI.
+     * @param numberPage
+     * @param count
+     * @return Response, containing the list of all lots one page in the format lotDto.
+     */
+    @GetMapping ("/page/{number}/{count}")
+    public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
+                                     @PathVariable(value = "count") int count) {
+        return status(OK).body(lotService.getPage(numberPage, count));
     }
 }

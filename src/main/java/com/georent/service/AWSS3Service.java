@@ -16,7 +16,6 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.georent.config.S3ConfigurationProperties;
-import com.georent.domain.Lot;
 import com.georent.exception.FileException;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -124,6 +123,7 @@ public class AWSS3Service {
      * upload file to S3Bucket, return fileName, which is the key to get the file
      *
      * @param multipartFile
+     * @return null if error
      */
     public String uploadFile(MultipartFile multipartFile, String keyFileName) {
         File file = convertMultiPartToFileTmp(multipartFile);
@@ -133,11 +133,11 @@ public class AWSS3Service {
     }
 
     /**
-     * @param objectKey
-     * @return url for the Picture from S3
+     * @param keyFileName
+     * @return null if error
      */
 
-    public URL GeneratePresignedURL(String objectKey) {
+    public URL GeneratePresignedURL(String keyFileName) {
         URL url = null;
         try {
             // Set the presigned URL to expire after expires-in pref: aws.
@@ -146,7 +146,7 @@ public class AWSS3Service {
 
             // Generate the presigned URL.
             GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                    new GeneratePresignedUrlRequest(s3Properties.getBucketName(), objectKey)
+                    new GeneratePresignedUrlRequest(s3Properties.getBucketName(), keyFileName)
                             .withMethod(HttpMethod.GET)
                             .withExpiration(expiration);
             url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
@@ -167,33 +167,81 @@ public class AWSS3Service {
     }
 
     /**
+     * if keyPrefix != null, then delete all Pictures with  filter lotId
+     * if keyPrefix == null, then delete all Pictures with  filter userId
      *
-     * @param lot
+     * @param lotId
+     * @param userId
      * @return successfulDeletes - count of deleted files by prefix
      */
 
-    public int deleteLotPictures(String keyPrefix) {
+    public int deleteLotPictures(Long lotId, Long userId) {
+        int successfulDeletes = 0;
+        // test
+        ListObjectsRequest listObjectsRequestTest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
+        ObjectListing objectListingTest = s3Client.listObjects(listObjectsRequestTest);
+
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
+        // all Pictures with  filter userId
+        if (userId > 0) {
+            keys = getKeysUserLots(userId);
+        }
+        // all Pictures with  filter lotId
+        else {
+            keys = getKeysLot(lotId);
+        }
+        if (keys.size() > 0) {
+            // Delete the sample objects without specifying versions.
+            DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest(this.s3Properties.getBucketName()).withKeys(keys)
+                    .withQuiet(false);
+            //  Verify that delete markers were successfully added to the objects.
+            DeleteObjectsResult delObjRes = s3Client.deleteObjects(multiObjectDeleteRequest);
+            successfulDeletes = delObjRes.getDeletedObjects().size();
+        }
+
+        // test
+        objectListingTest = s3Client.listObjects(listObjectsRequestTest);
+
+        return successfulDeletes;
+    }
+
+    /**
+     *
+     * @param userId
+     * @return keys all Pictures with  filter userId
+     */
+    public List<DeleteObjectsRequest.KeyVersion> getKeysUserLots(Long userId) {
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
+        ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
+        ObjectListing objects = s3Client.listObjects(listObjectsRequestAll);
+        List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
+        for (S3ObjectSummary objectSummarie : objectSummaries) {
+            int firstFlesh = objectSummarie.getKey().indexOf("/", 1);
+            int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
+            if (objectSummarie.getKey().substring(firstFlesh + 1, secondFlesh).equals(Long.toString(userId))) {
+                keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+            }
+        }
+        return keys;
+    }
+
+    /**
+     * @param lotId
+     * @return keys all Pictures with  filter lotId
+     */
+    public List<DeleteObjectsRequest.KeyVersion> getKeysLot(Long lotId) {
+        String keyPrefix = Long.toString(lotId)+ "/";
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName())
                 .withPrefix(keyPrefix);
-        ListObjectsRequest listObjectsRequestTest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-        ObjectListing objectListing = s3Client.listObjects(listObjectsRequestTest);
-
+//                .withDelimiter("/");    // only files, not delete folder
         ObjectListing objects = s3Client.listObjects(listObjectsRequest);
         List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
-        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
-        for (S3ObjectSummary objectSummarie  : objectSummaries) {
+        for (S3ObjectSummary objectSummarie : objectSummaries) {
             // Gather the new object keys without version IDs.
             keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
         }
-
-        // Delete the sample objects without specifying versions.
-        DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest(this.s3Properties.getBucketName()).withKeys(keys)
-                .withQuiet(false);
-        //  Verify that delete markers were successfully added to the objects.
-        DeleteObjectsResult delObjRes =  s3Client.deleteObjects(multiObjectDeleteRequest);
-        int successfulDeletes = delObjRes.getDeletedObjects().size();
-        objectListing = s3Client.listObjects(listObjectsRequestTest);
-        return successfulDeletes;
+        return keys;
     }
 
 }
