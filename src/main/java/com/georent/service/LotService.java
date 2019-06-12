@@ -14,11 +14,9 @@ import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,8 +133,8 @@ public class LotService {
         dto.setLotName(lot.getDescription().getLotName());
         List<DeleteObjectsRequest.KeyVersion> keys =  this.awss3Service.getKeysLot(lot.getId());
         if (keys.size() > 0) {
-            URL url = this.awss3Service.GeneratePresignedURL(keys.get(0).getKey());
-            dto.setUrl(url);
+            URL imageUrl = this.awss3Service.GeneratePresignedURL(keys.get(0).getKey());
+            dto.setImageUrl(imageUrl);
         }
         return dto;
     }
