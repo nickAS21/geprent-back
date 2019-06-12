@@ -140,6 +140,7 @@ public class GeoRentUserService {
 
     /**
      * Downloads the lot and temp URL picture from pictures repository (Amazon S3).
+     * key = lotId/userId /picrureId
      * @param principal Current user identifier.
      * @param id The id of the specified lot.
      * @return The lot with specified id in the format of LotDTO.
@@ -152,7 +153,7 @@ public class GeoRentUserService {
                         + Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
         LotDTO  lotDTO = mapToLotDTO(lot);
         for (Long  picrureId: lotDTO.getDescription().getPictureIds()) {
-            String keyFileName = Long.toString(geoRentUser.getId()) + "/" + Long.toString(lotDTO.getId()) + "/" + Long.toString(picrureId);
+            String keyFileName = Long.toString(lotDTO.getId()) + "/" + Long.toString(geoRentUser.getId()) + "/" + Long.toString(picrureId);
             URL url = this.awss3Service.GeneratePresignedURL(keyFileName);
             if (url != null) lotDTO.getDescription().getURLs().add(url);
         }
@@ -178,7 +179,7 @@ public class GeoRentUserService {
     }
 
     /**
-     * keyFileName = {userId}/{lotId}/{(max value from PictureIds) +1}"
+     * keyFileName = {lotId}/{userId}/{(max value from PictureIds) +1}"
      * picrureIdNext (for the fileUrl -> keyFileName)  is saved to list pictureIds - >  in Description
      * picrureIdNext  not is saved to list pictureIds if AmazonServiceException or SdkClientException
      * @param multipartFiles
@@ -202,7 +203,7 @@ public class GeoRentUserService {
         for (MultipartFile multipartFile : multipartFiles) {
             Long picrureIdNext = 1L;
             if (lot.getDescription().getPictureIds().size() > 0) picrureIdNext = Collections.max(lot.getDescription().getPictureIds())+1;
-            String keyFileName = Long.toString(geoRentUser.getId()) + "/" + Long.toString(lot.getId()) + "/" + Long.toString(picrureIdNext);
+            String keyFileName = Long.toString(lot.getId())  + "/" + Long.toString(geoRentUser.getId())+ "/" + Long.toString(picrureIdNext);
             String keyFileNameS3 = this.awss3Service.uploadFile(multipartFile, keyFileName);
             if (keyFileNameS3 != null && !keyFileNameS3.isEmpty()) {
                 lot.getDescription().getPictureIds().add(Long.valueOf(picrureIdNext));
@@ -326,14 +327,12 @@ public class GeoRentUserService {
     }
 
     private void deleteOneLot (Lot lot) {
-        String keyPrefix = Long.toString(lot.getGeoRentUser().getId()) + "/" + Long.toString(lot.getId()) + "/";
-        this.awss3Service.deleteLotPictures(keyPrefix);
+        this.awss3Service.deleteLotPictures(lot.getId(), 0L);
         this.lotRepository.deleteById(lot.getId());
 
     }
     private void deleteAllLotUser (GeoRentUser geoRentUser) {
-        String keyPrefix = Long.toString(geoRentUser.getId()) + "/" ;
-        this.awss3Service.deleteLotPictures(keyPrefix);
+        this.awss3Service.deleteLotPictures(null, geoRentUser.getId());
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
     }
 }
