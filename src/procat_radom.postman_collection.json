@@ -1041,6 +1041,29 @@
 							"body": ""
 						}
 					]
+				},
+				{
+					"name": "Get information on all lots one page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/lot/page/0/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"lot",
+								"page",
+								"0",
+								"3"
+							]
+						},
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) Processes the GET request to \"/lot/page/{number}/{count}\" URI.\n\n- \"number\" - Page number. First page from zero.\n\n- \"count\" - The count of lots on one page."
+					},
+					"response": []
 				}
 			]
 		}
