@@ -10,5 +10,5 @@ public class LotPageDTO {
     private Long price;
     private String address;
     private String lotName;
-    private URL url;
+    private URL imageUrl;
 }
