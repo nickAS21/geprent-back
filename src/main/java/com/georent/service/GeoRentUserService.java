@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -201,6 +202,7 @@ public class GeoRentUserService {
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         for (MultipartFile multipartFile : multipartFiles) {
+//            String pictureName = UUID.randomUUID().toString();
             Long picrureIdNext = 1L;
             if (lot.getDescription().getPictureIds().size() > 0) picrureIdNext = Collections.max(lot.getDescription().getPictureIds())+1;
             String keyFileName = Long.toString(lot.getId())  + "/" + Long.toString(geoRentUser.getId())+ "/" + Long.toString(picrureIdNext);
