@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ServiceTestUtils {
     public static GeoRentUser createTestUser() {
@@ -158,17 +160,17 @@ public class ServiceTestUtils {
         MultipartFile multipartFile = new MultipartFile() {
             @Override
             public String getName() {
-                return "newImageForLot";
+                return "testImageForLot";
             }
 
             @Override
             public String getOriginalFilename() {
-                return null;
+                return "testImageForLot.jpg";
             }
 
             @Override
             public String getContentType() {
-                return null;
+                return "image/jpeg";
             }
 
             @Override
@@ -178,12 +180,14 @@ public class ServiceTestUtils {
 
             @Override
             public long getSize() {
-                return 0;
+                return 150000;
             }
 
             @Override
             public byte[] getBytes() throws IOException {
-                return new byte[0];
+                String text = "Geo Rent Procat Radom!";
+                 return text.getBytes();
+
             }
 
             @Override
@@ -205,5 +209,9 @@ public class ServiceTestUtils {
         String registrationLotDtoStr = "{\"price\":\"120\",\"longitude\":\"80800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"newLotName With Picture\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}";
 
         return registrationLotDtoStr;
+    }
+
+    public static URL getUrl (String keyFileName) throws MalformedURLException {
+        return new URL("http", "localhost", 8080, keyFileName);
     }
 }

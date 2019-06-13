@@ -1,7 +1,6 @@
 package com.georent.service;
 
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
@@ -169,7 +168,7 @@ public class GeoRentUserService {
         LotDTO  lotDTO = mapToLotDTO(lot);
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
         for (DeleteObjectsRequest.KeyVersion keyFileName : keys) {
-            URL url = this.awss3Service.GeneratePresignedURL(keyFileName.getKey());
+            URL url = this.awss3Service.generatePresignedURL(keyFileName.getKey());
             if (url != null) lotDTO.getDescription().getURLs().add(url);
         }
         return lotDTO;
