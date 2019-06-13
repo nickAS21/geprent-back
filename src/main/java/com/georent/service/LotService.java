@@ -126,7 +126,7 @@ public class LotService {
         //  add URLs picture
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
         for (DeleteObjectsRequest.KeyVersion keyFileName : keys) {
-            URL url = this.awss3Service.GeneratePresignedURL(keyFileName.getKey());
+            URL url = this.awss3Service.generatePresignedURL(keyFileName.getKey());
             if (url != null) dto.getDescription().getURLs().add(url);
         }
 
@@ -146,7 +146,7 @@ public class LotService {
         dto.setLotName(lot.getDescription().getLotName());
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
         if (keys.size() > 0) {
-            URL imageUrl = this.awss3Service.GeneratePresignedURL(keys.get(0).getKey());
+            URL imageUrl = this.awss3Service.generatePresignedURL(keys.get(0).getKey());
             dto.setImageUrl(imageUrl);
         }
         return dto;

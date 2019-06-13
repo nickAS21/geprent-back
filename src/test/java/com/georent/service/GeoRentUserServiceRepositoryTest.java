@@ -13,24 +13,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import static com.georent.service.ServiceTestUtils.getMultipartFiles;
-import static com.georent.service.ServiceTestUtils.getRegistrationLotDtoStr;
+import static com.georent.service.ServiceTestUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -161,14 +155,14 @@ public class GeoRentUserServiceRepositoryTest {
     public void WhenGetUserLotIdUploadPicture_Return_LotDto() throws MalformedURLException {
         // given
         Long picrureId = 1L;
-        String keyFileName = "/" + Long.toString(TEST_LOT.getId()) + "/" + Long.toString(TEST_LOT.getGeoRentUser().getId()) + "/" + Long.toString(picrureId);
-        URL url = new URL("http", "localhost", 8080, keyFileName);
+        String keyFileName = "/geo-rent-bucket.s3.eu-west-1.amazonaws.com/" + Long.toString(TEST_LOT.getId()) + "/" + Long.toString(TEST_LOT.getGeoRentUser().getId()) + "/" + Long.toString(picrureId);
+        URL url = getUrl(keyFileName);
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         keys.add(new DeleteObjectsRequest.KeyVersion(keyFileName));
         // when
         when(mockLotRepository.findByIdAndGeoRentUser_Id(any(Long.class), any(Long.class))).thenReturn(Optional.of(TEST_LOT));
         when(mockDAWSS3Service.getKeysLot(TEST_LOT.getId())).thenReturn(keys);
-        when(mockDAWSS3Service.GeneratePresignedURL(any(String.class))).thenReturn(url);
+        when(mockDAWSS3Service.generatePresignedURL(any(String.class))).thenReturn(url);
         // then
         LotDTO lotDTOOut = userService.getUserLotIdUploadPicture(principal, TEST_LOT.getId());
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));

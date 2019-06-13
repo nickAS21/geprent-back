@@ -7,13 +7,10 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsResult;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.georent.config.S3ConfigurationProperties;
 import com.georent.exception.FileException;
@@ -29,7 +26,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,28 +35,14 @@ import java.util.UUID;
 @Service
 public class AWSS3Service {
 
-    private final AmazonS3 s3Client;
-    private final S3ConfigurationProperties s3Properties;
+    public final AmazonS3 s3Client;
+    public final S3ConfigurationProperties s3Properties;
 
     @Autowired
     public AWSS3Service(AmazonS3 s3Client,
                         S3ConfigurationProperties s3ConfigurationProperties) {
         this.s3Client = s3Client;
         this.s3Properties = s3ConfigurationProperties;
-    }
-
-    /*
-     * return S3object and save it in saveFilePath
-     * */
-    //TODO change the way we pass file to client.
-    public S3Object getS3Object(String keyFile,
-                                Path saveFilePath) throws IOException {
-        ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-        ObjectListing objectListing = s3Client.listObjects(listObjectsRequest);
-        S3Object s3Object = s3Client.getObject(new GetObjectRequest(s3Properties.getBucketName(), keyFile));
-        S3ObjectInputStream inputStream = s3Object.getObjectContent();
-        Files.copy(inputStream, saveFilePath, StandardCopyOption.REPLACE_EXISTING);
-        return s3Object;
     }
 
     /**
@@ -71,7 +53,6 @@ public class AWSS3Service {
      * @param multipart
      * @return
      */
-
     private File convertMultiPartToFileTmp(MultipartFile multipart) {
         Assert.notNull(multipart, Message.INVALID_FILE_NULL.getDescription());
         if (!multipart.getContentType().equals("image/jpeg")) {
@@ -138,7 +119,7 @@ public class AWSS3Service {
      * @return null if error
      */
 
-    public URL GeneratePresignedURL(String keyFileName) {
+    public URL generatePresignedURL(String keyFileName) {
         URL url = null;
         try {
             // Set the presigned URL to expire after expires-in pref: aws.
@@ -215,7 +196,7 @@ public class AWSS3Service {
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
         ObjectListing objects = s3Client.listObjects(listObjectsRequestAll);
-        List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
+         List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
         for (S3ObjectSummary objectSummarie : objectSummaries) {
             int firstFlesh = objectSummarie.getKey().indexOf("/", 1);
             int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
