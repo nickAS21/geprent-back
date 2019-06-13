@@ -202,7 +202,7 @@ public class GeoRentUserService {
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         for (MultipartFile multipartFile : multipartFiles) {
-//            String pictureName = UUID.randomUUID().toString();
+            String pictureName = this.awss3Service.generateKeyFileName();
             Long picrureIdNext = 1L;
             if (lot.getDescription().getPictureIds().size() > 0) picrureIdNext = Collections.max(lot.getDescription().getPictureIds())+1;
             String keyFileName = Long.toString(lot.getId())  + "/" + Long.toString(geoRentUser.getId())+ "/" + Long.toString(picrureIdNext);

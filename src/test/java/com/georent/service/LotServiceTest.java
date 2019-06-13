@@ -2,11 +2,17 @@ package com.georent.service;
 
 import com.georent.domain.Lot;
 import com.georent.dto.LotDTO;
+import com.georent.dto.LotPageDTO;
 import com.georent.repository.LotRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +30,11 @@ public class LotServiceTest {
 
     private LotService lotService;
     private LotRepository mockRepository = mock(LotRepository.class);
+    private AWSS3Service mockService = mock(AWSS3Service.class);
 
     @Before
     public void setup() {
-        lotService = new LotService(mockRepository);
+        lotService = new LotService(mockRepository, mockService);
     }
 
     @Test
@@ -54,6 +61,16 @@ public class LotServiceTest {
         Assert.assertEquals(TEST_LOT_DTO, actualLotDTO);
     }
 
+
+    @Test    public void When_Service_GetPage_Return_LotsPageDTO() {
+
+        List<Lot> lots = new ArrayList<>();
+        Page<Lot> pagedLots = new PageImpl(lots);
+        Pageable pageRequest = PageRequest.of(0, 4);
+        when(this.mockRepository.findAll(pageRequest)).thenReturn(pagedLots);
+        lotService.getPage(0, 4, "");
+        verify(mockRepository, times(1)).findAll(pageRequest);
+    }
 
 
 }
