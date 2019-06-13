@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -90,9 +91,9 @@ public class AWSS3Service {
         return tempFile.toFile();
     }
 
-//    private String generateKeyFileName(MultipartFile multiPart) {
-//        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
-//    }
+    public String generateKeyFileName() {
+        return UUID.randomUUID().toString();
+    }
 
     /**
      * @param keyFileName
@@ -103,20 +104,20 @@ public class AWSS3Service {
      *                                request.
      */
     private String uploadFileTos3bucket(String keyFileName, File file) {
+        String keyFileNameS3 = null;
         try {
             PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, file));
+            keyFileNameS3 = keyFileName;
         } catch (AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
             e.printStackTrace();
-            return null;
         } catch (SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
             e.printStackTrace();
-            return null;
         }
-        return keyFileName;
+        return keyFileNameS3;
     }
 
     /**

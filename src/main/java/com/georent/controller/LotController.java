@@ -52,9 +52,10 @@ public class LotController {
      * @param count
      * @return Response, containing the list of all lots one page in the format lotDto.
      */
-    @GetMapping ("/page/{number}/{count}")
+    @GetMapping ("/page/{number}/{count}/{metod}")
     public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
-                                     @PathVariable(value = "count") int count) {
-        return status(OK).body(lotService.getPage(numberPage, count));
+                                     @PathVariable(value = "count") int count,
+                                     @PathVariable(value = "metod") String metodPage) {
+        return status(OK).body(lotService.getPage(numberPage, count, metodPage));
     }
 }

@@ -43,13 +43,22 @@ public class LotControllerTest {
     }
 
     @Test
-
     public void getLotAll_mapping_get_lots_Return_Status_isNotFound() throws Exception {
         mockMvc.perform(get("/lots")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andDo(print())
                 .andExpect(status().isNotFound())
+                .andReturn();
+    }
+
+    @Test
+    public void getPage_mapping_get_numberPage_count_Return_Status_ok() throws Exception {
+        mockMvc.perform(get("/lot/page/0/5")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andDo(print())
+                .andExpect(status().isOk())
                 .andReturn();
     }
 }
