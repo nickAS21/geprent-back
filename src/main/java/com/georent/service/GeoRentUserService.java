@@ -1,5 +1,6 @@
 package com.georent.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.georent.domain.Coordinates;
@@ -30,19 +31,15 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.status;
-
 
 @Service
 public class GeoRentUserService {
@@ -69,13 +66,30 @@ public class GeoRentUserService {
         this.awss3Service = awss3Service;
     }
 
+    /**
+     *
+     * @param email
+     * @return GeoRentUser if user with this email is registered
+     */
+
     public Optional<GeoRentUser> getUserByEmail(final String email) {
         return userRepository.findByEmail(email);
     }
 
+    /**
+     *
+     * @param email
+     * @return true if email is registered, false if email is not registered
+     */
     public Boolean existsUserByEmail(final String email) {
         return userRepository.existsByEmail(email);
     }
+
+    /**
+     *
+     * @param user
+     * @return GeoRentUser
+     */
 
     @Transactional
     public GeoRentUser saveNewUser(final GeoRentUser user) {
@@ -153,9 +167,9 @@ public class GeoRentUserService {
                 .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID.getDescription() + Long.toString(id)
                         + Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
         LotDTO  lotDTO = mapToLotDTO(lot);
-        for (Long  picrureId: lotDTO.getDescription().getPictureIds()) {
-            String keyFileName = Long.toString(lotDTO.getId()) + "/" + Long.toString(geoRentUser.getId()) + "/" + Long.toString(picrureId);
-            URL url = this.awss3Service.GeneratePresignedURL(keyFileName);
+        List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
+        for (DeleteObjectsRequest.KeyVersion keyFileName : keys) {
+            URL url = this.awss3Service.GeneratePresignedURL(keyFileName.getKey());
             if (url != null) lotDTO.getDescription().getURLs().add(url);
         }
         return lotDTO;
