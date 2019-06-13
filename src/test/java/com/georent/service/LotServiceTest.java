@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,13 +64,15 @@ public class LotServiceTest {
 
 
     @Test    public void When_Service_GetPage_Return_LotsPageDTO() {
-
         List<Lot> lots = new ArrayList<>();
         Page<Lot> pagedLots = new PageImpl(lots);
         Pageable pageRequest = PageRequest.of(0, 4);
         when(this.mockRepository.findAll(pageRequest)).thenReturn(pagedLots);
-        lotService.getPage(0, 4, "");
+        PageImpl page = lotService.getPage(0, 4, "");
         verify(mockRepository, times(1)).findAll(pageRequest);
+        Assert.assertEquals(page.getPageable().getPageNumber(), 0);
+        Assert.assertEquals(page.getPageable().getPageSize(), 4);
+        Assert.assertEquals(page.getPageable().getSort(), Sort.unsorted());
     }
 
 

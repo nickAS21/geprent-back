@@ -1,5 +1,6 @@
 package com.georent.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
 import com.georent.dto.*;
@@ -11,13 +12,25 @@ import com.georent.repository.LotRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import static com.georent.service.ServiceTestUtils.getMultipartFiles;
+import static com.georent.service.ServiceTestUtils.getRegistrationLotDtoStr;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -125,45 +138,79 @@ public class GeoRentUserServiceRepositoryTest {
     public void WhengetUserLots_Return_List_LotDto() {
         // given
         List<Lot> lotsIn = Arrays.asList(TEST_LOT);
+         // when
         when(mockLotRepository.findAllByGeoRentUser_Id(any(Long.class))).thenReturn(lotsIn);
-        List<LotDTO> expectedLotsDTO = Arrays.asList(TEST_LOT_DTO);
-        // when
-        List<LotDTO> actualLotsDTO =  userService.getUserLots(principal);
+        // then
+        userService.getUserLots(principal);
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));
         verify(mockLotRepository, times(1)).findAllByGeoRentUser_Id(any(Long.class));
-        // then
-        Assert.assertEquals(expectedLotsDTO, actualLotsDTO);
     }
 
     @Test
     public void WhenGetUserLotId_Return_LotDto() {
         // given
-        when(mockLotRepository.findByIdAndGeoRentUser_Id(any(Long.class), any(Long.class))).thenReturn(Optional.of(TEST_LOT));
         // when
-        LotDTO lotDTOOut = userService.getUserLotId(principal, TEST_LOT.getId());
+        when(mockLotRepository.findByIdAndGeoRentUser_Id(any(Long.class), any(Long.class))).thenReturn(Optional.of(TEST_LOT));
+        // then
+        userService.getUserLotId(principal, TEST_LOT.getId());
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));
         verify(mockLotRepository, times(1)).findByIdAndGeoRentUser_Id(any(Long.class), any(Long.class));
+    }
+
+    @Test
+    public void WhenGetUserLotIdUploadPicture_Return_LotDto() throws MalformedURLException {
+        // given
+        Long picrureId = 1L;
+        String keyFileName = "/" + Long.toString(TEST_LOT.getId()) + "/" + Long.toString(TEST_LOT.getGeoRentUser().getId()) + "/" + Long.toString(picrureId);
+        URL url = new URL("http", "localhost", 8080, keyFileName);
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
+        keys.add(new DeleteObjectsRequest.KeyVersion(keyFileName));
+        // when
+        when(mockLotRepository.findByIdAndGeoRentUser_Id(any(Long.class), any(Long.class))).thenReturn(Optional.of(TEST_LOT));
+        when(mockDAWSS3Service.getKeysLot(TEST_LOT.getId())).thenReturn(keys);
+        when(mockDAWSS3Service.GeneratePresignedURL(any(String.class))).thenReturn(url);
         // then
+        LotDTO lotDTOOut = userService.getUserLotIdUploadPicture(principal, TEST_LOT.getId());
+        verify(mockUserRepository, times(1)).findByEmail(any(String.class));
+        verify(mockLotRepository, times(1)).findByIdAndGeoRentUser_Id(any(Long.class), any(Long.class));
+        TEST_LOT_DTO.getDescription().getURLs().add(url);
         Assert.assertEquals(TEST_LOT_DTO, lotDTOOut);
     }
 
     @Test
-    public void WhenSaveUserLot_Return_LotDto() {
+    public void WhenSaveUserLotWithoutPicture_Return_LotDto() {
         // given
         RegistrationLotDto registrationLotDto = ServiceTestUtils.registrationLotDto (TEST_LOT);
-        when(mockLotRepository.save(any(Lot.class))).thenReturn(TEST_LOT);
         // when
+        when(mockLotRepository.save(any(Lot.class))).thenReturn(TEST_LOT);
+        // then
         GenericResponseDTO responseDTO = userService.saveUserLotWithoutPicture(principal, registrationLotDto);
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));
         verify(mockLotRepository, times(1)).save(any(Lot.class));
-        // then
         Assert.assertEquals(Message.SUCCESS_SAVE_LOT.getDescription(), responseDTO.getMessage());
-        Assert.assertEquals(TEST_LOT_DTO, responseDTO.getBody());
+    }
+
+    @Test
+    public void WhenSaveUserLotUploadPicture_Return_LotDto() {
+        // given
+        RegistrationLotDto registrationLotDto = ServiceTestUtils.registrationLotDto (TEST_LOT);
+        MultipartFile[] multipartFiles = getMultipartFiles ();
+        Long picrureIdNext = 1L;
+        // when
+        String keyFileName = Long.toString(TEST_LOT.getId())  + "/" + Long.toString(TEST_LOT.getGeoRentUser().getId())+ "/" + Long.toString(picrureIdNext);
+        when(mockDAWSS3Service.uploadFile(any(MultipartFile.class), any(String.class))).thenReturn(keyFileName);
+        when(mockLotRepository.save(any(Lot.class))).thenReturn(TEST_LOT);
+        // then
+        org.springframework.http.ResponseEntity <?> bodyBuilder =  userService.saveUserLotUploadPicture(getMultipartFiles (), principal, getRegistrationLotDtoStr());
+        verify(mockUserRepository, times(1)).findByEmail(any(String.class));
+        verify(mockLotRepository, times(2)).save(any(Lot.class));
+        Assert.assertEquals(HttpStatus.OK, bodyBuilder.getStatusCode());
+        GenericResponseDTO lotDTO = (GenericResponseDTO) bodyBuilder.getBody();
+        Assert.assertEquals(Message.SUCCESS_SAVE_LOT.getDescription(), lotDTO.getMessage());
     }
 
     @Test
     public void WhenDeleteUser_DeleteUserLots_DeleteUser_Return_MsgMessage_SUCCESS_DELETE_USER() {
-        
         GenericResponseDTO responseDTO =  userService.deleteUser(principal);
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));
         Assert.assertEquals(Message.SUCCESS_DELETE_USER.getDescription(), responseDTO.getMessage());

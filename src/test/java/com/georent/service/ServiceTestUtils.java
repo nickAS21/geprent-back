@@ -11,6 +11,11 @@ import com.georent.dto.GeoRentUserInfoDto;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.LotDTO;
 import com.georent.dto.RegistrationLotDto;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ServiceTestUtils {
     public static GeoRentUser createTestUser() {
@@ -36,7 +41,7 @@ public class ServiceTestUtils {
     public static Description createTestDescription() {
         Description description = new Description();
         description.setId(1L);
-//        description.setPictureId(1L);
+        description.getPictureIds().add(1L);
         description.setLotName("itemName2");
         description.setLotDescription("lotDescription2 lotDescription lotDescription");
         return description;
@@ -80,8 +85,7 @@ public class ServiceTestUtils {
 
         descDTO.setLotName(description.getLotName());
         descDTO.setLotDescription(description.getLotDescription());
-//        descDTO.setPictureId(description.getPictureId());
-
+        descDTO.getPictureIds().add(description.getPictureIds().get(0));
         return descDTO;
     }
 
@@ -148,5 +152,58 @@ public class ServiceTestUtils {
         registrationLotDto.setLotName(lot.getDescription().getLotName());
         registrationLotDto.setLotDescription(lot.getDescription().getLotDescription());
         return registrationLotDto;
+    }
+
+    public static MultipartFile[] getMultipartFiles () {
+        MultipartFile multipartFile = new MultipartFile() {
+            @Override
+            public String getName() {
+                return "newImageForLot";
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return null;
+            }
+
+            @Override
+            public String getContentType() {
+                return null;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
+        MultipartFile[] multipartFiles = {multipartFile};
+
+        return  multipartFiles;
+    }
+
+    public static String getRegistrationLotDtoStr () {
+        String registrationLotDtoStr = "{\"price\":\"120\",\"longitude\":\"80800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"newLotName With Picture\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}";
+
+        return registrationLotDtoStr;
     }
 }
