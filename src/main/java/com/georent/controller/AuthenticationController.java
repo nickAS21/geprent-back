@@ -30,12 +30,22 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
+//    @RequestMapping(
+//            method = RequestMethod.POST,
+//            value = "/login",
+//            produces = "application/json"
+//    )
     public ResponseEntity<AuthenticationResponseDTO> authenticateUser(@Valid @RequestBody final LoginRequestDTO authRequest,
                                                                       final HttpServletResponse response) {
         return status(OK).body(authService.loginUser(authRequest, response));
     }
 
     @PostMapping("/register")
+//    @RequestMapping(
+//            method = RequestMethod.POST,
+//            value = "/register",
+//            produces = "application/json"
+//    )
     public ResponseEntity<?> registerUser(@Valid @RequestBody final RegistrationRequestDTO signUpRequest) {
         return status(CREATED).body(authService.registerUser(signUpRequest));
     }
