@@ -5,15 +5,15 @@ import lombok.Data;
 @Data
 public class RegistrationLotDto {
 
-    //    Coordinates
     private Long price;
+
+    //    Coordinates
     private Float longitude;
     private Float latitude;
     private String address;
 
     //         Description
-    private String itemPath;
-    private String itemName;
+    private String lotName;
     private String lotDescription;
 
 }

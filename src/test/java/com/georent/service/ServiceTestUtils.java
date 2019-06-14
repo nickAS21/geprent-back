@@ -11,6 +11,13 @@ import com.georent.dto.GeoRentUserInfoDto;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.LotDTO;
 import com.georent.dto.RegistrationLotDto;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ServiceTestUtils {
     public static GeoRentUser createTestUser() {
@@ -36,8 +43,8 @@ public class ServiceTestUtils {
     public static Description createTestDescription() {
         Description description = new Description();
         description.setId(1L);
-        description.setPictureId(1L);
-        description.setItemName("itemName2");
+        description.getPictureIds().add(1L);
+        description.setLotName("itemName2");
         description.setLotDescription("lotDescription2 lotDescription lotDescription");
         return description;
     }
@@ -78,10 +85,9 @@ public class ServiceTestUtils {
         final Description description = createTestDescription();
         DescriptionDTO descDTO = new DescriptionDTO();
 
-        descDTO.setItemName(description.getItemName());
+        descDTO.setLotName(description.getLotName());
         descDTO.setLotDescription(description.getLotDescription());
-        descDTO.setPictureId(description.getPictureId());
-
+        descDTO.getPictureIds().add(description.getPictureIds().get(0));
         return descDTO;
     }
 
@@ -95,7 +101,7 @@ public class ServiceTestUtils {
         coordDTO.setLongitude(testCoord.getLongitude());
 
         DescriptionDTO descriptionDTO = new DescriptionDTO();
-        descriptionDTO.setItemName(testDescr.getItemName());
+        descriptionDTO.setLotName(testDescr.getLotName());
 
         LotDTO lotDTO = new LotDTO();
 
@@ -145,9 +151,67 @@ public class ServiceTestUtils {
         registrationLotDto.setLongitude(lot.getCoordinates().getLongitude());
         registrationLotDto.setLatitude(lot.getCoordinates().getLatitude());
         registrationLotDto.setAddress(lot.getCoordinates().getAddress());
-        registrationLotDto.setItemPath(Long.toString(lot.getDescription().getPictureId()));
-        registrationLotDto.setItemName(lot.getDescription().getItemName());
+        registrationLotDto.setLotName(lot.getDescription().getLotName());
         registrationLotDto.setLotDescription(lot.getDescription().getLotDescription());
         return registrationLotDto;
+    }
+
+    public static MultipartFile[] getMultipartFiles () {
+        MultipartFile multipartFile = new MultipartFile() {
+            @Override
+            public String getName() {
+                return "testImageForLot";
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return "testImageForLot.jpg";
+            }
+
+            @Override
+            public String getContentType() {
+                return "image/jpeg";
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 150000;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                String text = "Geo Rent Procat Radom!";
+                 return text.getBytes();
+
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
+        MultipartFile[] multipartFiles = {multipartFile};
+
+        return  multipartFiles;
+    }
+
+    public static String getRegistrationLotDtoStr () {
+        String registrationLotDtoStr = "{\"price\":\"120\",\"longitude\":\"80800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"newLotName With Picture\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}";
+
+        return registrationLotDtoStr;
+    }
+
+    public static URL getUrl (String keyFileName) throws MalformedURLException {
+        return new URL("http", "localhost", 8080, keyFileName);
     }
 }

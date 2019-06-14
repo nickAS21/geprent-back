@@ -104,22 +104,22 @@ public class GeoRentUserController {
      */
     @PostMapping("/lot")
     public ResponseEntity<?> setUserLot(@Valid @RequestBody final RegistrationLotDto registrationLotDto, Principal principal){
-        return ResponseEntity.ok(userService.saveUserLot(principal, registrationLotDto));
+        return ResponseEntity.ok(userService.saveUserLotWithoutPicture(principal, registrationLotDto));
     }
 
     /**
      * Processes POST requests to the endpoint "/lot/upload-picture".
      * Uploads the lot picture to the pictures repository.
-     * @param multipartFile The file to upload.
-     * @param registrationLotDtoStr ???
+     * @param multipartFiles The files to upload.
+     * @param registrationLotDtoStr JSON new lot
      * @param principal Current user identifier.
-     * @return ???
+     * @return Response, containing the saved lot in the LotDTO format.
      */
     @PostMapping("/lot/upload-picture")
-    public ResponseEntity<?> setUploadPicture(@Valid @RequestParam(name = "file") MultipartFile multipartFile,
-                                              @RequestParam(name = "testDto") String registrationLotDtoStr,
+    public ResponseEntity<?> setUploadPicture(@Valid @RequestParam("files") MultipartFile[] multipartFiles,
+                                              @RequestParam(name = "lot") String registrationLotDtoStr,
                                               Principal principal)  {
-        return userService.saveUserLotUploadPicture(multipartFile, principal, registrationLotDtoStr);
+        return userService.saveUserLotUploadPicture(multipartFiles, principal, registrationLotDtoStr);
     }
 
     /**

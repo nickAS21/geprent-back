@@ -14,5 +14,6 @@ public class S3ConfigurationProperties {
     private String accessKey;
     private String bucketName;
     private String andPointUrl;
+    private String expiresIn;
 
 }

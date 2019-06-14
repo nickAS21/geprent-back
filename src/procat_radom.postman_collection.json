@@ -238,7 +238,8 @@
 								"lot",
 								"upload-picture"
 							]
-						}
+						},
+						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request:\n\nFor example:\n\n\"tokenType\": \"Bearer\", \n\n \"accessToken\": \n \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTU4Njk2MTk0LCJleHAiOjE1NTg2OTk3OTR9.4WlO568k_8WMbzz_VZPQcML5OwjrpHQOrBQPJwnmzKinBneSIp60j4VTK6plAXSTJ3oQcvphHE7rC-Y5kY3fhg\"\n\n2)Add Body from-data:\n\n2.1) KEY: files\n\nvalue: path for read file/files for tne lot\n\n2.2) KEY: lot\n\nvalue: Example: \n\n{\"price\":\"120\",\"longitude\":\"80800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"newLotName With Picture\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}"
 					},
 					"response": [
 						{
@@ -595,7 +596,7 @@
 					]
 				},
 				{
-					"name": "Get one user loat with picture",
+					"name": "Get one user lot with picture",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -622,7 +623,8 @@
 								"upload-picture",
 								"1"
 							]
-						}
+						},
+						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request.\n\n2) Output: one lot with:\n\n- link to picture from S3 (expires-in: 60000 == 1 min)"
 					},
 					"response": []
 				}
@@ -1039,6 +1041,29 @@
 							"body": ""
 						}
 					]
+				},
+				{
+					"name": "Get information on all lots one page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/lot/page/0/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"lot",
+								"page",
+								"0",
+								"3"
+							]
+						},
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) IntPut: Processes the GET request to \"/lot//page/{number}/{count}/{metod}\" URI.\n\n- \"number\" - Page number. First page from zero. \n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n- \"count\" - The count of lots on one page.\n\n- \"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\"\n calls the appropriate pageable method.\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotDTO in content\n- \"last\": true or false - Last page or not\n- \"first\": true or false - Fist page or not\n- \"number\": value current page\n- \"totalPages\": tottal count page\n- \"totalElements\": total count lots"
+					},
+					"response": []
 				}
 			]
 		}
