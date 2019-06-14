@@ -199,9 +199,13 @@ public class AWSS3Service {
          List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
         for (S3ObjectSummary objectSummarie : objectSummaries) {
             int firstFlesh = objectSummarie.getKey().indexOf("/", 1);
-            int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
-            if (objectSummarie.getKey().substring(firstFlesh + 1, secondFlesh).equals(Long.toString(userId))) {
-                keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+            if (firstFlesh > 0) {
+                int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
+                if (secondFlesh > 0) {
+                    if (objectSummarie.getKey().substring(firstFlesh + 1, secondFlesh).equals(Long.toString(userId))) {
+                        keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+                    }
+                }
             }
         }
         return keys;
