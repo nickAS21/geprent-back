@@ -127,7 +127,7 @@ public class LotService {
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
         for (DeleteObjectsRequest.KeyVersion keyFileName : keys) {
             URL url = this.awss3Service.generatePresignedURL(keyFileName.getKey());
-            if (url != null) dto.getDescription().getURLs().add(url);
+            if (url != null) descriptionDTO.getURLs().add(url);
         }
 
         dto.setId(id);

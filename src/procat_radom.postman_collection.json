@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8fd588a7-9af9-4c3f-89eb-4f24322deea4",
+		"_postman_id": "ef8ea584-ba93-4e3f-aa42-4c49b67256c2",
 		"name": "procat_radom",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\",\n    \"phoneNumber\": \"123456789012\"\n}\n\n<!-- comment\nRegister a new USER\n1) When registering each USER - validity is checked.\n2) There is only one unique value: email.\n3) If you need to register a new USER for the test, all you have to do is change the email only.\nValidation check:\nemail field (standard email input is used):\n- allowed Latin characters, numbers, lower underscores, dot, signs \"[] @\";\n- min = 6, max  = 40;\npassword field:\n- Latin characters, numbers, underscores are allowed;\n- min = 8, max  = 64;\nphoneNumber field:\n- only numbers are allowed;\n- min = 12, max  = 12;-->"
+							"raw": "{\n    \"firstName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\",\n    \"phoneNumber\": \"123456789012\"\n}\n\n"
 						},
 						"url": {
 							"raw": "http://localhost:8080/register",
@@ -120,7 +120,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwMDM0LCJleHAiOjE1NTgyNzM2MzR9.wHiKe3dcT8lBVeNXq3U7pM3K8cR6Wg90n-r6xr3deJkED9euzh-GqIAMJWonrWkc5I9XWsS9aD7amQXZLzFstA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -197,7 +197,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4NzA4Njk0LCJleHAiOjE1NTg3MTIyOTR9.GIyV9ZMbzTDsAuWKCo5MJiMvu42kfrViIoDIf_yC0Z79aDEkOFUlx-Pltlzwf6S-2DxiVWJ3HnaAh3kqcCvt6w",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -215,14 +215,19 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "file",
+									"key": "files",
 									"type": "file",
 									"src": "/mnt/data/Hillel/Kino_Procat/Png_Jpg/drel.jpg"
 								},
 								{
-									"key": "testDto",
-									"value": "{\"price\":\"456\",\"longitude\":\"801.800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"itemPath\":\"d:tmp/dc/2.png\",\"itemName\":\"itemName2\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}",
+									"key": "lot",
+									"value": "{\"price\":\"456\",\"longitude\":\"801.800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"lotName2\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}",
 									"type": "text"
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": "/mnt/data/Hillel/Kino_Procat/Png_Jpg/shurup.jpg"
 								}
 							]
 						},
@@ -260,9 +265,7 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": [
-												"/mnt/data/Hillel/Kino_Procat/Png_Jpg/drel.jpg"
-											]
+											"src": "/mnt/data/Hillel/Kino_Procat/Png_Jpg/drel.jpg"
 										},
 										{
 											"key": "testDto",
@@ -285,10 +288,10 @@
 									]
 								}
 							},
-							"_postman_previewlanguage": null,
-							"header": null,
+							"_postman_previewlanguage": "Text",
+							"header": [],
 							"cookie": [],
-							"body": null
+							"body": ""
 						}
 					]
 				}
@@ -311,7 +314,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"mkyong@gmail23.com.aa\",\n    \"password\": \"pass5678910\"\n\n}"
+							"raw": "{\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\"\n\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8080/login",
@@ -378,7 +381,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwMDM0LCJleHAiOjE1NTgyNzM2MzR9.wHiKe3dcT8lBVeNXq3U7pM3K8cR6Wg90n-r6xr3deJkED9euzh-GqIAMJWonrWkc5I9XWsS9aD7amQXZLzFstA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -454,7 +457,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwMDM0LCJleHAiOjE1NTgyNzM2MzR9.wHiKe3dcT8lBVeNXq3U7pM3K8cR6Wg90n-r6xr3deJkED9euzh-GqIAMJWonrWkc5I9XWsS9aD7amQXZLzFstA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -473,7 +476,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/lot/3",
+							"raw": "http://localhost:8080/user/lot/8",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -482,7 +485,7 @@
 							"path": [
 								"user",
 								"lot",
-								"3"
+								"8"
 							]
 						},
 						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request.\n\n2) Output: one lot"
@@ -532,7 +535,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwMzA4LCJleHAiOjE1NTgyNzM5MDh9.bpLACxwwXsFFqWDnHKOUh-QcXr2EUSKR7kV73851o-vNd90ccEvbZWLLEC6y-GykYXTA7-lcqeg0jwTdNonTQA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -603,7 +606,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4ODUzNjc4LCJleHAiOjE1NTg4NTcyNzh9.6PPA_s-DZb31hqpGx9-EnaVEzPaLiVGhPv1RJgQy2zbdQ3_huQ3jQS--kvLSWzE-8GS8B_yzrrm6n5rSRgPnlQ",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -611,7 +614,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/user/lot/upload-picture/1",
+							"raw": "http://localhost:8080/user/lot/upload-picture/8",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -621,7 +624,7 @@
 								"user",
 								"lot",
 								"upload-picture",
-								"1"
+								"8"
 							]
 						},
 						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request.\n\n2) Output: one lot with:\n\n- link to picture from S3 (expires-in: 60000 == 1 min)"
@@ -641,7 +644,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwMzA4LCJleHAiOjE1NTgyNzM5MDh9.bpLACxwwXsFFqWDnHKOUh-QcXr2EUSKR7kV73851o-vNd90ccEvbZWLLEC6y-GykYXTA7-lcqeg0jwTdNonTQA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -721,7 +724,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNTU4MjcwNjcyLCJleHAiOjE1NTgyNzQyNzJ9.DOLwqEe5jL03b7jWH93w3-ht-1pEoHxiuJY9fon0U_ri_IiP8suZtf3MxAQhYN4N6jzIrruuRPmiHgWTkZ-zgA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQyNzMwLCJleHAiOjE1NjA1NDYzMzB9.DUUrPgW5Ung0_qIrIyNvWdO-jdQQ90ixvzGSL7VzNT2_1RipJTEXfQouI4vKN_MqcTOQC0mFUPbQBawRyAfTnw",
 									"type": "string"
 								}
 							]
@@ -788,7 +791,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwNzQ5LCJleHAiOjE1NTgyNzQzNDl9.KWdUHJwzLqOGXImckQVXYizC0xi4np3E-pMlX-ifLWVy0PqgByUAmnBYQFpt81n1GJq9Y1t_a6i2EMJj9psvAQ",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -807,7 +810,7 @@
 							"raw": "      {\n        \"firstName\":\"firstName2\",\n        \"lastName\":\"lastName\",\n         \"email\":\"nick@avalr.com.ua\",\n         \"password\":\"password\",\n         \"phoneNumber\":\"106\"\n    }\n\n\n "
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/lot/3",
+							"raw": "http://localhost:8080/user/lot/8",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -816,7 +819,7 @@
 							"path": [
 								"user",
 								"lot",
-								"3"
+								"8"
 							]
 						},
 						"description": "The request is performed with authorization by USER\n\n1) Add authorization from the Get registered user token (login) request.\n\n2) One lot is deleted if it is associated with the user.\n\nThe lot and all records associated with it (including the description and pictures) are deleted."
@@ -902,7 +905,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4MjcwODY5LCJleHAiOjE1NTgyNzQ0Njl9.UTFvU4HqpPM5Cp25DSxD_Ah8NoM2hVIVVKPb0PDwh0_yft1l5NTN_WAmFjx53j3Kgaq8k9qmvZTJ5JjqSr0GwQ",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
 									"type": "string"
 								}
 							]
@@ -1003,7 +1006,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/lot/15",
+							"raw": "http://localhost:8080/lot/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1011,7 +1014,7 @@
 							"port": "8080",
 							"path": [
 								"lot",
-								"15"
+								"3"
 							]
 						},
 						"description": "Request open. Performed without authorization of the USER."
@@ -1048,7 +1051,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/lot/page/0/3",
+							"raw": "http://localhost:8080/lot/page/0/3/next",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1058,7 +1061,8 @@
 								"lot",
 								"page",
 								"0",
-								"3"
+								"3",
+								"next"
 							]
 						},
 						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) IntPut: Processes the GET request to \"/lot//page/{number}/{count}/{metod}\" URI.\n\n- \"number\" - Page number. First page from zero. \n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n- \"count\" - The count of lots on one page.\n\n- \"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\"\n calls the appropriate pageable method.\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotDTO in content\n- \"last\": true or false - Last page or not\n- \"first\": true or false - Fist page or not\n- \"number\": value current page\n- \"totalPages\": tottal count page\n- \"totalElements\": total count lots"
