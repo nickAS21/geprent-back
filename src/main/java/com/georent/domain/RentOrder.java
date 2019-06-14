@@ -1,9 +1,13 @@
 package com.georent.domain;
 
 import lombok.Data;
-import org.joda.time.DateTime;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.time.LocalDateTime;
+
 
 @Data
 @Entity
@@ -14,7 +18,7 @@ public class RentOrder {
     private long id;
     private long lotId;
     private long renteeId;
-    private DateTime startDateTime;
-    private DateTime endDateTime;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
     private RentOrderStatus status;
 }
