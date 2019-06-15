@@ -188,7 +188,6 @@ public class AWSS3Service {
     }
 
     /**
-     *
      * @param userId
      * @return keys all Pictures with  filter userId
      */
@@ -196,16 +195,13 @@ public class AWSS3Service {
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
         ObjectListing objects = s3Client.listObjects(listObjectsRequestAll);
-         List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
+        List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
         for (S3ObjectSummary objectSummarie : objectSummaries) {
             int firstFlesh = objectSummarie.getKey().indexOf("/", 1);
-            if (firstFlesh > 0) {
-                int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
-                if (secondFlesh > 0) {
-                    if (objectSummarie.getKey().substring(firstFlesh + 1, secondFlesh).equals(Long.toString(userId))) {
-                        keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
-                    }
-                }
+            int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
+            if (firstFlesh > 0 && secondFlesh > 0 &&
+                    (objectSummarie.getKey().substring(firstFlesh + 1, secondFlesh).equals(Long.toString(userId)))) {
+                keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
             }
         }
         return keys;
@@ -216,7 +212,7 @@ public class AWSS3Service {
      * @return keys all Pictures with  filter lotId
      */
     public List<DeleteObjectsRequest.KeyVersion> getKeysLot(Long lotId) {
-        String keyPrefix = Long.toString(lotId)+ "/";
+        String keyPrefix = Long.toString(lotId) + "/";
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName())
                 .withPrefix(keyPrefix);
