@@ -54,7 +54,7 @@ public class LotControllerTest {
 
     @Test
     public void getPage_mapping_get_numberPage_count_Return_Status_ok() throws Exception {
-        mockMvc.perform(get("/lot/page/0/5")
+        mockMvc.perform(get("/lot/page/0/5/next")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andDo(print())
