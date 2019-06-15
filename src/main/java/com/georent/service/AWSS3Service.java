@@ -197,10 +197,7 @@ public class AWSS3Service {
         ObjectListing objects = s3Client.listObjects(listObjectsRequestAll);
         List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
         for (S3ObjectSummary objectSummarie : objectSummaries) {
-            int firstFlesh = objectSummarie.getKey().indexOf("/", 1);
-            int secondFlesh = objectSummarie.getKey().indexOf("/", firstFlesh + 1);
-            if (firstFlesh > 0 && secondFlesh > 0 &&
-                    (objectSummarie.getKey().substring(firstFlesh + 1, secondFlesh).equals(Long.toString(userId)))) {
+            if (validKeyToUserId (objectSummarie.getKey(), userId) != null) {
                 keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
             }
         }
@@ -224,6 +221,14 @@ public class AWSS3Service {
             keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
         }
         return keys;
+    }
+
+    private String validKeyToUserId (String key, Long userId) {
+        String[] res = key.split("/", 3);
+        if (res.length == 3 && res[1].equals("" + userId)){
+            return key;
+        }
+        return null;
     }
 
 }
