@@ -11,6 +11,7 @@ import com.georent.dto.GeoRentUserInfoDto;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.LotDTO;
 import com.georent.dto.RegistrationLotDto;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -170,7 +171,7 @@ public class ServiceTestUtils {
 
             @Override
             public String getContentType() {
-                return "image/jpeg";
+                return MediaType.IMAGE_JPEG_VALUE;
             }
 
             @Override
