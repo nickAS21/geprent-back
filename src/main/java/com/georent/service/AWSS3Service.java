@@ -9,23 +9,24 @@ import com.amazonaws.services.s3.model.DeleteObjectsResult;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.georent.config.S3ConfigurationProperties;
-import com.georent.exception.FileException;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,23 +54,15 @@ public class AWSS3Service {
      * @param multipart
      * @return
      */
-    private File convertMultiPartToFileTmp(MultipartFile multipart) {
+    public boolean validMultiPartFile(MultipartFile multipart) {
         Assert.notNull(multipart, Message.INVALID_FILE_NULL.getDescription());
-        if (!multipart.getContentType().equals("image/jpeg")) {
+        if (!multipart.getContentType().equals(MediaType.IMAGE_JPEG_VALUE)) {
             throw new RuntimeException(Message.INVALID_FILE_EXTENSION_JPG.getDescription());
         }
         if (multipart.getSize() > 200000) {
             throw new RuntimeException(Message.INVALID_FILE_SIZE.getDescription());
         }
-        Path tempFile = null;
-        try {
-            tempFile = Files.createTempFile("tmp_", multipart.getOriginalFilename());
-            multipart.transferTo(tempFile);
-        } catch (IOException e) {
-            log.error(Message.INVALID_FILE_SAVE_TMP.getDescription(), e);
-            throw new FileException(Message.INVALID_FILE_SAVE_TMP.getDescription(), e);
-        }
-        return tempFile.toFile();
+        return true;
     }
 
     public String generateKeyFileName() {
@@ -77,46 +70,41 @@ public class AWSS3Service {
     }
 
     /**
+     *
+     * @param multipartFile
      * @param keyFileName
-     * @param file
      * @throws SdkClientException     If any errors are encountered in the client while making the
-     *                                request or handling the response.
+     *                                request or handling the response. return null
      * @throws AmazonServiceException If any errors occurred in Amazon S3 while processing the
-     *                                request.
+     *                                request. return null
      */
-    private String uploadFileTos3bucket(String keyFileName, File file) {
+    public String uploadFileToS3bucket(MultipartFile multipartFile, String keyFileName) {
         String keyFileNameS3 = null;
         try {
-            PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, file));
+            byte [] byteArr = multipartFile.getBytes();
+            InputStream inputStream = new ByteArrayInputStream(byteArr);
+            ObjectMetadata meta = new ObjectMetadata();
+            meta.setContentLength(byteArr.length);
+            meta.setContentType(MediaType.IMAGE_JPEG_VALUE);
+            s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, inputStream, meta));
             keyFileNameS3 = keyFileName;
-        } catch (AmazonServiceException e) {
+        } catch (AmazonServiceException | IOException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
-            e.printStackTrace();
+//            e.printStackTrace();
+            return null;
         } catch (SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
-            e.printStackTrace();
+//            e.printStackTrace();
+            return null;
         }
         return keyFileNameS3;
     }
 
     /**
-     * upload file to S3Bucket, return fileName, which is the key to get the file
-     *
-     * @param multipartFile
-     * @return null if error
-     */
-    public String uploadFile(MultipartFile multipartFile, String keyFileName) {
-        File file = convertMultiPartToFileTmp(multipartFile);
-        String keyFileNameS3 = uploadFileTos3bucket(keyFileName, file);
-        file.delete();
-        return keyFileNameS3;
-    }
-
-    /**
      * @param keyFileName
-     * @return null if error
+     * @return URL or null if error
      */
 
     public URL generatePresignedURL(String keyFileName) {
@@ -125,8 +113,6 @@ public class AWSS3Service {
             // Set the presigned URL to expire after expires-in pref: aws.
             java.util.Date expiration = new java.util.Date();
             expiration.setTime(expiration.getTime() + Long.valueOf(s3Properties.getExpiresIn()));
-
-            // Generate the presigned URL.
             GeneratePresignedUrlRequest generatePresignedUrlRequest =
                     new GeneratePresignedUrlRequest(s3Properties.getBucketName(), keyFileName)
                             .withMethod(HttpMethod.GET)
@@ -136,21 +122,21 @@ public class AWSS3Service {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
 //            throw new FileException(Message.INVALID_PICTURE_LOAD_AMAZONE_SERVICES.getDescription(), e);
-            e.printStackTrace();
+//            e.printStackTrace();
             return null;
         } catch (SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
 //            throw new FileException(Message.INVALID_PICTURE_LOAD_SDK_CLIENT.getDescription(), e);
-            e.printStackTrace();
+//            e.printStackTrace();
             return null;
         }
         return url;
     }
 
     /**
-     * if keyPrefix != null, then delete all Pictures with  filter lotId
-     * if keyPrefix == null, then delete all Pictures with  filter userId
+     * if userId == 0, then delete all Pictures with  filter lotId
+     * if userId > 0, then delete all Pictures with  filter userId
      *
      * @param lotId
      * @param userId
@@ -194,41 +180,54 @@ public class AWSS3Service {
     public List<DeleteObjectsRequest.KeyVersion> getKeysUserLots(Long userId) {
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-        ObjectListing objects = s3Client.listObjects(listObjectsRequestAll);
-        List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
-        for (S3ObjectSummary objectSummarie : objectSummaries) {
-            if (validKeyToUserId (objectSummarie.getKey(), userId) != null) {
-                keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+        ObjectListing objects;
+        do {
+            objects = s3Client.listObjects(listObjectsRequestAll);
+            List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
+            for (S3ObjectSummary objectSummarie : objectSummaries) {
+                if (validKeyToUserId(objectSummarie.getKey(), userId)) {
+                    keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+                }
             }
-        }
+            listObjectsRequestAll.setMarker(objects.getNextMarker());
+        } while (objects.isTruncated());
         return keys;
     }
 
     /**
+     * Structure of Image key: {lotId}/{userId}/pictureName
      * @param lotId
-     * @return keys all Pictures with  filter lotId
+     * @return keys all Pictures withPrefix(lotId + "/")
      */
     public List<DeleteObjectsRequest.KeyVersion> getKeysLot(Long lotId) {
-        String keyPrefix = Long.toString(lotId) + "/";
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName())
-                .withPrefix(keyPrefix);
-//                .withDelimiter("/");    // only files, not delete folder
-        ObjectListing objects = s3Client.listObjects(listObjectsRequest);
-        List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
-        for (S3ObjectSummary objectSummarie : objectSummaries) {
-            // Gather the new object keys without version IDs.
-            keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
-        }
+                .withPrefix(lotId + "/");
+        ObjectListing objects;
+        do {
+            objects = s3Client.listObjects(listObjectsRequest);
+            List<S3ObjectSummary> objectSummaries = objects.getObjectSummaries();
+            for (S3ObjectSummary objectSummarie : objectSummaries) {
+                // Gather the new object keys without version IDs.
+                keys.add(new DeleteObjectsRequest.KeyVersion(objectSummarie.getKey()));
+            }
+            listObjectsRequest.setMarker(objects.getNextMarker());
+        } while (objects.isTruncated());
         return keys;
     }
 
-    private String validKeyToUserId (String key, Long userId) {
+    /**
+     * Structure of Image key: {lotId}/{userId}/pictureName
+     * @param key
+     * @param userId
+     * @return
+     */
+    private boolean validKeyToUserId(String key, Long userId) {
         String[] res = key.split("/", 3);
-        if (res.length == 3 && res[1].equals("" + userId)){
-            return key;
+        if (res.length == 3 && res[1].equals("" + userId)) {
+            return true;
         }
-        return null;
+        return false;
     }
 
 }

@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -215,13 +216,14 @@ public class GeoRentUserService {
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         for (MultipartFile multipartFile : multipartFiles) {
-            String pictureName = this.awss3Service.generateKeyFileName();
-            Long picrureIdNext = 1L;
-            if (lot.getDescription().getPictureIds().size() > 0) picrureIdNext = Collections.max(lot.getDescription().getPictureIds())+1;
-            String keyFileName = Long.toString(lot.getId())  + "/" + Long.toString(geoRentUser.getId())+ "/" + Long.toString(picrureIdNext);
-            String keyFileNameS3 = this.awss3Service.uploadFile(multipartFile, keyFileName);
-            if (keyFileNameS3 != null && !keyFileNameS3.isEmpty()) {
-                lot.getDescription().getPictureIds().add(Long.valueOf(picrureIdNext));
+            if(this.awss3Service.validMultiPartFile(multipartFile)) {
+                Long picrureIdNext = 1L;
+                if (lot.getDescription().getPictureIds().size() > 0) picrureIdNext = Collections.max(lot.getDescription().getPictureIds()) + 1;
+                String keyFileName = lot.getId() + "/" + geoRentUser.getId() + "/" + picrureIdNext + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf('.'));
+                String keyFileNameS3 = this.awss3Service.uploadFileToS3bucket(multipartFile, keyFileName);
+                if (keyFileNameS3 != null && !keyFileNameS3.isEmpty()) {
+                    lot.getDescription().getPictureIds().add(Long.valueOf(picrureIdNext));
+                }
             }
         }
         lotRepository.save(lot);

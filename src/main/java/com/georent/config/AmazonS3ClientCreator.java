@@ -1,5 +1,7 @@
 package com.georent.config;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -27,9 +29,12 @@ public class AmazonS3ClientCreator {
 
         AWSCredentials credentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretKey);
 
+//        ClientConfiguration clientConfig = new ClientConfiguration();
+//        clientConfig.setProtocol(Protocol.HTTP);
         AmazonS3 s3client = AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
+//                .withClientConfiguration(clientConfig)
                 .withRegion(Regions.EU_WEST_1)
                 .build();
         return s3client;
