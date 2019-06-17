@@ -56,6 +56,6 @@ public class LotController {
     public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
                                      @PathVariable(value = "count") int count,
                                      @PathVariable(value = "metod") String metodPage) {
-        return status(OK).body(lotService.getPage(numberPage, count, metodPage));
+        return status(OK).body(lotService.getPage(numberPage-1, count, metodPage));
     }
 }
