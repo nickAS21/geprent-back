@@ -187,13 +187,12 @@ public class GeoRentUserServiceRepositoryTest {
     @Test
     public void WhenSaveUserLotUploadPicture_Return_LotDto() {
         // given
-        RegistrationLotDto registrationLotDto = ServiceTestUtils.registrationLotDto (TEST_LOT);
-        MultipartFile[] multipartFiles = getMultipartFiles ();
         Long picrureIdNext = 1L;
+        String keyFileName = TEST_LOT.getId()  + "/" + TEST_LOT.getGeoRentUser().getId()+ "/" + picrureIdNext;
         // when
-        String keyFileName = Long.toString(TEST_LOT.getId())  + "/" + Long.toString(TEST_LOT.getGeoRentUser().getId())+ "/" + Long.toString(picrureIdNext);
-        when(mockDAWSS3Service.uploadFile(any(MultipartFile.class), any(String.class))).thenReturn(keyFileName);
+        when(mockDAWSS3Service.uploadFileToS3bucket(any(MultipartFile.class), any(String.class))).thenReturn(keyFileName);
         when(mockLotRepository.save(any(Lot.class))).thenReturn(TEST_LOT);
+        when(mockDAWSS3Service.validMultiPartFile(any(MultipartFile.class))).thenReturn(true);
         // then
         org.springframework.http.ResponseEntity <?> bodyBuilder =  userService.saveUserLotUploadPicture(getMultipartFiles (), principal, getRegistrationLotDtoStr());
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ef8ea584-ba93-4e3f-aa42-4c49b67256c2",
+		"_postman_id": "c91ff848-e211-4fa1-a290-58b60f4516f8",
 		"name": "procat_radom",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -197,7 +197,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTkyNDA3LCJleHAiOjE1NjA1OTYwMDd9.4CMHm79BmwZNiZlFCguej0rJb4-no9kXNLAETqVfaC1aK9fERUnvrndlg3IgHSwS8NrLLwl1W2YA_e-nZHK1Mg",
 									"type": "string"
 								}
 							]
@@ -1006,7 +1006,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/lot/3",
+							"raw": "http://localhost:8080/lot/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1014,7 +1014,7 @@
 							"port": "8080",
 							"path": [
 								"lot",
-								"3"
+								"1"
 							]
 						},
 						"description": "Request open. Performed without authorization of the USER."
@@ -1051,7 +1051,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/lot/page/0/3/next",
+							"raw": "http://localhost:8080/lot/page/1/3/next",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1060,12 +1060,12 @@
 							"path": [
 								"lot",
 								"page",
-								"0",
+								"1",
 								"3",
 								"next"
 							]
 						},
-						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) IntPut: Processes the GET request to \"/lot//page/{number}/{count}/{metod}\" URI.\n\n- \"number\" - Page number. First page from zero. \n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n- \"count\" - The count of lots on one page.\n\n- \"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\"\n calls the appropriate pageable method.\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotDTO in content\n- \"last\": true or false - Last page or not\n- \"first\": true or false - Fist page or not\n- \"number\": value current page\n- \"totalPages\": tottal count page\n- \"totalElements\": total count lots"
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) IntPut: Processes the GET request to \"/lot//page/{number}/{count}/{metod}\" URI.\n\n- \"number\" - Page number. First page from one. \n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n- \"count\" - The count of lots on one page.\n\n- \"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\"\n calls the appropriate pageable method.\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotDTO in content\n- \"last\": true or false - Last page or not\n- \"first\": true or false - Fist page or not\n- \"number\": value current page\n- \"totalPages\": tottal count page\n- \"totalElements\": total count lots"
 					},
 					"response": []
 				}

@@ -12,8 +12,11 @@ import com.georent.message.Message;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.AssertTrue;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ class AWSS3ServiceTest {
     private String keyFileName = "/1/1/1";
     private String bucketName =  "geo-rent-bucket";
     private String nameUrl = "/geo-rent-bucket.s3.eu-west-1.amazonaws.com/";
-    private String contentType = "image/jpeg";
+    private String contentType = MediaType.IMAGE_JPEG_VALUE;
     private String expiresIn = "60000";
 
     @BeforeEach
@@ -47,27 +50,34 @@ class AWSS3ServiceTest {
     }
 
     @Test
-    void whenUploadFileSuccessful_Return_keyFileNameS3_equals_keyFileName() {
-        when(mockMultipartFile.getContentType()).thenReturn(contentType);
-        when(mockMultipartFile.getSize()).thenReturn(199999L);
-        String keyFileNameS3 = awss3Service.uploadFile(mockMultipartFile, keyFileName);
-        Assert.assertEquals(keyFileNameS3, keyFileName);
+    void whenValidMultiPartFileOk_Return_true() {
+        Assert.assertTrue(awss3Service.validMultiPartFile(multipartFiles[0]));
     }
 
     @Test
-    void whenUploadFileGetExtensionError_Return_keyFileNameS3_equals_keyFileName() {
+    void whenValidMultiPartFileMessageContentType_Return_false() {
         when(mockMultipartFile.getContentType()).thenReturn(contentType + "png");
-        when(mockMultipartFile.getSize()).thenReturn(219999L);
-        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.uploadFile(mockMultipartFile, keyFileName));
+        when(mockMultipartFile.getSize()).thenReturn(119999L);
+        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.validMultiPartFile(mockMultipartFile));
         Assert.assertEquals(Message.INVALID_FILE_EXTENSION_JPG.getDescription(), exception.getMessage());
     }
 
     @Test
-    void whenUploadFileGetSizeError_Return_keyFileNameS3_equals_keyFileName() {
+    void whenValidMultiPartFileMessageSize_Return_false() {
         when(mockMultipartFile.getContentType()).thenReturn(contentType);
         when(mockMultipartFile.getSize()).thenReturn(219999L);
-        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.uploadFile(mockMultipartFile, keyFileName));
+        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.validMultiPartFile(mockMultipartFile));
         Assert.assertEquals(Message.INVALID_FILE_SIZE.getDescription(), exception.getMessage());
+    }
+
+
+    @Test
+    void whenUploadFileSuccessful_Return_keyFileNameS3_equals_keyFileName() throws IOException {
+
+        byte [] b = {0x12, 0x32};
+        when(mockMultipartFile.getBytes()).thenReturn(b);
+        String keyFileNameS3 = awss3Service.uploadFileToS3bucket(mockMultipartFile, keyFileName);
+        Assert.assertEquals(keyFileNameS3, keyFileName);
     }
 
     @Test
