@@ -8,6 +8,7 @@ aws:
   bucket-name: geo-rent-bucket
   and-point-url: https://georent.ua/
   expires-in: 60000
+  file-size-max: 200000
 
 app:
   jwt:

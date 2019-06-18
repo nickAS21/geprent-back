@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,7 +39,8 @@ class AWSS3ServiceTest {
     private String bucketName =  "geo-rent-bucket";
     private String nameUrl = "/geo-rent-bucket.s3.eu-west-1.amazonaws.com/";
     private String contentType = MediaType.IMAGE_JPEG_VALUE;
-    private String expiresIn = "60000";
+    private Long expiresIn = 60000L;
+    private Long fileSizeMax = 200000L;
 
     @BeforeEach
     void init() {
@@ -51,6 +51,7 @@ class AWSS3ServiceTest {
 
     @Test
     void whenValidMultiPartFileOk_Return_true() {
+        when(mockS3Properties.getFileSizeMax()).thenReturn(fileSizeMax);
         Assert.assertTrue(awss3Service.validMultiPartFile(multipartFiles[0]));
     }
 
@@ -66,6 +67,7 @@ class AWSS3ServiceTest {
     void whenValidMultiPartFileMessageSize_Return_false() {
         when(mockMultipartFile.getContentType()).thenReturn(contentType);
         when(mockMultipartFile.getSize()).thenReturn(219999L);
+        when(mockS3Properties.getFileSizeMax()).thenReturn(fileSizeMax);
         Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.validMultiPartFile(mockMultipartFile));
         Assert.assertEquals(Message.INVALID_FILE_SIZE.getDescription(), exception.getMessage());
     }
@@ -104,7 +106,7 @@ class AWSS3ServiceTest {
         when(mockS3Properties.getBucketName()).thenReturn(bucketName);
         when(mockS3Client.listObjects(any(ListObjectsRequest.class))).thenReturn(objectListing);
         when(mockS3Client.deleteObjects(any(DeleteObjectsRequest.class))).thenReturn(deleteObjectsResult);
-        Assert.assertEquals(1, awss3Service.deleteLotPictures(1L, 1L));
+        Assert.assertEquals(1, awss3Service.deletePicturesFromAllLotsUser(1L));
     }
 
     @Test
@@ -121,6 +123,6 @@ class AWSS3ServiceTest {
         when(mockS3Properties.getBucketName()).thenReturn(bucketName);
         when(mockS3Client.listObjects(any(ListObjectsRequest.class))).thenReturn(objectListing);
         when(mockS3Client.deleteObjects(any(DeleteObjectsRequest.class))).thenReturn(deleteObjectsResult);
-        Assert.assertEquals(1, awss3Service.deleteLotPictures(1L, 0L));
+        Assert.assertEquals(1, awss3Service.deleteLotPictures(1L));
     }
 }
