@@ -344,12 +344,12 @@ public class GeoRentUserService {
     }
 
     private void deleteOneLot (Lot lot) {
-        this.awss3Service.deleteLotPictures(lot.getId(), 0L);
+        this.awss3Service.deleteLotPictures(lot.getId());
         this.lotRepository.deleteById(lot.getId());
 
     }
     private void deleteAllLotUser (GeoRentUser geoRentUser) {
-        this.awss3Service.deleteLotPictures(null, geoRentUser.getId());
+        this.awss3Service.deletePicturesFromAllLotsUser(geoRentUser.getId());
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
     }
 }
