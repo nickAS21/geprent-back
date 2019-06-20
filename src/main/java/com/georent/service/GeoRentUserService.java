@@ -66,7 +66,6 @@ public class GeoRentUserService {
     }
 
     /**
-     *
      * @param email
      * @return GeoRentUser if user with this email is registered
      */
@@ -76,7 +75,6 @@ public class GeoRentUserService {
     }
 
     /**
-     *
      * @param email
      * @return true if email is registered, false if email is not registered
      */
@@ -85,7 +83,6 @@ public class GeoRentUserService {
     }
 
     /**
-     *
      * @param user
      * @return GeoRentUser
      */
@@ -98,6 +95,7 @@ public class GeoRentUserService {
 
     /**
      * Reads user info from the database and maps it to GeoRentUserInfoDto object.
+     *
      * @param principal Current user identifier.
      * @return The user info in the format of GeoRentUserInfoDto.
      */
@@ -109,7 +107,8 @@ public class GeoRentUserService {
 
     /**
      * Updates user info in the database.
-     * @param principal Current user identifier.
+     *
+     * @param principal            Current user identifier.
      * @param geoRentUserUpdateDto Information to update.
      * @return The generic response, containing the proper message and incoming GeoRentUserUpdateDto object.
      */
@@ -125,6 +124,7 @@ public class GeoRentUserService {
 
     /**
      * Reads the list of user lots from the database and maps them to the LotDTO format.
+     *
      * @param principal Current user identifier.
      * @return The list of user lots in the LotDTO format.
      */
@@ -139,8 +139,9 @@ public class GeoRentUserService {
 
     /**
      * Reads the lot with specified id from the database and maps it to the LotDTO format.
+     *
      * @param principal Current user identifier.
-     * @param id - The id of the specified lot.
+     * @param id        - The id of the specified lot.
      * @return The requested lot in the LotDTO format.
      */
     public LotDTO getUserLotId(Principal principal, long id) {
@@ -155,8 +156,9 @@ public class GeoRentUserService {
     /**
      * Downloads the lot and temp URL picture from pictures repository (Amazon S3).
      * key = lotId/userId /picrureId
+     *
      * @param principal Current user identifier.
-     * @param id The id of the specified lot.
+     * @param id        The id of the specified lot.
      * @return The lot with specified id in the format of LotDTO.
      */
     public LotDTO getUserLotIdUploadPicture(Principal principal, long id) {
@@ -165,7 +167,7 @@ public class GeoRentUserService {
         Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId())
                 .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID.getDescription() + Long.toString(id)
                         + Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
-        LotDTO  lotDTO = mapToLotDTO(lot);
+        LotDTO lotDTO = mapToLotDTO(lot);
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
         for (DeleteObjectsRequest.KeyVersion keyFileName : keys) {
             URL url = this.awss3Service.generatePresignedURL(keyFileName.getKey());
@@ -177,7 +179,8 @@ public class GeoRentUserService {
 
     /**
      * Saves the provided lot to the database.
-     * @param principal Current user identifier.
+     *
+     * @param principal          Current user identifier.
      * @param registrationLotDto The lot to save in the registrationLotDto format.
      * @return The saved lot in the LotDTO format.
      */
@@ -196,6 +199,7 @@ public class GeoRentUserService {
      * keyFileName = {lotId}/{userId}/{(max value from PictureIds) +1}"
      * picrureIdNext (for the fileUrl -> keyFileName)  is saved to list pictureIds - >  in Description
      * picrureIdNext  not is saved to list pictureIds if AmazonServiceException or SdkClientException
+     *
      * @param multipartFiles
      * @param principal
      * @param registrationLotDtoStr
@@ -215,11 +219,13 @@ public class GeoRentUserService {
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         for (MultipartFile multipartFile : multipartFiles) {
-            if(this.awss3Service.validMultiPartFile(multipartFile)) {
+            if (this.awss3Service.validMultiPartFile(multipartFile)) {
                 Long picrureIdNext = 1L;
-                if (lot.getDescription().getPictureIds().size() > 0) picrureIdNext = Collections.max(lot.getDescription().getPictureIds()) + 1;
+                if (lot.getDescription().getPictureIds().size() > 0)
+                    picrureIdNext = Collections.max(lot.getDescription().getPictureIds()) + 1;
 //                String keyFileName = lot.getId() + "/" + geoRentUser.getId() + "/" + picrureIdNext + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf('.'));
-                String keyFileName = lot.getId() + "/" + geoRentUser.getId() + "/" + picrureIdNext;
+//                String keyFileName = lot.getId() + "/" + geoRentUser.getId() + "/" + picrureIdNext;
+                String keyFileName = lot.getId() + "/" + picrureIdNext;
                 String keyFileNameS3 = this.awss3Service.uploadFileToS3bucket(multipartFile, keyFileName);
                 if (keyFileNameS3 != null && !keyFileNameS3.isEmpty()) {
                     lot.getDescription().getPictureIds().add(Long.valueOf(picrureIdNext));
@@ -235,6 +241,7 @@ public class GeoRentUserService {
 
     /**
      * Deletes the specified user and all its lots from the database.
+     *
      * @param principal Current user identifier.
      * @return Generic response, containing  the proper message.
      */
@@ -242,7 +249,7 @@ public class GeoRentUserService {
     public GenericResponseDTO<LotDTO> deleteUser(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
-        deleteAllLotUser (geoRentUser);
+        deleteAllLotUser(geoRentUser);
         userRepository.delete(geoRentUser);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
         responseDTO.setMessage(Message.SUCCESS_DELETE_USER.getDescription());
@@ -252,8 +259,9 @@ public class GeoRentUserService {
 
     /**
      * Deletes the user lot with the specified id.
+     *
      * @param principal Current user identifier.
-     * @param id - The id of the lot to delete.
+     * @param id        - The id of the lot to delete.
      * @return Generic response, containing the proper message.
      */
     @Transactional
@@ -271,6 +279,7 @@ public class GeoRentUserService {
 
     /**
      * Deletes all lots of the current user from the database.
+     *
      * @param principal Current user identifier.
      * @return Generic response, containing the proper message.
      */
@@ -343,13 +352,19 @@ public class GeoRentUserService {
         return lot;
     }
 
-    private void deleteOneLot (Lot lot) {
+    private void deleteOneLot(Lot lot) {
         this.awss3Service.deleteLotPictures(lot.getId());
         this.lotRepository.deleteById(lot.getId());
 
     }
-    private void deleteAllLotUser (GeoRentUser geoRentUser) {
-        this.awss3Service.deletePicturesFromAllLotsUser(geoRentUser.getId());
+
+    private void deleteAllLotUser(GeoRentUser geoRentUser) {
+//        this.awss3Service.deletePicturesFromAllLotsUser(geoRentUser.getId());
+        lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
+                .stream()
+                .collect(Collectors.toList())
+                    .stream()
+                    .forEach(lot -> this.awss3Service.deleteLotPictures(lot.getId()));
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
     }
 }

@@ -91,23 +91,23 @@ class AWSS3ServiceTest {
         URL urlOut = awss3Service.generatePresignedURL(keyFileName);
         Assert.assertEquals(urlS3, urlOut);
     }
-
-    @Test
-    void whenDeleteLotPicturesUserIdSuccessful_Return_CntDelFiles() {
-        ObjectListing objectListing = new ObjectListing();
-        S3ObjectSummary s3ObjectSummary = new S3ObjectSummary();
-        s3ObjectSummary.setKey(keyFileName);
-        objectListing.setBucketName(bucketName);
-        objectListing.getObjectSummaries().add(s3ObjectSummary);
-        DeleteObjectsResult.DeletedObject deletedObject = new DeleteObjectsResult.DeletedObject();
-        List<DeleteObjectsResult.DeletedObject> deletedObjects = new ArrayList<>();
-        deletedObjects.add(deletedObject);
-        DeleteObjectsResult deleteObjectsResult = new DeleteObjectsResult(deletedObjects);
-        when(mockS3Properties.getBucketName()).thenReturn(bucketName);
-        when(mockS3Client.listObjects(any(ListObjectsRequest.class))).thenReturn(objectListing);
-        when(mockS3Client.deleteObjects(any(DeleteObjectsRequest.class))).thenReturn(deleteObjectsResult);
-        Assert.assertEquals(1, awss3Service.deletePicturesFromAllLotsUser(1L));
-    }
+//
+//    @Test
+//    void whenDeleteLotPicturesUserIdSuccessful_Return_CntDelFiles() {
+//        ObjectListing objectListing = new ObjectListing();
+//        S3ObjectSummary s3ObjectSummary = new S3ObjectSummary();
+//        s3ObjectSummary.setKey(keyFileName);
+//        objectListing.setBucketName(bucketName);
+//        objectListing.getObjectSummaries().add(s3ObjectSummary);
+//        DeleteObjectsResult.DeletedObject deletedObject = new DeleteObjectsResult.DeletedObject();
+//        List<DeleteObjectsResult.DeletedObject> deletedObjects = new ArrayList<>();
+//        deletedObjects.add(deletedObject);
+//        DeleteObjectsResult deleteObjectsResult = new DeleteObjectsResult(deletedObjects);
+//        when(mockS3Properties.getBucketName()).thenReturn(bucketName);
+//        when(mockS3Client.listObjects(any(ListObjectsRequest.class))).thenReturn(objectListing);
+//        when(mockS3Client.deleteObjects(any(DeleteObjectsRequest.class))).thenReturn(deleteObjectsResult);
+//        Assert.assertEquals(1, awss3Service.deletePicturesFromAllLotsUser(1L));
+//    }
 
     @Test
     void whenDeleteLotPicturesLotIdSuccessful_Return_CntDelFiles() {
