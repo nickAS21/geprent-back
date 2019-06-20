@@ -1,21 +1,22 @@
 package com.georent.domain;
 
 import lombok.Data;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
-import javax.persistence.FetchType;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import java.util.ArrayList;
-import java.util.List;
 
+@Indexed
 @Data
 @Entity
 public class Description {
@@ -29,11 +30,13 @@ public class Description {
     private Lot lot;
 
     @CollectionTable(name="picture_ids")
-    private ArrayList<Long> pictureIds = new ArrayList<Long>();
+    private ArrayList<Long> pictureIds = new ArrayList<>();
 
+    @Field
     @Column(name = "lot_name")
     private String lotName;
 
+    @Field
     @Column(name = "lot_description")
     private String lotDescription;
 }
