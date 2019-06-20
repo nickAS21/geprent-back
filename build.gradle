@@ -2,6 +2,8 @@ def jUnitVer='5.4.2'
 def assertJVer = '3.12.2'
 def h2Ver = '1.4.197'
 def mysqlConnectorVer = '8.0.14'
+def hibernateVer = '5.11.2.Final'
+def swaggerVer = '2.9.2'
 
 buildscript {
 
@@ -49,11 +51,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.548'
-    implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation 'commons-io:commons-io:2.4'
+    implementation "io.springfox:springfox-swagger2:$swaggerVer"
+    implementation "io.springfox:springfox-swagger-ui:$swaggerVer"
 
+    implementation "org.hibernate:hibernate-search-orm:$hibernateVer"
+    implementation "org.hibernate:hibernate-search-engine:$hibernateVer"
 
 //    implementation 'org.liquibase:liquibase-core'
 
