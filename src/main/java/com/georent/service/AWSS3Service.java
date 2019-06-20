@@ -11,7 +11,6 @@ import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.georent.config.S3ConfigurationProperties;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -145,46 +144,47 @@ public class AWSS3Service {
 
         return successfulDeletes;
     }
+
+//    /**
+//     * delete all Pictures with  filter userId
+//     * @param userId
+//     * @return successfulDeletes - count of deleted files by prefix
+//     */
+//    public int deletePicturesFromAllLotsUser(Long userId) {
+//        int successfulDeletes = 0;
+//        // test
+//        ListObjectsRequest listObjectsRequestTest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
+//        ObjectListing objectListingTest = s3Client.listObjects(listObjectsRequestTest);
+//
+//        List<DeleteObjectsRequest.KeyVersion> keys = getKeysUserLots(userId);
+//        if (keys.size() > 0) {
+//            successfulDeletes = delObjRequest (keys);
+//        }
+//
+//        // test
+//        objectListingTest = s3Client.listObjects(listObjectsRequestTest);
+//
+//        return successfulDeletes;
+//    }
+
+//    /**
+//     * @param userId
+//     * @return keys all Pictures with  filter userId
+//     */
+//    public List<DeleteObjectsRequest.KeyVersion> getKeysUserLots(Long userId) {
+//        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
+//        ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
+//        ObjectListing objectListing = s3Client.listObjects(listObjectsRequestAll);
+//        objectListing
+//                .getObjectSummaries()
+//                .stream()
+//                .filter(summary -> validKeyToUserId(summary.getKey(), userId))
+//                .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
+//        return keys;
+//    }
+
     /**
-     * delete all Pictures with  filter userId
-     * @param userId
-     * @return successfulDeletes - count of deleted files by prefix
-     */
-    public int deletePicturesFromAllLotsUser(Long userId) {
-        int successfulDeletes = 0;
-        // test
-        ListObjectsRequest listObjectsRequestTest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-        ObjectListing objectListingTest = s3Client.listObjects(listObjectsRequestTest);
-
-        List<DeleteObjectsRequest.KeyVersion> keys = getKeysUserLots(userId);
-        if (keys.size() > 0) {
-            successfulDeletes = delObjRequest (keys);
-        }
-
-        // test
-        objectListingTest = s3Client.listObjects(listObjectsRequestTest);
-
-        return successfulDeletes;
-    }
-
-    /**
-     * @param userId
-     * @return keys all Pictures with  filter userId
-     */
-    public List<DeleteObjectsRequest.KeyVersion> getKeysUserLots(Long userId) {
-        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
-        ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-        ObjectListing objectListing = s3Client.listObjects(listObjectsRequestAll);
-        objectListing
-                .getObjectSummaries()
-                .stream()
-                .filter(summary -> validKeyToUserId(summary.getKey(), userId))
-                .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
-        return keys;
-    }
-
-    /**
-     * Structure of Image key: {lotId}/{userId}/pictureName
+     * Structure of Image key: {lotId}/pictureName
      * @param lotId
      * @return keys all Pictures withPrefix(lotId + "/")
      */
@@ -199,20 +199,20 @@ public class AWSS3Service {
                 .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
         return keys;
     }
-
-    /**
-     * Structure of Image key: {lotId}/{userId}/pictureName
-     * @param key
-     * @param userId
-     * @return
-     */
-    private boolean validKeyToUserId(String key, Long userId) {
-        String[] res = key.split("/", 3);
-        if (res.length == 3 && res[1].equals("" + userId)) {
-            return true;
-        }
-        return false;
-    }
+//
+//    /**
+//     * Structure of Image key: {lotId}/{userId}/pictureName
+//     * @param key
+//     * @param userId
+//     * @return
+//     */
+//    private boolean validKeyToUserId(String key, Long userId) {
+//        String[] res = key.split("/", 3);
+//        if (res.length == 3 && res[1].equals("" + userId)) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     private int delObjRequest (List<DeleteObjectsRequest.KeyVersion> keys){
         // Delete the sample objects without specifying versions.
