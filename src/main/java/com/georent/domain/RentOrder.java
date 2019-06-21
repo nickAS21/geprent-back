@@ -16,6 +16,7 @@ public class RentOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private long ownerId;
     private long lotId;
     private long renteeId;
     private LocalDateTime startDateTime;
