@@ -2,14 +2,19 @@ package com.georent.controller;
 
 import com.georent.service.RentOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.status;
 
+@RestController
+@RequestMapping("rent")
 public class RentOrderController {
 
     private final RentOrderService rentOrderService;
@@ -70,7 +75,7 @@ public class RentOrderController {
      */
     @DeleteMapping("/user/order")
     public ResponseEntity<?> delete(long OwnerId){
-        return ResponseEntity.ok(rentOrderService.deleteAllRentOrders(OwnerId));
+        return ResponseEntity.ok("");
     }
 
     /**
@@ -92,7 +97,7 @@ public class RentOrderController {
      */
     @DeleteMapping ("/user/lot/{lotId}/order")
     public ResponseEntity<?> deleteRentOrdersByLotId(@PathVariable(value = "lotId") Long lotId){
-        return ResponseEntity.ok(rentOrderService.deleteRentOrdersByLotId(lotId));
+        return ResponseEntity.ok("");
     }
 
 
