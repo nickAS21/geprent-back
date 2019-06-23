@@ -10,12 +10,12 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Service
-public class RentOrderService {
+public class RentOrderOwnerService {
 
     private final RentOrderRepository rentOrderRepository;
 
     @Autowired
-    public RentOrderService(RentOrderRepository rentOrderRepository) {
+    public RentOrderOwnerService(RentOrderRepository rentOrderRepository) {
         this.rentOrderRepository = rentOrderRepository;
     }
 
