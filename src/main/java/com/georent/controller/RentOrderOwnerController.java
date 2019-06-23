@@ -15,12 +15,12 @@ import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("rent")
-public class RentOrderController {
+public class RentOrderOwnerController {
 
     private final RentOrderService rentOrderService;
 
     @Autowired
-    public RentOrderController(RentOrderService rentOrderService) {
+    public RentOrderOwnerController(RentOrderService rentOrderService) {
         this.rentOrderService = rentOrderService;
     }
 
