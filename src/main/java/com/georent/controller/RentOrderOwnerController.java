@@ -1,8 +1,7 @@
 package com.georent.controller;
 
-import com.georent.service.RentOrderService;
+import com.georent.service.RentOrderOwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +16,11 @@ import static org.springframework.http.ResponseEntity.status;
 @RequestMapping("rent")
 public class RentOrderOwnerController {
 
-    private final RentOrderService rentOrderService;
+    private final RentOrderOwnerService rentOrderOwnerService;
 
     @Autowired
-    public RentOrderOwnerController(RentOrderService rentOrderService) {
-        this.rentOrderService = rentOrderService;
+    public RentOrderOwnerController(RentOrderOwnerService rentOrderOwnerService) {
+        this.rentOrderOwnerService = rentOrderOwnerService;
     }
 
     /**
@@ -31,7 +30,7 @@ public class RentOrderOwnerController {
      */
     @GetMapping("user/order")
     public ResponseEntity<?> getAllRentOrders(Long ownerId) {
-        return ResponseEntity.ok(rentOrderService.getRentOrdersDto(ownerId));
+        return ResponseEntity.ok(rentOrderOwnerService.getRentOrdersDto(ownerId));
     }
 
     /**
@@ -42,7 +41,7 @@ public class RentOrderOwnerController {
      */
     @GetMapping("/user/order/{orderId}")
     public ResponseEntity<?> getRentOrderById(@PathVariable(value = "orderId") Long orderId) {
-        return status(OK).body(rentOrderService.getRentOrderDtoById(orderId));
+        return status(OK).body(rentOrderOwnerService.getRentOrderDtoById(orderId));
     }
 
     /**
@@ -53,7 +52,7 @@ public class RentOrderOwnerController {
      */
     @GetMapping("/user/lot/{lotId}/order")
     public ResponseEntity<?> getRentOrdersByLotId(@PathVariable(value = "lotId") Long lotId) {
-        return status(OK).body(rentOrderService.getRentOrdersDtoByLotId(lotId));
+        return status(OK).body(rentOrderOwnerService.getRentOrdersDtoByLotId(lotId));
     }
 
     /**
@@ -65,7 +64,7 @@ public class RentOrderOwnerController {
      */
 //    @PatchMapping("/user/order/{orderId}")
 //    public ResponseEntity<?> getOrderId(@PathVariable(value = "orderId") Long orderId, RentOrderStatus status) {
-//        return status(OK).body(rentOrderService.updateStatusInRentOrder(orderId, status));
+//        return status(OK).body(rentOrderOwnerService.updateStatusInRentOrder(orderId, status));
 //    }
 
     /**
@@ -86,7 +85,7 @@ public class RentOrderOwnerController {
      */
 //    @DeleteMapping ("/user/order/{orderId}")
 //    public ResponseEntity<?> deleteRentOrderById(@PathVariable(value = "orderId") Long orderId){
-//        return ResponseEntity.ok(rentOrderService.deleteRentOrderById(orderId));
+//        return ResponseEntity.ok(rentOrderOwnerService.deleteRentOrderById(orderId));
 //    }
 
     /**
