@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.ResponseEntity.status;
+
 @RestController
 @RequestMapping("search")
 public class SearchController {
@@ -41,6 +44,14 @@ public class SearchController {
                 })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
+    }
+
+
+    @GetMapping ("/two")
+    public ResponseEntity<?> findLotsAdrName(@RequestParam(name = "address") String address,
+                                             @RequestParam(name = "lotname") String lotName
+    ){
+        return status(OK).body(searchService.fuzzyLotNameAndAddressSearch(address, lotName));
     }
 
 }

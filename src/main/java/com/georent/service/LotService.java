@@ -8,6 +8,7 @@ import com.georent.dto.CoordinatesDTO;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotDTO;
 import com.georent.dto.LotPageDTO;
+import com.georent.dto.LotShortDTO;
 import com.georent.dto.MetodPage;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
@@ -43,10 +44,10 @@ public class LotService {
      *
      * @return the list of coordinates of all lots from the database.
      */
-    public List<LotDTO> getLotsDto() {
+    public List<LotShortDTO> getLotsDto() {
         return lotRepository.findAll()
                 .stream()
-                .map(this::mapToShortLotDTO)
+                .map(this::mapToLotShortDTO)
                 .collect(Collectors.toList());
     }
 
@@ -89,23 +90,20 @@ public class LotService {
         return new PageImpl(dto, pageable, totalElements);
     }
 
-    private LotDTO mapToShortLotDTO(Lot lot) {
+    private LotShortDTO mapToLotShortDTO(Lot lot) {
         Coordinates coordinates = lot.getCoordinates();
-        Description description = lot.getDescription();
-        Long id = lot.getId();
-
         CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
         coordinatesDTO.setLatitude(coordinates.getLatitude());
         coordinatesDTO.setLongitude(coordinates.getLongitude());
+        coordinatesDTO.setAddress(coordinates.getAddress());
 
-        DescriptionDTO descriptionDTO = new DescriptionDTO();
-        descriptionDTO.setLotName(description.getLotName());
+        LotShortDTO shortDto = new LotShortDTO();
+        shortDto.setId(lot.getId());
+        shortDto.setPrice(lot.getPrice());
+        shortDto.setLotName(lot.getDescription().getLotName());
+        shortDto.setCoordinates(coordinatesDTO);
 
-        LotDTO dto = new LotDTO();
-        dto.setId(id);
-        dto.setCoordinates(coordinatesDTO);
-        dto.setDescription(descriptionDTO);
-        return dto;
+        return shortDto;
     }
 
     private LotDTO mapToLotDTO(Lot lot) {
