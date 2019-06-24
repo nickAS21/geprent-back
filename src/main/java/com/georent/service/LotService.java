@@ -81,10 +81,13 @@ public class LotService {
      * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
     public LotPageable getPage(int pageNumber, int count, String methodPage, List<Long> ids) {
-        List<Lot> all = lotRepository.findAll();
-
-        long totalElements= all.size();
-
+        long totalElements;
+        if (ids != null) {
+            totalElements = ids.size();
+        }
+        else {
+            totalElements = lotRepository.findAll().size();
+        }
         int totalPages = (int) Math.ceil((float)totalElements/count);
         if (pageNumber > (totalPages - 1)
                 || (pageNumber >= (totalPages - 1) && methodPage.equals(MethodPage.NEXT.getTypeValue()))
@@ -93,16 +96,16 @@ public class LotService {
             pageNumber = Math.max(0, totalPages - 1);
             methodPage = MethodPage.LAST.getTypeValue();
         }
-        List<Lot>  lotPage;
+        Page <Lot>page;
         Pageable pageable = getPageable(pageNumber, count, methodPage);
-        if (ids != null && ids.size() > 0) {
-            lotPage = lotRepository.findByIdIn(ids, pageable).getContent();
+        if (ids != null) {
+            page = lotRepository.findByIdIn(ids, pageable);
         }
         else {
-            lotPage = lotRepository.findAll(pageable).getContent();
+            page = lotRepository.findAll(pageable);
         }
-
-        List<LotPageDTO> dtos = lotPage
+        pageNumber = page.getPageable().getPageNumber();
+        List<LotPageDTO> dtos = page.getContent()
                 .stream()
                 .map(this::mapToPageLotDTO)
                 .collect(Collectors.toList());
