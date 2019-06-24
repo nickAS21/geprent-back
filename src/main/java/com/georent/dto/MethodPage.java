@@ -1,32 +1,31 @@
 package com.georent.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
 @Getter
-public enum MetodPage {
+public enum MethodPage {
 
     FIRST("first"),
     NEXT("next"),
-    PREVOUS("previous"),
-    PREVOUS_OR_FIRST("previousOrFirst"),
+    PREVIOUS("previous"),
+    PREVIOUS_OR_FIRST("previousOrFirst"),
     LAST("last"),
     CURRENT("current");
 
     private String typeValue;
 
-    private MetodPage(String type) {
+    private MethodPage(String type) {
         typeValue = type;
     }
 
-    static public MetodPage getType(String pType) {
-        for (MetodPage type: MetodPage.values()) {
+    static public MethodPage getType(String pType) {
+        for (MethodPage type: MethodPage.values()) {
             if (type.getTypeValue().equals(pType)) {
                 return type;
             }
         }
-        return MetodPage.valueOf("CURRENT");
+        return MethodPage.valueOf("CURRENT");
     }
 
     public String getTypeValue() {

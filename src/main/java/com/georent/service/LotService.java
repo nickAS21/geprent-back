@@ -8,18 +8,21 @@ import com.georent.dto.CoordinatesDTO;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotDTO;
 import com.georent.dto.LotPageDTO;
+import com.georent.dto.LotPageable;
 import com.georent.dto.LotShortDTO;
-import com.georent.dto.MetodPage;
+import com.georent.dto.MethodPage;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,27 +70,44 @@ public class LotService {
     }
 
     /**
-     * if numberPage > totalPages - numberPage = totalPages;
-     * @param numberPage
+     * if numberPage > (PageLast) then metodPage = last;
+     * if numberPage >= (PageLast) and metodPage == next then metodPage = last;
+     * if numberPage > (PageLast+1) and metodPage == PREVOUS then metodPage = last;
+     * if numberPage > (PageLast+1) and metodPage == PREVOUS_OR_FIRST then metodPage = last;
+     * @param pageNumber
      * @param count
+     * @param ids - result after search
      * totalElements - total count of lots
-     * @return PageImpl(dto, pageable, totalElements)
+     * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
-    public PageImpl getPage(int numberPage, int count, String metodPage) {
-        List<LotPageDTO> dto = null;
-        final long totalElements=lotRepository.findAll().size();
-        int totalPages = (int) Math.ceil(totalElements/count);
-        if ((numberPage > (totalPages-1)) || metodPage.equals(MetodPage.LAST.getTypeValue())) {
-            numberPage = totalPages;
-            metodPage = MetodPage.LAST.getTypeValue();
+    public LotPageable getPage(int pageNumber, int count, String methodPage, List<Long> ids) {
+        List<Lot> all = lotRepository.findAll();
+
+        long totalElements= all.size();
+
+        int totalPages = (int) Math.ceil((float)totalElements/count);
+        if (pageNumber > (totalPages - 1)
+                || (pageNumber >= (totalPages - 1) && methodPage.equals(MethodPage.NEXT.getTypeValue()))
+                || (pageNumber > totalPages && methodPage.equals(MethodPage.PREVIOUS.getTypeValue()))
+                || (pageNumber > totalPages && methodPage.equals(MethodPage.PREVIOUS_OR_FIRST.getTypeValue()))) {
+            pageNumber = Math.max(0, totalPages - 1);
+            methodPage = MethodPage.LAST.getTypeValue();
         }
-         Pageable pageable = getPageable(numberPage, count, metodPage);
-        if (pageable == null) return new PageImpl(dto);
-        dto = lotRepository.findAll(pageable).getContent()
+        List<Lot>  lotPage;
+        Pageable pageable = getPageable(pageNumber, count, methodPage);
+        if (ids != null && ids.size() > 0) {
+            lotPage = lotRepository.findByIdIn(ids, pageable).getContent();
+        }
+        else {
+            lotPage = lotRepository.findAll(pageable).getContent();
+        }
+
+        List<LotPageDTO> dtos = lotPage
                 .stream()
                 .map(this::mapToPageLotDTO)
                 .collect(Collectors.toList());
-        return new PageImpl(dto, pageable, totalElements);
+
+        return new LotPageable(dtos, pageNumber + 1);
     }
 
     private LotShortDTO mapToLotShortDTO(Lot lot) {
@@ -151,15 +171,15 @@ public class LotService {
     }
 
     private Pageable getPageable(int numberPage, int count, String metodPage) {
-        MetodPage request = MetodPage.getType(metodPage);
+        MethodPage request = MethodPage.getType(metodPage);
         switch (request) {
             case FIRST:
                 return PageRequest.of(numberPage, count).first();
             case NEXT:
                 return PageRequest.of(numberPage, count).next();
-            case PREVOUS:
+            case PREVIOUS:
                 return PageRequest.of(numberPage, count).previous();
-            case PREVOUS_OR_FIRST:
+            case PREVIOUS_OR_FIRST:
                 return PageRequest.of(numberPage, count).previousOrFirst();
             case CURRENT:
             case LAST:

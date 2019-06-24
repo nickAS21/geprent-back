@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c91ff848-e211-4fa1-a290-58b60f4516f8",
+		"_postman_id": "b5dc4f46-9bda-4acd-8882-30480249ce84",
 		"name": "procat_radom",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -120,7 +120,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTQ0ODU2LCJleHAiOjE1NjA1NDg0NTZ9.KaLWr2Tz9SgQYbYHI-GE_bbZ-QtA95bANgY_zwbjiPkOSKbNouZUNmfGJ1pFJ0Yq7Y4K21-xrcYyDKJ-ptgouA",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYxMzcyMTYxLCJleHAiOjE1NjEzNzU3NjF9.x3P0DEs-NB2PIAv8Is39k4P4UPjNtG9eMSnhVw_28HeUeNeW13PshRNbMrAgVIZgcQi22pGURFsS9Olaj3_0KQ",
 									"type": "string"
 								}
 							]
@@ -136,7 +136,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "    {\n    \"longitude\": \"801.800\",\n    \"latitude\": \"901.900\",\n    \"address\": \"100 Киев 14\",\n    \"itemPath\": \"d:tmp/dc/2.png\",\n    \"itemName\": \"itemName2\",\n    \"lotDescription\": \"lotDescription2 lotDescription lotDescription\"\n\n    }\n\n "
+							"raw": "    {\n    \"longitude\": \"801.800\",\n    \"latitude\": \"901.900\",\n    \"address\": \"100 Киевs 140\",\n    \"lotName\": \"lotName23\",\n    \"lotDescription\": \"lotDescription2 lotDescription lotDescription\"\n\n    }\n\n "
 						},
 						"url": {
 							"raw": "http://localhost:8080/user/lot",
@@ -329,41 +329,7 @@
 						},
 						"description": "By input parameters USER: email and password\n\nWe get in response values: accessToken, tokenType\n\nWe use these parameters for requests where authorization is required.\n\nFor example:\n\n    \"accessToken\": \n\n \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNTU4Njk2MTk0LCJleHAiOjE1NTg2OTk3OTR9.4WlO568k_8WMbzz_VZPQcML5OwjrpHQOrBQPJwnmzKinBneSIp60j4VTK6plAXSTJ3oQcvphHE7rC-Y5kY3fhg\";\n\n    \"tokenType\": \"Bearer\";"
 					},
-					"response": [
-						{
-							"name": "http://localhost:8080/login",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"mkyong@gmail23.com.aa\",\n    \"password\": \"pass5678910\"\n}"
-								},
-								"url": {
-									"raw": "http://localhost:8080/login",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"login"
-									]
-								}
-							},
-							"_postman_previewlanguage": "Text",
-							"header": [],
-							"cookie": [],
-							"body": ""
-						}
-					]
+					"response": []
 				}
 			]
 		},
@@ -1065,7 +1031,101 @@
 								"next"
 							]
 						},
-						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) IntPut: Processes the GET request to \"/lot//page/{number}/{count}/{metod}\" URI.\n\n- \"number\" - Page number. First page from one. \n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n- \"count\" - The count of lots on one page.\n\n- \"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\"\n calls the appropriate pageable method.\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotDTO in content\n- \"last\": true or false - Last page or not\n- \"first\": true or false - Fist page or not\n- \"number\": value current page\n- \"totalPages\": tottal count page\n- \"totalElements\": total count lots"
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format Pagination without sorting.\n\n2) IntPut: Processes the GET request to \"/lot//page/{number}/{count}/{metod}\" URI.\n\n- \"number\" - Page number. First page from one. \n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n- \"count\" - The count of lots on one page.\n\n- \"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\"\n calls the appropriate pageable method.\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotPageDTO in content \n- pageNumber"
+					},
+					"response": []
+				},
+				{
+					"name": "Get information about all lots with lotDescriptionfilters and lotName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/search/?query=lotName23",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "lotName23"
+								}
+							]
+						},
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format List<LotPageDTO>.\n\n2) IntPut: Processes the GET request to \"search/?query={query}\" URI.\n\n\"query\" - filter to the on Fields: \"lotName\" and \"lotDescription\"\n\n3) OutPut: Response, containing the all lots with filters: \"query\" on Fields: \"lotName\" and \"lotDescription\" in the format  List<DescriptionDTO>"
+					},
+					"response": []
+				},
+				{
+					"name": "Get information about all lots with address filters and lotName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/search/twoparams/?address=Kuiv&lotname=lotName",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"search",
+								"twoparams",
+								""
+							],
+							"query": [
+								{
+									"key": "address",
+									"value": "Kuiv"
+								},
+								{
+									"key": "lotname",
+									"value": "lotName"
+								}
+							]
+						},
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format List<LotPageDTO>.\n\n2) IntPut: Processes the GET request to \"search/twoparams?address={address}&lotname={lotname}\" URI.\n\n\"address\" - filter to the field address\n\n\"lotname\" - filter to the field lotname\n\n3) OutPut: listLotDTO in content"
+					},
+					"response": []
+				},
+				{
+					"name": "Get information about all lots/page with address filters and lotName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/search/page/2/3/next/?address=14&lotname=lotName",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"search",
+								"page",
+								"2",
+								"3",
+								"next",
+								""
+							],
+							"query": [
+								{
+									"key": "address",
+									"value": "14"
+								},
+								{
+									"key": "lotname",
+									"value": "lotName"
+								}
+							]
+						},
+						"description": "Request open. Performed without authorization of the USER.\n\n1) It is used at the start and after the start of the program to display all the lots in format List<LotPageDTO>.\n\n2) IntPut: Processes the GET request to \"/search/page/{number}/{count}/{metod}?address={address}&lotname={lotname}\" URI.\n\n\"number\" - Page number. First page from one.\n\nIf the parameter is greater than the maximum page value, the page with the last page value is returned.\n\n\"count\" - The count of lots on one page.\n\n\"metod\" - String value. If one of these values: \"first\", \"next\", \"previous\", \"previousOrFirst\", \"last\" calls the appropriate pageable method.\n\n\"address\" - filter to the field address\n\n\"lotname\" - filter to the field lotname\n\nAll other values are ignored and the current page is displayed with parameter \"number\"\n\n3) OutPut: PageImpl:\n- listLotPageDTO in content \n- pageNumber"
 					},
 					"response": []
 				}

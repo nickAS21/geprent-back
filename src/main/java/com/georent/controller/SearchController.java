@@ -6,6 +6,7 @@ import com.georent.service.DescriptionSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,29 +30,49 @@ public class SearchController {
         this.searchService = searchService;
     }
 
+    /**
+     * Search all lots with filters: "query" on Fields: "lotName" and "lotDescription" in class Description
+     * @param query
+     * @return Response, containing the all lots with filters: "query" on Fields: "lotName" and "lotDescription" in the format  List<DescriptionDTO>
+     */
     @GetMapping
     public ResponseEntity<List<DescriptionDTO>> findDescriptions(@RequestParam(name = "query") String query){
-        List<Description> descriptions = searchService.fuzzyLotSearch(query);
-        List<DescriptionDTO> dtos = descriptions
-                .stream()
-                .map(description -> {
-                    DescriptionDTO dto = new DescriptionDTO();
-                    dto.setLotDescription(description.getLotDescription());
-                    dto.setLotName(description.getLotName());
-                    dto.setPictureIds(description.getPictureIds());
-                    dto.setURLs(Collections.emptyList());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(searchService.fuzzyLotSearch(query));
     }
 
-
-    @GetMapping ("/two")
+    /**
+     * Search allLots with filters: "address" to the field address in class Coordinates
+     * Search allLots with filters: "lotname" to the field lotName in class Description
+     * @param address
+     * @param lotName
+     * @return Response, containing the all lots with filters: "address" and "lotname" in the format  Set<LotPageDTO>
+     */
+    @GetMapping ("/twoparams")
     public ResponseEntity<?> findLotsAdrName(@RequestParam(name = "address") String address,
                                              @RequestParam(name = "lotname") String lotName
     ){
         return status(OK).body(searchService.fuzzyLotNameAndAddressSearch(address, lotName));
+    }
+
+
+    /**
+     *
+     * @param numberPage
+     * @param count
+     * @param metodPage
+     * @param address
+     * @param lotName
+     * @return Response, containing the list of all lots with filters: "address" and "lotname"
+     * one page in the format  of List<LotPageDTO>  with pageNumber (LotPageable).
+     */
+    @GetMapping ("/page/{number}/{count}/{metod}")
+    public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
+                                     @PathVariable(value = "count") int count,
+                                     @PathVariable(value = "metod") String metodPage,
+                                     @RequestParam(name = "address") String address,
+                                     @RequestParam(name = "lotname") String lotName
+    ) {
+        return status(OK).body(searchService.fuzzyLotPageNameAndAddressSearch(numberPage-1, count, metodPage, address, lotName));
     }
 
 }
