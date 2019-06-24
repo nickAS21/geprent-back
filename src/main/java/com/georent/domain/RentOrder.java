@@ -26,17 +26,17 @@ public class RentOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long orderId;
+    private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "lot_id")
     private Lot lot;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id")
-    private GeoRentUser geoRentUser;
+    @JoinColumn(name = "rentee_id")
+    private GeoRentUser rentee;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;

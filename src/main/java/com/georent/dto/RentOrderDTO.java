@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class RentOrderDTO {
     private Long orderId;
     private LotDTO lotDTO;
-    private Long ownerId;
+    private Long renteeId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
