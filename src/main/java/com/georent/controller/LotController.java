@@ -50,12 +50,12 @@ public class LotController {
      * Processes the GET request to "/lot/page/{number}/{count}" URI.
      * @param numberPage
      * @param count
-     * @return Response, containing the list of all lots one page in the format lotDto.
+     * @return Response, containing the list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
     @GetMapping ("/page/{number}/{count}/{metod}")
     public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
                                      @PathVariable(value = "count") int count,
                                      @PathVariable(value = "metod") String metodPage) {
-        return status(OK).body(lotService.getPage(numberPage-1, count, metodPage));
+        return status(OK).body(lotService.getPage(numberPage-1, count, metodPage, null));
     }
 }

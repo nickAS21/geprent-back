@@ -3,6 +3,8 @@ package com.georent.service;
 import com.georent.domain.Lot;
 import com.georent.dto.LotDTO;
 import com.georent.dto.LotPageDTO;
+import com.georent.dto.LotPageable;
+import com.georent.dto.LotShortDTO;
 import com.georent.repository.LotRepository;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,7 +47,7 @@ public class LotServiceTest {
         when(mockRepository.findAll()).thenReturn(testLots);
         List<LotDTO> expectedLotDTOS = Arrays.asList(TEST_SHORT_LOT_DTO);
         // when
-        List<LotDTO> actualLotDTOS = lotService.getLotsDto();
+        List<LotShortDTO> actualLotDTOS = lotService.getLotsDto();
         verify(mockRepository, times(1)).findAll();
         // then
         Assert.assertEquals(expectedLotDTOS, actualLotDTOS);
@@ -68,11 +70,10 @@ public class LotServiceTest {
         Page<Lot> pagedLots = new PageImpl(lots);
         Pageable pageRequest = PageRequest.of(0, 4);
         when(this.mockRepository.findAll(pageRequest)).thenReturn(pagedLots);
-        PageImpl page = lotService.getPage(0, 4, "");
+        LotPageable lotPageable = lotService.getPage(0, 4, "", null);
         verify(mockRepository, times(1)).findAll(pageRequest);
-        Assert.assertEquals(page.getPageable().getPageNumber(), 0);
-        Assert.assertEquals(page.getPageable().getPageSize(), 4);
-        Assert.assertEquals(page.getPageable().getSort(), Sort.unsorted());
+        Assert.assertEquals(lotPageable.getPageNumber(), 0);
+        Assert.assertEquals(lotPageable.getLots().size(), 4);
     }
 
 

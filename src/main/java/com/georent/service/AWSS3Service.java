@@ -106,19 +106,20 @@ public class AWSS3Service {
                             .withMethod(HttpMethod.GET)
                             .withExpiration(expiration);
             url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
-        } catch (AmazonServiceException e) {
+        }catch (RuntimeException e) { }
+//        } catch (AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
 //            throw new FileException(Message.INVALID_PICTURE_LOAD_AMAZONE_SERVICES.getDescription(), e);
 //            e.printStackTrace();
-            return null;
-        } catch (SdkClientException e) {
+//            return null;
+//        } catch (SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
 //            throw new FileException(Message.INVALID_PICTURE_LOAD_SDK_CLIENT.getDescription(), e);
 //            e.printStackTrace();
-            return null;
-        }
+//            return null;
+//        }
         return url;
     }
 
@@ -145,44 +146,6 @@ public class AWSS3Service {
         return successfulDeletes;
     }
 
-//    /**
-//     * delete all Pictures with  filter userId
-//     * @param userId
-//     * @return successfulDeletes - count of deleted files by prefix
-//     */
-//    public int deletePicturesFromAllLotsUser(Long userId) {
-//        int successfulDeletes = 0;
-//        // test
-//        ListObjectsRequest listObjectsRequestTest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-//        ObjectListing objectListingTest = s3Client.listObjects(listObjectsRequestTest);
-//
-//        List<DeleteObjectsRequest.KeyVersion> keys = getKeysUserLots(userId);
-//        if (keys.size() > 0) {
-//            successfulDeletes = delObjRequest (keys);
-//        }
-//
-//        // test
-//        objectListingTest = s3Client.listObjects(listObjectsRequestTest);
-//
-//        return successfulDeletes;
-//    }
-
-//    /**
-//     * @param userId
-//     * @return keys all Pictures with  filter userId
-//     */
-//    public List<DeleteObjectsRequest.KeyVersion> getKeysUserLots(Long userId) {
-//        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
-//        ListObjectsRequest listObjectsRequestAll = new ListObjectsRequest().withBucketName(s3Properties.getBucketName());
-//        ObjectListing objectListing = s3Client.listObjects(listObjectsRequestAll);
-//        objectListing
-//                .getObjectSummaries()
-//                .stream()
-//                .filter(summary -> validKeyToUserId(summary.getKey(), userId))
-//                .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
-//        return keys;
-//    }
-
     /**
      * Structure of Image key: {lotId}/pictureName
      * @param lotId
@@ -192,27 +155,16 @@ public class AWSS3Service {
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName())
                 .withPrefix(lotId + "/");
-        ObjectListing objectListing = s3Client.listObjects(listObjectsRequest);
-        objectListing
-                .getObjectSummaries()
-                .stream()
-                .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
+        ObjectListing objectListing = new ObjectListing();
+        try {
+            objectListing = s3Client.listObjects(listObjectsRequest);
+            objectListing
+                    .getObjectSummaries()
+                    .stream()
+                    .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));        }
+        catch (RuntimeException e) { }
         return keys;
     }
-//
-//    /**
-//     * Structure of Image key: {lotId}/{userId}/pictureName
-//     * @param key
-//     * @param userId
-//     * @return
-//     */
-//    private boolean validKeyToUserId(String key, Long userId) {
-//        String[] res = key.split("/", 3);
-//        if (res.length == 3 && res[1].equals("" + userId)) {
-//            return true;
-//        }
-//        return false;
-//    }
 
     private int delObjRequest (List<DeleteObjectsRequest.KeyVersion> keys){
         // Delete the sample objects without specifying versions.
