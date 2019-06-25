@@ -36,7 +36,7 @@ public class SearchController {
      * @return Response, containing the all lots with filters: "query" on Fields: "lotName" and "lotDescription" in the format  List<DescriptionDTO>
      */
     @GetMapping
-    public ResponseEntity<List<DescriptionDTO>> findDescriptions(@RequestParam(name = "query") String query){
+    public ResponseEntity<?> findDescriptions(@RequestParam(name = "query") String query){
         return ResponseEntity.ok(searchService.fuzzyLotSearch(query));
     }
 
