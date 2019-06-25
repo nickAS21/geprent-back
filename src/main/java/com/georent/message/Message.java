@@ -38,7 +38,13 @@ public enum Message {
     INVALID_FILE_SAVE_TMP("Unable to save file tmp."),
 
     INVALID_PICTURE_LOAD_AMAZONE_SERVICES("Amazon S3 couldn't process."),
-    INVALID_PICTURE_LOAD_SDK_CLIENT("Client couldn't parse the response from Amazon S3.");
+    INVALID_PICTURE_LOAD_SDK_CLIENT("Client couldn't parse the response from Amazon S3."),
+
+    SUCCESS_SAVE_ORDER("Order saved successfully!"),
+    INVALID_SAVE_ORDER("Failed to save order!"),
+    SUCCESS_DELETE_ORDER("Order deleted successfully!"),
+    SUCCESS_DELETE_ORDERS("Orders deleted successfully!"),
+    INVALID_GET_LOT_ORDER("Not found order with ID: ");
 
     private String description;
 }
