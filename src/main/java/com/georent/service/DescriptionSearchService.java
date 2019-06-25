@@ -1,5 +1,6 @@
 package com.georent.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.dto.DescriptionDTO;
@@ -16,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManagerFactory;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,12 +34,15 @@ public class DescriptionSearchService {
 
     private final EntityManagerFactory entityManagerFactory;
     private final LotService lotService;
+    private final AWSS3Service awss3Service;
 
     @Autowired
     public DescriptionSearchService(EntityManagerFactory entityManagerFactory,
-                                    LotService lotService) {
+                                    LotService lotService,
+                                    AWSS3Service awss3Service) {
         this.entityManagerFactory = entityManagerFactory;
         this.lotService = lotService;
+        this.awss3Service = awss3Service;
     }
 
     /**
@@ -79,29 +86,47 @@ public class DescriptionSearchService {
 
         FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
 
-        Set<LotPageDTO> dtoSet = new HashSet<>();
+//        Set<LotPageDTO> dtoSet = new HashSet<>();
+        Map <Long,LotPageDTO> hm = new HashMap <Long,LotPageDTO>();
 
         if (!StringUtils.isBlank(address)) {
             List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
-            dtoSet = coordinates
+//            dtoSet = coordinates
+//                    .stream()
+//                    .map(this::mapCoordinatesDTO)
+//                    .collect(Collectors.toSet());
+            hm = coordinates
                     .stream()
                     .map(this::mapCoordinatesDTO)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toMap(LotPageDTO ->LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
         }
 
         if (!StringUtils.isBlank(lotName)) {
             List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
+
+            Map <Long,LotPageDTO> hmSrc = descriptions
+                    .stream()
+                    .map(this::mapDescriptionDTO)
+                    .collect(Collectors.toMap(LotPageDTO ->LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
+
             Set<LotPageDTO> src = descriptions
                     .stream()
                     .map(this::mapDescriptionDTO)
                     .collect(Collectors.toSet());
-            dtoSet.addAll(src);
-        }
+//            dtoSet.addAll(src);
 
-        return dtoSet
+            hm.putAll(hmSrc);
+        }
+        Set<LotPageDTO> valueSet= new HashSet<LotPageDTO>(hm.values());
+        return valueSet
                 .stream()
                 .sorted(Comparator.comparing(LotPageDTO::getId))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+
+//        return dtoSet
+//                .stream()
+//                .sorted(Comparator.comparing(LotPageDTO::getId))
+//                .collect(Collectors.toCollection(LinkedHashSet::new));
 
 //        LinkedHashSet<Coordinates> sorted = resultList
 //                .stream()
@@ -220,6 +245,7 @@ public class DescriptionSearchService {
         dto.setPrice(coordinates.getLot().getPrice());
         dto.setAddress(coordinates.getAddress());
         dto.setLotName(coordinates.getLot().getDescription().getLotName());
+        dto.setImageUrl(getUrl(dto.getId()));
         return dto;
     }
 
@@ -229,7 +255,17 @@ public class DescriptionSearchService {
         dto.setPrice(description.getLot().getPrice());
         dto.setAddress(description.getLot().getCoordinates().getAddress());
         dto.setLotName(description.getLotName());
+        dto.setImageUrl(getUrl(dto.getId()));
         return dto;
+    }
+
+    private URL getUrl (Long lotId) {
+        List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lotId);
+        if (keys.size() > 0) {
+            return this.awss3Service.generatePresignedURL(keys.get(0).getKey());
+
+        }
+        return null;
     }
 
 }

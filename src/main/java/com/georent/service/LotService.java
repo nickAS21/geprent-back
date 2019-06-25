@@ -105,12 +105,13 @@ public class LotService {
             page = lotRepository.findAll(pageable);
         }
         pageNumber = page.getPageable().getPageNumber();
+        totalPages = page.getTotalPages();
         List<LotPageDTO> dtos = page.getContent()
                 .stream()
                 .map(this::mapToPageLotDTO)
                 .collect(Collectors.toList());
 
-        return new LotPageable(dtos, pageNumber + 1);
+        return new LotPageable(dtos, pageNumber + 1, totalPages);
     }
 
     private LotShortDTO mapToLotShortDTO(Lot lot) {
@@ -157,7 +158,6 @@ public class LotService {
         dto.setDescription(descriptionDTO);
         return dto;
     }
-
 
     private LotPageDTO mapToPageLotDTO(Lot lot) {
         LotPageDTO dto = new LotPageDTO();
