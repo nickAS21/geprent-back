@@ -14,4 +14,6 @@ out
 #Ignore all .log files
 *.log
 
-indexpath
+#Ignore all indexpath
+com.*
+
