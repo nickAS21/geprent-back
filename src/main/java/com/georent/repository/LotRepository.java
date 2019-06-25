@@ -21,7 +21,6 @@ public interface LotRepository extends JpaRepository<Lot, Long>, PagingAndSortin
     List<Lot> findAllByPrice(Long price, Pageable pageable);
 
     Page<Lot> findAllById(Iterable<Long> longs, Pageable pageable);
-    List<Lot> findAllByIdContains(Iterable<Long> longs, Pageable pageable);
     List<Lot> findAllByIdIs(List<Long> longs, Pageable pageable);
     Page<Lot> findByIdIn(List<Long> ids, Pageable pageable);
 

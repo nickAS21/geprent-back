@@ -1068,7 +1068,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/search/twoparams/?address=Kuiv&lotname=lotName",
+							"raw": "http://localhost:8080/search/filters/?address=Kuiv&lotname=lotName",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1076,7 +1076,7 @@
 							"port": "8080",
 							"path": [
 								"search",
-								"twoparams",
+								"filters",
 								""
 							],
 							"query": [

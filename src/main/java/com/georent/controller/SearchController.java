@@ -47,7 +47,7 @@ public class SearchController {
      * @param lotName
      * @return Response, containing the all lots with filters: "address" and "lotname" in the format  Set<LotPageDTO>
      */
-    @GetMapping ("/twoparams")
+    @GetMapping ("/filters")
     public ResponseEntity<?> findLotsAdrName(@RequestParam(name = "address") String address,
                                              @RequestParam(name = "lotname") String lotName
     ){
