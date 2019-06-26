@@ -6,6 +6,7 @@ import com.georent.domain.GeoRentUserDetails;
 import com.georent.domain.UserRole;
 import com.georent.dto.*;
 import com.georent.exception.RegistrationSuchUserExistsException;
+import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import com.georent.security.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class AuthenticationService {
 
     public GeoRentUser registerNewUserAccount(final RegistrationRequestDTO registerUserRequest) {
         if (userService.existsUserByEmail(registerUserRequest.getEmail())) {
-            throw new RegistrationSuchUserExistsException(Message.REGISTRATION_USER_ERROR.getDescription());
+            throw new RegistrationSuchUserExistsException(GeoRentIHttpStatus.REGISTRATION_USER_ERROR.getReasonPhrase());
         }
 
         GeoRentUser user = new GeoRentUser();

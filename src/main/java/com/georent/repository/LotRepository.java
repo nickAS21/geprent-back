@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Optional;
-
 import java.util.List;
 
 public interface LotRepository extends JpaRepository<Lot, Long>, PagingAndSortingRepository<Lot, Long> {
@@ -18,10 +17,5 @@ public interface LotRepository extends JpaRepository<Lot, Long>, PagingAndSortin
     void deleteAllByGeoRentUser_Id(Long userId);
 
     Page<Lot> findAll (Pageable pageable);
-    List<Lot> findAllByPrice(Long price, Pageable pageable);
-
-    Page<Lot> findAllById(Iterable<Long> longs, Pageable pageable);
-    List<Lot> findAllByIdIs(List<Long> longs, Pageable pageable);
     Page<Lot> findByIdIn(List<Long> ids, Pageable pageable);
-
 }

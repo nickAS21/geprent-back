@@ -12,6 +12,10 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.georent.config.S3ConfigurationProperties;
+import com.georent.exception.LotNotFoundException;
+import com.georent.exception.S3PropertiesException;
+import com.georent.exception.ValidMultiPartFileException;
+import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +60,10 @@ public class AWSS3Service {
     public boolean validMultiPartFile(MultipartFile multipart) {
         Assert.notNull(multipart, Message.INVALID_FILE_NULL.getDescription());
         if (!multipart.getContentType().equals(MediaType.IMAGE_JPEG_VALUE)) {
-            throw new RuntimeException(Message.INVALID_FILE_EXTENSION_JPG.getDescription());
+            throw new ValidMultiPartFileException(GeoRentIHttpStatus.INVALID_FILE_EXTENSION_JPG.getReasonPhrase());
         }
         if (multipart.getSize() > this.s3Properties.getFileSizeMax()) {
-            throw new RuntimeException(Message.INVALID_FILE_SIZE.getDescription());
+            throw new ValidMultiPartFileException(GeoRentIHttpStatus.INVALID_FILE_SIZE.getReasonPhrase());
         }
         return true;
     }

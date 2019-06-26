@@ -12,7 +12,6 @@ public enum Message {
     SECURITY_CONTEXT_ERROR("Could not set user authentication in security context!"),
     ACTIVATION_USER_ERROR("The account has already been activated!"),
     LOGIN_USER_ERROR("User is not activated!"),
-    REGISTRATION_USER_ERROR("Email address already in use!"),
     UNAUTHORIZED_ERROR("You are not authorized to access this resource!"),
     INVALID_TOKEN_ERROR("Invalid JWT token!"),
     INVALID_PASSWORD("Invalid password!"),
@@ -32,9 +31,10 @@ public enum Message {
     INVALID_GET_LOT_ID_USER(" for user with ID: "),
     INVALID_SAVE_FILE("Unable to save the file."),
 
-    INVALID_FILE_EXTENSION_JPG("Only JPG images are accepted."),
+//    INVALID_FILE_EXTENSION_JPG("Only JPG images are accepted."),
+//    INVALID_FILE_SIZE("Size is too big."),
     INVALID_FILE_NULL("File must not be empty!"),
-    INVALID_FILE_SIZE("Size is too big."),
+
     INVALID_FILE_SAVE_TMP("Unable to save file tmp."),
 
     INVALID_PICTURE_LOAD_AMAZONE_SERVICES("Amazon S3 couldn't process."),
