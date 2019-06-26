@@ -113,7 +113,6 @@ public class LotService {
                 .stream()
                 .map(this::mapToPageLotDTO)
                 .collect(Collectors.toList());
-
         return new LotPageable(dtos, pageNumber + 1, totalPages);
     }
 
@@ -129,7 +128,6 @@ public class LotService {
         shortDto.setPrice(lot.getPrice());
         shortDto.setLotName(lot.getDescription().getLotName());
         shortDto.setCoordinates(coordinatesDTO);
-
         return shortDto;
     }
 

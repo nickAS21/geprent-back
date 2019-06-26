@@ -37,12 +37,10 @@ public class DescriptionSearchServiceTest {
     void whenFuzzyLotSearchSuccessfully_Return_ListDescriptionDTO() {
         List<DescriptionDTO> actualLotDTOS = descriptionSearchService.fuzzyLotSearch(searchTerm);
         assertThat(actualLotDTOS != null);
-
     }
 
     @Test
     void whenFuzzyLotNameAndAddressSearchSuccessfully_Return_SetLotPageDTO() {
-
         Set<LotPageDTO> actualPageDTO = descriptionSearchService.fuzzyLotNameAndAddressSearch(searchTerm, lotName);
         assertThat(actualPageDTO != null);
     }
@@ -59,7 +57,6 @@ public class DescriptionSearchServiceTest {
         Assert.assertEquals(0, actualLotPageable.getTotalPages());
         Assert.assertEquals(1, actualLotPageable.getPageNumber());
     }
-
 }
 
 

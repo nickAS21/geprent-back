@@ -1,5 +1,6 @@
 package com.georent.exception;
 
+import com.georent.message.GeoRentIHttpStatus;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @ControllerAdvice
 public class BasicExceptionHandler {
@@ -29,6 +31,7 @@ public class BasicExceptionHandler {
         response.setCause(message);
         response.setPath(requestURI);
         response.setBody("ERROR!");
+        response.setStatusCode(HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
@@ -36,7 +39,7 @@ public class BasicExceptionHandler {
      * Exception handler for SuchUserExistsException.
      * @param ex - The exception.
      * @param request The http request that caused the exception.
-     * @return 409 "Conflict" status and additional info.
+     * @return 452 "REGISTRATION_USER_ERROR" and "HttpStatus.CONFLICT"  status and additional info.
      */
     @ExceptionHandler({RegistrationSuchUserExistsException.class})
     protected ResponseEntity<?> handleSuchUserExists(RegistrationSuchUserExistsException ex,
@@ -44,13 +47,38 @@ public class BasicExceptionHandler {
         final String method = request.getMethod();
         final String requestURI = request.getRequestURI();
         final String message = ex.getMessage();
+        final int statusCode = GeoRentIHttpStatus.getValue(ex.getMessage());
 
         GenericResponse<String> response = new GenericResponse<>();
         response.setMethod(method);
         response.setCause(message);
         response.setPath(requestURI);
         response.setBody("ERROR!");
+        response.setStatusCode(statusCode);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    /**
+     * Exception handler for SuchUserExistsException.
+     * @param ex - The exception.
+     * @param request The http request that caused the exception.
+     * @return 453 or 454 "INVALID_FILE_... " (multipartfile to s3) and "HttpStatus.PRECONDITION_FAILED"  status and additional info.
+     */
+    @ExceptionHandler({ValidMultiPartFileException.class})
+    protected ResponseEntity<?> handleMultiPartFile(ValidMultiPartFileException ex,
+                                                  HttpServletRequest request){
+        final String method = request.getMethod();
+        final String requestURI = request.getRequestURI();
+        final String message = ex.getMessage();
+        final int statusCode = GeoRentIHttpStatus.getValue(ex.getMessage());
+
+        GenericResponse<String> response = new GenericResponse<>();
+        response.setMethod(method);
+        response.setCause(message);
+        response.setPath(requestURI);
+        response.setBody("ERROR!");
+        response.setStatusCode(statusCode);
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(response);
     }
 
     @Data
@@ -59,5 +87,6 @@ public class BasicExceptionHandler {
         private String method;
         private String path;
         private String cause;
+        private int statusCode;
     }
 }

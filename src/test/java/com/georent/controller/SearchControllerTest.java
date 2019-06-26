@@ -50,5 +50,4 @@ public class SearchControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
     }
-
 }

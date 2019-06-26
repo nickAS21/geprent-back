@@ -47,6 +47,7 @@ public class DescriptionSearchService {
 
     /**
      * Search all lots with filters: "query" on Fields: "lotName" and "lotDescription" in class Description
+     *
      * @param searchTerm
      * @return all lots with filters: "query" on Fields: "lotName" and "lotDescription" in the format  List<DescriptionDTO>
      */
@@ -76,6 +77,7 @@ public class DescriptionSearchService {
      * Search allLots with filters: "address" to the field address in class Coordinates
      * Search allLots with filters: "lotname" to the field lotName in class Description
      * and/or: if param equals !isBlank, not filters to this param
+     *
      * @param address
      * @param lotName
      * @return all lots with filters: "address" and "lotname" in the format  Set<LotPageDTO>
@@ -83,56 +85,29 @@ public class DescriptionSearchService {
     public Set<LotPageDTO> fuzzyLotNameAndAddressSearch(String address, String lotName) {
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
         Session currentSession = sessionFactory.openSession();
-
         FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
 
-//        Set<LotPageDTO> dtoSet = new HashSet<>();
-        Map <Long,LotPageDTO> hm = new HashMap <Long,LotPageDTO>();
-
+        Map<Long, LotPageDTO> hm = new HashMap<Long, LotPageDTO>();
         if (!StringUtils.isBlank(address)) {
             List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
-//            dtoSet = coordinates
-//                    .stream()
-//                    .map(this::mapCoordinatesDTO)
-//                    .collect(Collectors.toSet());
             hm = coordinates
                     .stream()
                     .map(this::mapCoordinatesDTO)
-                    .collect(Collectors.toMap(LotPageDTO ->LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
+                    .collect(Collectors.toMap(LotPageDTO -> LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
         }
-
         if (!StringUtils.isBlank(lotName)) {
             List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
-
-            Map <Long,LotPageDTO> hmSrc = descriptions
+            Map<Long, LotPageDTO> hmSrc = descriptions
                     .stream()
                     .map(this::mapDescriptionDTO)
-                    .collect(Collectors.toMap(LotPageDTO ->LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
-
-            Set<LotPageDTO> src = descriptions
-                    .stream()
-                    .map(this::mapDescriptionDTO)
-                    .collect(Collectors.toSet());
-//            dtoSet.addAll(src);
-
+                    .collect(Collectors.toMap(LotPageDTO -> LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
             hm.putAll(hmSrc);
         }
-        Set<LotPageDTO> valueSet= new HashSet<LotPageDTO>(hm.values());
+        Set<LotPageDTO> valueSet = new HashSet<LotPageDTO>(hm.values());
         return valueSet
                 .stream()
                 .sorted(Comparator.comparing(LotPageDTO::getId))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-
-//        return dtoSet
-//                .stream()
-//                .sorted(Comparator.comparing(LotPageDTO::getId))
-//                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-//        LinkedHashSet<Coordinates> sorted = resultList
-//                .stream()
-//                .sorted(Comparator.comparing(Coordinates::getId))
-//                .collect(Collectors.toCollection(LinkedHashSet::new));
-
     }
 
 
@@ -145,25 +120,22 @@ public class DescriptionSearchService {
      * @param count
      * @param methodPage
      * @param address
-     * @param lotName
-     * List<Long> ids - result all lotId after search with filters: "address" and "lotname"
+     * @param lotName    List<Long> ids - result all lotId after search with filters: "address" and "lotname"
      * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
     public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName) {
         List<Long> ids = new ArrayList<>();
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
         Session currentSession = sessionFactory.openSession();
-
         FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
 
         Set<Long> idSet = new HashSet<>();
-
         if (!StringUtils.isBlank(address)) {
             List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
             idSet = coordinates
                     .stream()
                     .map(description -> {
-                          return description.getId();
+                        return description.getId();
                     })
                     .collect(Collectors.toSet());
         }
@@ -183,7 +155,6 @@ public class DescriptionSearchService {
     }
 
     /**
-     *
      * @param fullTextSession
      * @param address
      * @return List<Coordinates> with filters: "address"
@@ -191,7 +162,6 @@ public class DescriptionSearchService {
     private List<Coordinates> getLotsSearchAdr(FullTextSession fullTextSession, String address) {
 
         QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Coordinates.class).get();
-
         Query query = queryBuilder
                 .keyword()
                 .fuzzy()
@@ -200,21 +170,12 @@ public class DescriptionSearchService {
                 .onFields("address")
                 .matching(address)
                 .createQuery();
-//        Query query = queryBuilder
-//                .phrase()
-//                .onField("address")
-//                .sentence(address)
-//                .createQuery();
-
         javax.persistence.Query fullTextQuery = fullTextSession.createFullTextQuery(query, Coordinates.class);
-
         List<Coordinates> resultList = fullTextQuery.getResultList();
-
         return resultList;
     }
 
     /**
-     *
      * @param fullTextSession
      * @param lotName
      * @return List<Description> with filters: "lotName"
@@ -231,11 +192,8 @@ public class DescriptionSearchService {
                 .onFields("lotName")
                 .matching(lotName)
                 .createQuery();
-
         javax.persistence.Query fullTextQuery = fullTextSession.createFullTextQuery(query, Description.class);
-
         List<Description> resultList = fullTextQuery.getResultList();
-
         return resultList;
     }
 
@@ -259,7 +217,7 @@ public class DescriptionSearchService {
         return dto;
     }
 
-    private URL getUrl (Long lotId) {
+    private URL getUrl(Long lotId) {
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lotId);
         if (keys.size() > 0) {
             return this.awss3Service.generatePresignedURL(keys.get(0).getKey());
