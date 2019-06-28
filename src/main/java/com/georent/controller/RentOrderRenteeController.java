@@ -1,11 +1,11 @@
 package com.georent.controller;
 
-import com.georent.dto.RegistrationLotDto;
 import com.georent.dto.RentOrderRequestDTO;
 import com.georent.service.RentOrderRenteeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +41,22 @@ public class RentOrderRenteeController {
      * @return Response, containing the saved lot in the LotDTO format.
      */
     @PostMapping("/order")
-    public ResponseEntity<?> createRentOrder(@RequestBody final RentOrderRequestDTO orderRequestDTO, Principal principal){
+    public ResponseEntity<?> saveRentOrder(@RequestBody final RentOrderRequestDTO orderRequestDTO, Principal principal){
         return ResponseEntity.ok(rentOrderRenteeService.saveRentOrder(principal, orderRequestDTO));
     }
 
+    @GetMapping("/order")
+    public ResponseEntity<?> getRenteeOrders(Principal principal){
+        return ResponseEntity.ok(rentOrderRenteeService.getRenteeOrders(principal));
+    }
+
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<?> getRenteeOrderById(@PathVariable(value = "orderId") Long orderId, Principal principal) {
+        return ResponseEntity.ok(rentOrderRenteeService.getRenteeOrderById(orderId, principal));
+    }
+
+    @GetMapping("/order/lot/{lotId}")
+    public ResponseEntity<?> getRenteeOrdersToLot(@PathVariable(value = "lotId") Long lotId, Principal principal) {
+        return ResponseEntity.ok(rentOrderRenteeService.getRenteeOrdersToLot(lotId, principal));
+    }
 }

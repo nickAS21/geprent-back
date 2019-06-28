@@ -9,16 +9,20 @@ import com.georent.dto.LotDTO;
 import com.georent.dto.RentOrderDTO;
 import com.georent.dto.RentOrderRequestDTO;
 import com.georent.exception.LotNotFoundException;
+import com.georent.exception.OrderNotFoundException;
 import com.georent.exception.OrderOverlapsApprovedOrdersException;
 import com.georent.message.Message;
 import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
 import com.georent.repository.RentOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RentOrderRenteeService {
     private final GeoRentUserService userService;
@@ -127,6 +131,15 @@ public class RentOrderRenteeService {
         return user.getId() == lot.getGeoRentUser().getId();
     }
 
+
+    public List<RentOrder> findOrdersByRentee(GeoRentUser rentee) {
+        return rentOrderRepository.findByRentee_Id(rentee.getId());
+    }
+
+    public List<RentOrder> findOrdersByLotAndRentee(Lot lot, GeoRentUser rentee) {
+        return rentOrderRepository.findByLot_IdAndRentee_Id(lot.getId(), rentee.getId());
+    }
+
     /**
      * Check if the time intervals in this two orders overlaps.
      * @param orderA Order to check against another.
@@ -149,5 +162,70 @@ public class RentOrderRenteeService {
                 .findByLotAndStatus(order.getLot(), RentOrderStatus.APPROVED)
                 .stream()
                 .anyMatch( approvedOrderFromLot -> ordersOverlaps(order, approvedOrderFromLot));
+    }
+
+    /**
+     * Reads the list of user (rentee) orders from the database
+     * and maps them to the RentOrderDTO format.
+     * @param principal Current user (rentee) identifier.
+     * @return The list of user (rentee) orders in the RentOrderDTO format.
+     */
+    public List<RentOrderDTO> getRenteeOrders(Principal principal) {
+        GeoRentUser rentee = findUserByPrincipal(principal);
+        List<RentOrder> renteeOrders = findOrdersByRentee(rentee);
+        return renteeOrders
+                .stream()
+                .map(this::mapToRentOrderDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Reads the list of user (rentee) orders to the specified lot from the database
+     * and maps them to the RentOrderDTO format.
+     * @param principal Current user (rentee) identifier.
+     * @param lotId lot identifier.
+     * @return The list of user (rentee) orders in the RentOrderDTO format.
+     */
+    public List<RentOrderDTO> getRenteeOrdersToLot(Long lotId, Principal principal) {
+        GeoRentUser rentee = findUserByPrincipal(principal);
+        Lot lot = findLotById(lotId);
+
+        List<RentOrder> renteeOrdersToLot = findOrdersByLotAndRentee(lot, rentee);
+
+        return renteeOrdersToLot
+                .stream()
+                .map(this::mapToRentOrderDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Reads the order with provided id from the database,
+     * and maps it to the RentOrderDTO format.
+     * Checks if this user has the access to this order, if not,
+     * throws OrderNotFoundException.
+     * @param orderId the id of the order.
+     * @param principal current user (rentee) authentifier.
+     * @return the order in the RentOrderDTO format.
+     */
+    public RentOrderDTO getRenteeOrderById(Long orderId, Principal principal) {
+        GeoRentUser rentee = findUserByPrincipal(principal);
+
+        RentOrder order = rentOrderRepository
+                .findByIdAndRentee(orderId, rentee)
+                .orElseThrow(() -> new OrderNotFoundException(
+                        Message.INVALID_GET_ORDER.getDescription() + orderId)
+                );
+
+        return mapToRentOrderDTO(order);
+    }
+
+    /**
+     * Checks if this order was submitted by this user.
+     * @param order the order to check
+     * @param user the user to check
+     * @return true, if the order was submitted by the user, false otherwise.
+     */
+    public boolean orderWasSubmittedByUser(final RentOrder order, final GeoRentUser user) {
+        return order.getRentee().getId() == user.getId();
     }
 }

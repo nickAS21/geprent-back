@@ -44,9 +44,8 @@ public enum Message {
     INVALID_SAVE_ORDER("Failed to save order!"),
     SUCCESS_DELETE_ORDER("Order deleted successfully!"),
     SUCCESS_DELETE_ORDERS("Orders deleted successfully!"),
-    INVALID_GET_LOT_ORDER("Not found order with ID: "),
+    INVALID_GET_ORDER("Not found order with ID: "),
     ORDER_OVERLAPS("This order overlaps with some approved orders for this lot!");
-
 
     private String description;
 }

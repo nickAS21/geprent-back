@@ -1,13 +1,17 @@
 package com.georent.repository;
 
+import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
 import com.georent.domain.RentOrder;
 import com.georent.domain.RentOrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RentOrderRepository extends JpaRepository<RentOrder, Long> {
+
+    Optional<RentOrder> findByIdAndRentee(Long orderId, GeoRentUser rentee);
 
     List<RentOrder> findByLot_Id(Long lotId);
 
