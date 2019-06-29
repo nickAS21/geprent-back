@@ -9,6 +9,7 @@ import com.georent.dto.GenericResponseDTO;
 import com.georent.dto.LoginRequestDTO;
 import com.georent.dto.RegistrationRequestDTO;
 import com.georent.exception.RegistrationSuchUserExistsException;
+import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import com.georent.security.JwtProvider;
 import org.junit.Assert;
@@ -75,7 +76,7 @@ public class AuthenticationServiceTest {
             authenticationService.registerNewUserAccount(registerUserRequest);
         });
         verify(mockUserService, times(1)).existsUserByEmail(any(String.class));
-        Assert.assertEquals(registrationSuchUserExistsException.getMessage(), Message.REGISTRATION_USER_ERROR.getDescription());
+        Assert.assertEquals(registrationSuchUserExistsException.getMessage(), GeoRentIHttpStatus.REGISTRATION_USER_ERROR.getReasonPhrase());
     }
 
     @Test

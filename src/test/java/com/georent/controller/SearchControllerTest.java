@@ -43,7 +43,7 @@ public class SearchControllerTest {
 
     @Test
     public void getPage_mapping_get_PageFiltersAddressAndLotName_Return_Status_ok() throws Exception {
-        mockMvc.perform(get("/search/page/1/3/next?address=Kuiv&lotname=lotName")
+        mockMvc.perform(get("/search/page/1/3/next/?address=Kuiv&lotName=lotName")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andDo(print())
