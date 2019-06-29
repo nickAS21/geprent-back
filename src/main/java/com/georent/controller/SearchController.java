@@ -1,7 +1,5 @@
 package com.georent.controller;
 
-import com.georent.domain.Description;
-import com.georent.dto.DescriptionDTO;
 import com.georent.service.DescriptionSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.status;
@@ -59,20 +53,21 @@ public class SearchController {
      *
      * @param numberPage
      * @param count
-     * @param metodPage
+     * @param methodPage
      * @param address
      * @param lotName
      * @return Response, containing the list of all lots with filters: "address" and "lotname"
      * one page in the format  of List<LotPageDTO>  with pageNumber (LotPageable).
      */
-    @GetMapping ("/page/{number}/{count}/{metod}")
-    public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
-                                     @PathVariable(value = "count") int count,
-                                     @PathVariable(value = "metod") String metodPage,
-                                     @RequestParam(name = "address") String address,
-                                     @RequestParam(name = "lotname") String lotName
-    ) {
-        return status(OK).body(searchService.fuzzyLotPageNameAndAddressSearch(numberPage-1, count, metodPage, address, lotName));
+    @GetMapping ("/page/{number}/{count}/{method}")
+    public ResponseEntity<?> searchByAddressAndLotName(@PathVariable(value = "number") int numberPage,
+                                                       @PathVariable(value = "count") int count,
+                                                       @PathVariable(value = "method") String methodPage,
+                                                       @RequestParam(name = "address") String address,
+                                                       @RequestParam(name = "lotName") String lotName) {
+        return status(OK)
+                .body(searchService
+                .fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName));
     }
 
 }

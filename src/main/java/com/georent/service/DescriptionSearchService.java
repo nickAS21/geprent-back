@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,23 +88,23 @@ public class DescriptionSearchService {
         Session currentSession = sessionFactory.openSession();
         FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
 
-        Map<Long, LotPageDTO> hm = new HashMap<Long, LotPageDTO>();
+        Map<Long, LotPageDTO> hm = new HashMap<>();
         if (!StringUtils.isBlank(address)) {
             List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
             hm = coordinates
                     .stream()
                     .map(this::mapCoordinatesDTO)
-                    .collect(Collectors.toMap(LotPageDTO -> LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
+                    .collect(Collectors.toMap(LotPageDTO::getId, Function.identity()));
         }
         if (!StringUtils.isBlank(lotName)) {
             List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
             Map<Long, LotPageDTO> hmSrc = descriptions
                     .stream()
                     .map(this::mapDescriptionDTO)
-                    .collect(Collectors.toMap(LotPageDTO -> LotPageDTO.getId(), LotPageDTO -> LotPageDTO));
+                    .collect(Collectors.toMap(LotPageDTO::getId, Function.identity()));
             hm.putAll(hmSrc);
         }
-        Set<LotPageDTO> valueSet = new HashSet<LotPageDTO>(hm.values());
+        Set<LotPageDTO> valueSet = new HashSet<>(hm.values());
         return valueSet
                 .stream()
                 .sorted(Comparator.comparing(LotPageDTO::getId))
@@ -124,7 +125,6 @@ public class DescriptionSearchService {
      * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
     public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName) {
-        List<Long> ids = new ArrayList<>();
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
         Session currentSession = sessionFactory.openSession();
         FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
@@ -134,9 +134,7 @@ public class DescriptionSearchService {
             List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
             idSet = coordinates
                     .stream()
-                    .map(description -> {
-                        return description.getId();
-                    })
+                    .map(Coordinates::getId)
                     .collect(Collectors.toSet());
         }
 
@@ -144,13 +142,11 @@ public class DescriptionSearchService {
             List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
             Set<Long> src = descriptions
                     .stream()
-                    .map(coordinate -> {
-                        return coordinate.getId();
-                    })
+                    .map(Description::getId)
                     .collect(Collectors.toSet());
             idSet.addAll(src);
         }
-        ids.addAll(idSet);
+        List<Long> ids = new ArrayList<>(idSet);
         return this.lotService.getPage(pageNumber, count, methodPage, ids);
     }
 
