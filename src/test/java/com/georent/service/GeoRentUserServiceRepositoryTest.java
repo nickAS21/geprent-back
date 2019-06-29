@@ -155,7 +155,7 @@ public class GeoRentUserServiceRepositoryTest {
     public void WhenGetUserLotIdUploadPicture_Return_LotDto() throws MalformedURLException {
         // given
         Long picrureId = 1L;
-        String keyFileName = "/geo-rent-bucket.s3.eu-west-1.amazonaws.com/" + Long.toString(TEST_LOT.getId()) + "/" + Long.toString(TEST_LOT.getGeoRentUser().getId()) + "/" + Long.toString(picrureId);
+        String keyFileName = "/geo-rent-bucket.s3.eu-west-1.amazonaws.com/" + TEST_LOT.getId() + "/" + TEST_LOT.getGeoRentUser().getId() + "/" + picrureId;
         URL url = getUrl(keyFileName);
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
         keys.add(new DeleteObjectsRequest.KeyVersion(keyFileName));
