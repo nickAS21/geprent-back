@@ -223,8 +223,6 @@ public class GeoRentUserService {
                 Long picrureIdNext = 1L;
                 if (lot.getDescription().getPictureIds().size() > 0)
                     picrureIdNext = Collections.max(lot.getDescription().getPictureIds()) + 1;
-//                String keyFileName = lot.getId() + "/" + geoRentUser.getId() + "/" + picrureIdNext + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf('.'));
-//                String keyFileName = lot.getId() + "/" + geoRentUser.getId() + "/" + picrureIdNext;
                 String keyFileName = lot.getId() + "/" + picrureIdNext;
                 String keyFileNameS3 = this.awss3Service.uploadFileToS3bucket(multipartFile, keyFileName);
                 if (keyFileNameS3 != null && !keyFileNameS3.isEmpty()) {
