@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\",\n    \"phoneNumber\": \"123456789012\"\n}\n\n"
+							"raw": "{\n    \"firstName\": \"firstName\",\n    \"lastName\": \"lastName\",\n    \"email\": \"user3@gmail.com.ua\",\n    \"password\": \"password3\",\n    \"phoneNumber\": \"123456789012\"\n}\n\n"
 						},
 						"url": {
 							"raw": "http://localhost:8080/register",
@@ -120,7 +120,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYxMzcyMTYxLCJleHAiOjE1NjEzNzU3NjF9.x3P0DEs-NB2PIAv8Is39k4P4UPjNtG9eMSnhVw_28HeUeNeW13PshRNbMrAgVIZgcQi22pGURFsS9Olaj3_0KQ",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYxNzQyMjYxLCJleHAiOjE1NjE3NDU4NjF9.--J4Br58qSGNFSXtt6JKLNJqvcbeBVB9LMmtrOHoEVSGqDP1VL073Xu1F6NQTMMxc1PqN5hosskZaVKnDcX8lA",
 									"type": "string"
 								}
 							]
@@ -136,7 +136,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "    {\n    \"longitude\": \"801.800\",\n    \"latitude\": \"901.900\",\n    \"address\": \"100 Киевs 140\",\n    \"lotName\": \"lotName23\",\n    \"lotDescription\": \"lotDescription2 lotDescription lotDescription\"\n\n    }\n\n "
+							"raw": "    {\n    \"longitude\": \"30.4234496\",\n    \"latitude\": \"50.4365056\",\n    \"address\": \"100 Киевs 140\",\n    \"lotName\": \"lotName23\",\n    \"lotDescription\": \"lotDescription2 lotDescription lotDescription\"\n\n    }\n\n "
 						},
 						"url": {
 							"raw": "http://localhost:8080/user/lot",
@@ -197,7 +197,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYwNTkyNDA3LCJleHAiOjE1NjA1OTYwMDd9.4CMHm79BmwZNiZlFCguej0rJb4-no9kXNLAETqVfaC1aK9fERUnvrndlg3IgHSwS8NrLLwl1W2YA_e-nZHK1Mg",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTYxODIzNjE2LCJleHAiOjE1NjE4MjcyMTZ9.gFcSWhtcSzyxYuFyqdVKVhuX88frWie3nSEDxfM4F9TVprmqhatRY6wnHJ1_IsnbNsNDZ8c82tMmROeMO9aaMA",
 									"type": "string"
 								}
 							]
@@ -221,7 +221,7 @@
 								},
 								{
 									"key": "lot",
-									"value": "{\"price\":\"456\",\"longitude\":\"801.800\",\"latitude\":\"901.900\",\"address\":\"100 Киев 14\",\"lotName\":\"lotName2\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}",
+									"value": "{\"price\":\"456\",\"longitude\":\"30.3807901\",\"latitude\":\"50.4115383\",\"address\":\"100 Киев 14\",\"lotName\":\"lotName2\",\"lotDescription\":\"lotDescription2 lotDescription lotDescription\"}",
 									"type": "text"
 								},
 								{
@@ -314,7 +314,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"mkyong@gmail.com.aa\",\n    \"password\": \"pass5678910\"\n\n}"
+							"raw": "{\n    \"email\": \"user3@gmail.com.ua\",\n    \"password\": \"password3\"\n\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8080/login",
@@ -1100,7 +1100,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/search/page/2/3/next/?address=14&lotname=lotName",
+							"raw": "http://localhost:8080/search/page/2/3/next/?address=14&lotName=lotName",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1120,7 +1120,7 @@
 									"value": "14"
 								},
 								{
-									"key": "lotname",
+									"key": "lotName",
 									"value": "lotName"
 								}
 							]
