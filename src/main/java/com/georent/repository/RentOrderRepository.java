@@ -28,4 +28,9 @@ public interface RentOrderRepository extends JpaRepository<RentOrder, Long> {
     void deleteAllByRentee_Id(Long renteeId);
 
     void deleteAllByLot_IdAndRentee_Id(Long lotId, Long renteeId);
+
+    List<RentOrder> findAllRentOrderByLot_GeoRentUser_Id(Long ownerId);
+
+    List<RentOrder> findAllRentOrderByLot_IdIn(List<Long> lotIds);
+
 }

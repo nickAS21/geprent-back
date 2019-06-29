@@ -29,7 +29,7 @@ public class RentOrderRenteeController {
 //    DELETE	rentee/order/{orderId}	    Delete this order
 //    DELETE	rentee/order/lot/{lotId}	Delete all orders for this lot
 
-    RentOrderRenteeService rentOrderRenteeService;
+    private final RentOrderRenteeService rentOrderRenteeService;
 
     @Autowired
     public RentOrderRenteeController(RentOrderRenteeService rentOrderRenteeService) {

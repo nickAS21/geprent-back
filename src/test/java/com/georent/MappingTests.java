@@ -1,10 +1,19 @@
 package com.georent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.georent.dto.RentOrderRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,4 +42,39 @@ public class MappingTests {
         log.info(map1.toString());
     }
 
+    @Test
+    void localDateTimeTest() throws JsonProcessingException {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime then = now.plusDays(2);
+
+        RentOrderRequestDTO dto = new RentOrderRequestDTO();
+        dto.setLotId(13L);
+        dto.setStartTime(now);
+        dto.setEndTime(then);
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+
+        String string = mapper.writeValueAsString(dto);
+
+        log.info("DTO: {}", string);
+
+        log.info(now.toString());
+        log.info(then.toString());
+
+    }
+
+    @Test
+    void localDateTimeDeserializationTest() throws IOException {
+
+        Path path = Paths.get("src/test/resources/rent_order.json");
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        RentOrderRequestDTO dto = mapper.readValue(path.toFile(), RentOrderRequestDTO.class);
+
+        log.info(dto.toString());
+
+    }
 }

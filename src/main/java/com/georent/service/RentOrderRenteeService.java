@@ -35,7 +35,10 @@ public class RentOrderRenteeService {
     private final LotRepository lotRepository;
 
     @Autowired
-    public RentOrderRenteeService(GeoRentUserService userService, RentOrderRepository rentOrderRepository, GeoRentUserRepository userRepository, LotRepository lotRepository) {
+    public RentOrderRenteeService(GeoRentUserService userService,
+                                  RentOrderRepository rentOrderRepository,
+                                  GeoRentUserRepository userRepository,
+                                  LotRepository lotRepository) {
         this.userService = userService;
         this.rentOrderRepository = rentOrderRepository;
         this.userRepository = userRepository;
@@ -142,7 +145,7 @@ public class RentOrderRenteeService {
 
         RentOrder orderToUpdate = findByIdAndRentee(orderId, rentee);
 
-        if (!orderToUpdate.getStatus().equals(RentOrderStatus.PENDING)) {
+        if (!RentOrderStatus.PENDING.equals(orderToUpdate.getStatus())) {
             throw new RentOrderUpdateException(Message.INVALID_UPDATE_ORDER.getDescription());
         }
 
