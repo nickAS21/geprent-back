@@ -12,15 +12,11 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.georent.config.S3ConfigurationProperties;
-import com.georent.exception.LotNotFoundException;
-import com.georent.exception.S3PropertiesException;
 import com.georent.exception.ValidMultiPartFileException;
 import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-
-
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -110,7 +106,9 @@ public class AWSS3Service {
                             .withMethod(HttpMethod.GET)
                             .withExpiration(expiration);
             url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
-        }catch (RuntimeException e) { }
+        }catch (SdkClientException e) {
+            log.error("Unable to upload picture", e);
+        }
 //        } catch (AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
@@ -156,17 +154,17 @@ public class AWSS3Service {
      * @return keys all Pictures withPrefix(lotId + "/")
      */
     public List<DeleteObjectsRequest.KeyVersion> getKeysLot(Long lotId) {
-        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<DeleteObjectsRequest.KeyVersion>();
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(s3Properties.getBucketName())
                 .withPrefix(lotId + "/");
-        ObjectListing objectListing = new ObjectListing();
         try {
-            objectListing = s3Client.listObjects(listObjectsRequest);
+            ObjectListing objectListing = s3Client.listObjects(listObjectsRequest);
             objectListing
                     .getObjectSummaries()
-                    .stream()
-                    .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));        }
-        catch (RuntimeException e) { }
+                    .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
+        } catch (SdkClientException e) {
+            log.error("Bucket exception", e);
+        }
         return keys;
     }
 
