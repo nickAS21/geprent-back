@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface RentOrderRepository extends JpaRepository<RentOrder, Long> {
 
-    Optional<RentOrder> findByIdAndRentee(Long orderId, GeoRentUser rentee);
+    Optional<RentOrder> findByOrderIdAndRentee(Long orderId, GeoRentUser rentee);
 
     List<RentOrder> findByLot_Id(Long lotId);
 

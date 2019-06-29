@@ -45,6 +45,8 @@ public enum Message {
     SUCCESS_DELETE_ORDER("Order deleted successfully!"),
     SUCCESS_DELETE_ORDERS("Orders deleted successfully!"),
     INVALID_GET_ORDER("Not found order with ID: "),
+    SUCCESS_UPDATE_ORDER("Order is successfully updated!"),
+    INVALID_UPDATE_ORDER("This order can not be updated!"),
     ORDER_OVERLAPS("This order overlaps with some approved orders for this lot!");
 
     private String description;
