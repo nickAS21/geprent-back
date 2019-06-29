@@ -192,7 +192,7 @@ public class GeoRentUserServiceRepositoryTest {
         // when
         when(mockDAWSS3Service.uploadFileToS3bucket(any(MultipartFile.class), any(String.class))).thenReturn(keyFileName);
         when(mockLotRepository.save(any(Lot.class))).thenReturn(TEST_LOT);
-        when(mockDAWSS3Service.validMultiPartFile(any(MultipartFile.class))).thenReturn(true);
+        when(mockDAWSS3Service.multiPartFileValidation(any(MultipartFile.class))).thenReturn(true);
         // then
         org.springframework.http.ResponseEntity <?> bodyBuilder =  userService.saveUserLotUploadPicture(getMultipartFiles (), principal, getRegistrationLotDtoStr());
         verify(mockUserRepository, times(1)).findByEmail(any(String.class));

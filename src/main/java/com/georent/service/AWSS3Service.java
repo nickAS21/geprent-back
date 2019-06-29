@@ -12,7 +12,7 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.georent.config.S3ConfigurationProperties;
-import com.georent.exception.ValidMultiPartFileException;
+import com.georent.exception.MultiPartFileValidationException;
 import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -53,13 +53,13 @@ public class AWSS3Service {
      * @param multipart
      * @return
      */
-    public boolean validMultiPartFile(MultipartFile multipart) {
+    public boolean multiPartFileValidation (MultipartFile multipart) {
         Assert.notNull(multipart, Message.INVALID_FILE_NULL.getDescription());
         if (!multipart.getContentType().equals(MediaType.IMAGE_JPEG_VALUE)) {
-            throw new ValidMultiPartFileException(GeoRentIHttpStatus.INVALID_FILE_EXTENSION_JPG.getReasonPhrase());
+            throw new MultiPartFileValidationException(GeoRentIHttpStatus.INVALID_FILE_EXTENSION_JPG.getReasonPhrase());
         }
         if (multipart.getSize() > this.s3Properties.getFileSizeMax()) {
-            throw new ValidMultiPartFileException(GeoRentIHttpStatus.INVALID_FILE_SIZE.getReasonPhrase());
+            throw new MultiPartFileValidationException(GeoRentIHttpStatus.INVALID_FILE_SIZE.getReasonPhrase());
         }
         return true;
     }
@@ -86,6 +86,7 @@ public class AWSS3Service {
             s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, inputStream, meta));
             return  keyFileName;
         } catch (IOException e) {
+            log.error("Unable to upload  File To S3bucket", e);
             return null;
         }
     }
@@ -107,21 +108,8 @@ public class AWSS3Service {
                             .withExpiration(expiration);
             url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
         }catch (SdkClientException e) {
-            log.error("Unable to upload picture", e);
+            log.error("Unable to upload picture, generate Presigned URL", e);
         }
-//        } catch (AmazonServiceException e) {
-            // The call was transmitted successfully, but Amazon S3 couldn't process
-            // it, so it returned an error response.
-//            throw new FileException(Message.INVALID_PICTURE_LOAD_AMAZONE_SERVICES.getDescription(), e);
-//            e.printStackTrace();
-//            return null;
-//        } catch (SdkClientException e) {
-            // Amazon S3 couldn't be contacted for a response, or the client
-            // couldn't parse the response from Amazon S3.
-//            throw new FileException(Message.INVALID_PICTURE_LOAD_SDK_CLIENT.getDescription(), e);
-//            e.printStackTrace();
-//            return null;
-//        }
         return url;
     }
 
@@ -163,7 +151,7 @@ public class AWSS3Service {
                     .getObjectSummaries()
                     .forEach(summary -> keys.add(new DeleteObjectsRequest.KeyVersion(summary.getKey())));
         } catch (SdkClientException e) {
-            log.error("Bucket exception", e);
+            log.error("Bucket exception, keys all Pictures", e);
         }
         return keys;
     }

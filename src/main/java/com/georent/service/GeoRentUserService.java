@@ -219,7 +219,7 @@ public class GeoRentUserService {
         }
         Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
         for (MultipartFile multipartFile : multipartFiles) {
-            if (this.awss3Service.validMultiPartFile(multipartFile)) {
+            if (this.awss3Service.multiPartFileValidation(multipartFile)) {
                 Long picrureIdNext = 1L;
                 if (lot.getDescription().getPictureIds().size() > 0)
                     picrureIdNext = Collections.max(lot.getDescription().getPictureIds()) + 1;

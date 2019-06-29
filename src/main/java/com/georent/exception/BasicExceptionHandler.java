@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @ControllerAdvice
 public class BasicExceptionHandler {
@@ -64,9 +63,9 @@ public class BasicExceptionHandler {
      * @param request The http request that caused the exception.
      * @return 453 or 454 "INVALID_FILE_... " (multipartfile to s3) and "HttpStatus.PRECONDITION_FAILED"  status and additional info.
      */
-    @ExceptionHandler({ValidMultiPartFileException.class})
-    protected ResponseEntity<?> handleMultiPartFile(ValidMultiPartFileException ex,
-                                                  HttpServletRequest request){
+    @ExceptionHandler({MultiPartFileValidationException.class})
+    protected ResponseEntity<?> handleMultiPartFile(MultiPartFileValidationException ex,
+                                                    HttpServletRequest request){
         final String method = request.getMethod();
         final String requestURI = request.getRequestURI();
         final String message = ex.getMessage();

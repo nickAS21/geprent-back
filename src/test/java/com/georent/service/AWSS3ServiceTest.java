@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.georent.config.S3ConfigurationProperties;
-import com.georent.message.Message;
+import com.georent.message.GeoRentIHttpStatus;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,15 +52,15 @@ class AWSS3ServiceTest {
     @Test
     void whenValidMultiPartFileOk_Return_true() {
         when(mockS3Properties.getFileSizeMax()).thenReturn(fileSizeMax);
-        Assert.assertTrue(awss3Service.validMultiPartFile(multipartFiles[0]));
+        Assert.assertTrue(awss3Service.multiPartFileValidation(multipartFiles[0]));
     }
 
     @Test
     void whenValidMultiPartFileMessageContentType_Return_false() {
         when(mockMultipartFile.getContentType()).thenReturn(contentType + "png");
         when(mockMultipartFile.getSize()).thenReturn(119999L);
-        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.validMultiPartFile(mockMultipartFile));
-        Assert.assertEquals(Message.INVALID_FILE_EXTENSION_JPG.getDescription(), exception.getMessage());
+        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.multiPartFileValidation(mockMultipartFile));
+        Assert.assertEquals(GeoRentIHttpStatus.INVALID_FILE_EXTENSION_JPG.getReasonPhrase(), exception.getMessage());
     }
 
     @Test
@@ -68,8 +68,8 @@ class AWSS3ServiceTest {
         when(mockMultipartFile.getContentType()).thenReturn(contentType);
         when(mockMultipartFile.getSize()).thenReturn(219999L);
         when(mockS3Properties.getFileSizeMax()).thenReturn(fileSizeMax);
-        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.validMultiPartFile(mockMultipartFile));
-        Assert.assertEquals(Message.INVALID_FILE_SIZE.getDescription(), exception.getMessage());
+        Throwable exception = assertThrows(RuntimeException.class, () -> awss3Service.multiPartFileValidation(mockMultipartFile));
+        Assert.assertEquals(GeoRentIHttpStatus.INVALID_FILE_SIZE.getReasonPhrase(), exception.getMessage());
     }
 
 
