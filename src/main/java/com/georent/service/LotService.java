@@ -92,7 +92,8 @@ public class LotService {
             totalElements = lotRepository.findAll().size();
         }
         int totalPages = (int) Math.ceil((float)totalElements/count);
-        if (pageNumber > (totalPages - 1)
+        if (methodPage.equals(MethodPage.LAST.getTypeValue())
+                ||pageNumber > (totalPages - 1)
                 || (pageNumber >= (totalPages - 1) && methodPage.equals(MethodPage.NEXT.getTypeValue()))
                 || (pageNumber > totalPages && methodPage.equals(MethodPage.PREVIOUS.getTypeValue()))
                 || (pageNumber > totalPages && methodPage.equals(MethodPage.PREVIOUS_OR_FIRST.getTypeValue()))) {
