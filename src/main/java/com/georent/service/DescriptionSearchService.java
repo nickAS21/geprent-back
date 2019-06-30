@@ -215,11 +215,12 @@ public class DescriptionSearchService {
 
     private URL getUrl(Long lotId) {
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lotId);
-        if (keys.size() > 0) {
-            return this.awss3Service.generatePresignedURL(keys.get(0).getKey());
-
-        }
-        return null;
+        return (keys.size() > 0) ? this.awss3Service.generatePresignedURL(keys.get(0).getKey()) : null;
+//        if (keys.size() > 0) {
+//            return this.awss3Service.generatePresignedURL(keys.get(0).getKey());
+//
+//        }
+//        return null;
     }
 
 }

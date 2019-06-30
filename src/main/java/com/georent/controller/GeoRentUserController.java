@@ -37,6 +37,7 @@ public class GeoRentUserController {
         return ResponseEntity.ok(userService.getUserInfo(principal));
     }
 
+
     /**
      * Processes PATCH requests to endpoint "/user".
      * Updates user information in the database.
