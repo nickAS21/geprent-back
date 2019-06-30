@@ -71,7 +71,6 @@ public class AuthenticationService {
         if (userService.existsUserByEmail(registerUserRequest.getEmail())) {
             throw new RegistrationSuchUserExistsException(GeoRentIHttpStatus.REGISTRATION_USER_ERROR.getReasonPhrase());
         }
-
         GeoRentUser user = new GeoRentUser();
         user.setFirstName(registerUserRequest.getFirstName());
         user.setLastName(registerUserRequest.getLastName());

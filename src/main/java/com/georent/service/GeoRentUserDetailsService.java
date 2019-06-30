@@ -29,7 +29,7 @@ public class GeoRentUserDetailsService implements UserDetailsService {
 
     public UserDetails loadUserById(final Long userId) {
         GeoRentUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_ID.getDescription() + Long.toString(userId)));
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_ID.getDescription() + userId));
         return GeoRentUserDetails.create(user);
     }
 }

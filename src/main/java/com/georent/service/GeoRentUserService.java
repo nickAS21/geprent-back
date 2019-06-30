@@ -6,13 +6,7 @@ import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
-import com.georent.dto.CoordinatesDTO;
-import com.georent.dto.DescriptionDTO;
-import com.georent.dto.GenericResponseDTO;
-import com.georent.dto.GeoRentUserInfoDto;
-import com.georent.dto.GeoRentUserUpdateDto;
-import com.georent.dto.LotDTO;
-import com.georent.dto.RegistrationLotDto;
+import com.georent.dto.*;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
@@ -365,4 +359,5 @@ public class GeoRentUserService {
                     .forEach(lot -> this.awss3Service.deleteLotPictures(lot.getId()));
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
     }
+
 }
