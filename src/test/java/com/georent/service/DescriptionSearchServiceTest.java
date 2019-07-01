@@ -3,6 +3,8 @@ package com.georent.service;
 import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotPageDTO;
 import com.georent.dto.LotPageable;
+import com.georent.dto.MethodPage;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,13 +17,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class DescriptionSearchServiceTest {
-
-    private final int pageNumber = 1;
-    private final int count = 3;
-    private final String methodPage = "next";
     private final String searchTerm = "Kiev";
     private final String lotName = "lotName2";
 
@@ -42,20 +41,30 @@ public class DescriptionSearchServiceTest {
     @Test
     void whenFuzzyLotNameAndAddressSearchSuccessfully_Return_SetLotPageDTO() {
         Set<LotPageDTO> actualPageDTO = descriptionSearchService.fuzzyLotNameAndAddressSearch(searchTerm, lotName);
-        assertThat(actualPageDTO != null);
+        Assert.assertNotNull(actualPageDTO);
     }
 
     @Test
-    void whenfuzzyLotPageNameAndAddressSearchSuccessfully_Return_LotPageable() {
-        LotPageable actualLotPageable = descriptionSearchService.fuzzyLotPageNameAndAddressSearch(
-                pageNumber,
-                count,
-                methodPage,
-                searchTerm,
-                lotName);
-        assertThat(actualLotPageable != null);
-        Assert.assertEquals(0, actualLotPageable.getTotalPages());
-        Assert.assertEquals(1, actualLotPageable.getPageNumber());
+    void whenFuzzyLotPageNameMethodPageNumberVarMethodPageVar_Return_Return_LotPageableTotalPagesZeroPageNumberOne () {
+        for (int i=-2; i <= 2; i+=2) {
+            for (MethodPage type: MethodPage.values()) {
+                String msg = "Method: " + type.getTypeValue() + " pageNumber: " + i;
+                System.out.println(msg);
+                log.info(msg);
+                LotPageable actualLotPageable = descriptionSearchService.fuzzyLotPageNameAndAddressSearch(
+                        i,
+                        3,
+                        type.getTypeValue(),
+                        searchTerm,
+                        lotName);
+                Assert.assertNotNull(actualLotPageable);
+                Assert.assertEquals(0, actualLotPageable.getTotalPages());
+                Assert.assertEquals(1, actualLotPageable.getPageNumber());
+                msg = "Ok: " + "Method: " + type.getTypeValue() + " pageNumber: " + i;
+                System.out.println(msg);
+                log.info(msg);
+            }
+        }
     }
 }
 
