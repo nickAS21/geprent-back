@@ -46,7 +46,7 @@ public class DescriptionSearchServiceTest {
 
     @Test
     void whenFuzzyLotPageNameMethodPageNumberVarMethodPageVar_Return_Return_LotPageableTotalPagesZeroPageNumberOne () {
-        for (int i=-2; i <= 2; i+=2) {
+        for (int i=-2; i <= 2; i++) {
             for (MethodPage type: MethodPage.values()) {
                 String msg = "Method: " + type.getTypeValue() + " pageNumber: " + i;
                 System.out.println(msg);
