@@ -14,19 +14,14 @@ import com.georent.dto.MethodPage;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.LotRepository;
-import com.google.common.collect.Iterators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -173,24 +168,25 @@ public class LotService {
         int totalPages = (int) Math.ceil((float)totalElements/count);
 
         pageNumber = pageNumber < 0 ? 0 : pageNumber;
+        boolean isLast = false;
         switch (request) {
             case PREVIOUS:
             case PREVIOUS_OR_FIRST:
-                pageNumber = (pageNumber - 1) > totalPages ? totalPages : pageNumber;
-                request = pageNumber == totalPages ? MethodPage.getType("last") : request;
+                isLast = (pageNumber) > (totalPages) ? true : false;
                 break;
             case NEXT:
-                pageNumber = (pageNumber + 1) > totalPages ? totalPages : pageNumber;
-                request = pageNumber == totalPages ? MethodPage.getType("last") : request;
+                isLast = (pageNumber) >= (totalPages) ? true : false;
                 break;
             case CURRENT:
-                pageNumber = (pageNumber) > totalPages ? totalPages : pageNumber;
+                isLast = (pageNumber + 1) >= (totalPages) ? true : false;
                 break;
             case LAST:
-                pageNumber = totalPages;
+                isLast = true;
                 break;
             default:
         }
+        pageNumber = isLast ? (totalPages - 1 < 0 ? 0 : totalPages - 1)  : pageNumber;
+        request = isLast ? MethodPage.getType("last") : request;
 
         switch (request) {
             case FIRST:
