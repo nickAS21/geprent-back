@@ -84,24 +84,8 @@ public class LotService {
      * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
     public LotPageable getPage(int pageNumber, int count, String methodPage, List<Long> ids) {
-        long totalElements;
-        if (ids != null) {
-            totalElements = ids.size();
-        }
-        else {
-            totalElements = lotRepository.findAll().size();
-        }
-        int totalPages = (int) Math.ceil((float)totalElements/count);
-        if (methodPage.equals(MethodPage.LAST.getTypeValue())
-                ||pageNumber > (totalPages - 1)
-                || (pageNumber >= (totalPages - 1) && methodPage.equals(MethodPage.NEXT.getTypeValue()))
-                || (pageNumber > totalPages && methodPage.equals(MethodPage.PREVIOUS.getTypeValue()))
-                || (pageNumber > totalPages && methodPage.equals(MethodPage.PREVIOUS_OR_FIRST.getTypeValue()))) {
-            pageNumber = Math.max(0, totalPages - 1);
-            methodPage = MethodPage.LAST.getTypeValue();
-        }
         Page <Lot>page;
-        Pageable pageable = getPageable(pageNumber, count, methodPage);
+        Pageable pageable = getPageable(pageNumber, count, methodPage, ids);
         if (ids != null) {
             page = lotRepository.findByIdIn(ids, pageable);
         }
@@ -109,7 +93,7 @@ public class LotService {
             page = lotRepository.findAll(pageable);
         }
         pageNumber = page.getPageable().getPageNumber();
-        totalPages = page.getTotalPages();
+        int totalPages = page.getTotalPages();
         List<LotPageDTO> dtos = page.getContent()
                 .stream()
                 .map(this::mapToPageLotDTO)
@@ -175,22 +159,55 @@ public class LotService {
         return dto;
     }
 
-    private Pageable getPageable(int numberPage, int count, String metodPage) {
-        MethodPage request = MethodPage.getType(metodPage);
+    private Pageable getPageable(int pageNumber, int count, String methodPage, List<Long> ids) {
+        long totalElements;
+        MethodPage request = MethodPage.getType(methodPage);
+        Pageable pageable = null;
+
+        if (ids != null) {
+            totalElements = ids.size();
+        }
+        else {
+            totalElements = lotRepository.findAll().size();
+        }
+        int totalPages = (int) Math.ceil((float)totalElements/count);
+
+        pageNumber = pageNumber < 0 ? 0 : pageNumber;
+        switch (request) {
+            case PREVIOUS:
+            case PREVIOUS_OR_FIRST:
+                pageNumber = (pageNumber - 1) > totalPages ? totalPages : pageNumber;
+                request = pageNumber == totalPages ? MethodPage.getType("last") : request;
+                break;
+            case NEXT:
+                pageNumber = (pageNumber + 1) > totalPages ? totalPages : pageNumber;
+                request = pageNumber == totalPages ? MethodPage.getType("last") : request;
+                break;
+            case CURRENT:
+                pageNumber = (pageNumber) > totalPages ? totalPages : pageNumber;
+                break;
+            case LAST:
+                pageNumber = totalPages;
+                break;
+            default:
+        }
+
         switch (request) {
             case FIRST:
-                return PageRequest.of(numberPage, count).first();
+                pageable = PageRequest.of(pageNumber, count).first();
+                break;
             case NEXT:
-                return PageRequest.of(numberPage, count).next();
+                pageable = PageRequest.of(pageNumber, count).next();
+                break;
             case PREVIOUS:
-                return PageRequest.of(numberPage, count).previous();
+                pageable =  PageRequest.of(pageNumber, count).previous();
+                break;
             case PREVIOUS_OR_FIRST:
-                return PageRequest.of(numberPage, count).previousOrFirst();
-            case CURRENT:
-            case LAST:
-                return PageRequest.of(numberPage, count);
+                pageable = PageRequest.of(pageNumber, count).previousOrFirst();
+                break;
             default:
-                return PageRequest.of(numberPage, count);
+                pageable =  PageRequest.of(pageNumber, count);
         }
+        return pageable;
     }
 }
