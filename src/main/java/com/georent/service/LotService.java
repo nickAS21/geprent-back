@@ -73,14 +73,14 @@ public class LotService {
      * if numberPage > (PageLast+1) and metodPage == PREVOUS then metodPage = last;
      * if numberPage > (PageLast+1) and metodPage == PREVOUS_OR_FIRST then metodPage = last;
      * @param pageNumber
-     * @param count
+     * @param itemsPerPage
      * @param ids - result after search
      * totalElements - total count of lots
      * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
      */
-    public LotPageable getPage(int pageNumber, int count, String methodPage, List<Long> ids) {
+    public LotPageable getPage(int pageNumber, int itemsPerPage, String rel, List<Long> ids) {
         Page <Lot>page;
-        Pageable pageable = getPageable(pageNumber, count, methodPage, ids);
+        Pageable pageable = getPageable(pageNumber, itemsPerPage, rel, ids);
         if (ids != null) {
             page = lotRepository.findByIdIn(ids, pageable);
         }
@@ -154,9 +154,9 @@ public class LotService {
         return dto;
     }
 
-    private Pageable getPageable(int pageNumber, int count, String methodPage, List<Long> ids) {
+    private Pageable getPageable(int pageNumber, int itemsPerPage, String rel, List<Long> ids) {
         long totalElements;
-        MethodPage request = MethodPage.getType(methodPage);
+        MethodPage request = MethodPage.getType(rel);
         Pageable pageable = null;
 
         if (ids != null) {
@@ -165,19 +165,23 @@ public class LotService {
         else {
             totalElements = lotRepository.findAll().size();
         }
-        int totalPages = (int) Math.ceil((float)totalElements/count);
+        int totalPages = (int) Math.ceil((float)totalElements/itemsPerPage);
 
         pageNumber = pageNumber < 0 ? 0 : pageNumber;
         boolean isLast = false;
         switch (request) {
-            case PREVIOUS:
+            case FIRST:
+                break;
+            case PREV:
+                isLast = (pageNumber) > (totalPages - 1) ? true : false;
+                break;
             case PREVIOUS_OR_FIRST:
-                isLast = (pageNumber) > (totalPages) ? true : false;
+                isLast = (pageNumber) > (totalPages - 1) ? true : false;
                 break;
             case NEXT:
-                isLast = (pageNumber) >= (totalPages) ? true : false;
+                isLast = (pageNumber) >= (totalPages - 1) ? true : false;
                 break;
-            case CURRENT:
+            case CUR:
                 isLast = (pageNumber + 1) >= (totalPages) ? true : false;
                 break;
             case LAST:
@@ -190,19 +194,19 @@ public class LotService {
 
         switch (request) {
             case FIRST:
-                pageable = PageRequest.of(pageNumber, count).first();
+                pageable = PageRequest.of(pageNumber, itemsPerPage).first();
                 break;
             case NEXT:
-                pageable = PageRequest.of(pageNumber, count).next();
+                pageable = PageRequest.of(pageNumber, itemsPerPage).next();
                 break;
-            case PREVIOUS:
-                pageable =  PageRequest.of(pageNumber, count).previous();
+            case PREV:
+                pageable =  PageRequest.of(pageNumber, itemsPerPage).previous();
                 break;
             case PREVIOUS_OR_FIRST:
-                pageable = PageRequest.of(pageNumber, count).previousOrFirst();
+                pageable = PageRequest.of(pageNumber, itemsPerPage).previousOrFirst();
                 break;
             default:
-                pageable =  PageRequest.of(pageNumber, count);
+                pageable =  PageRequest.of(pageNumber, itemsPerPage);
         }
         return pageable;
     }

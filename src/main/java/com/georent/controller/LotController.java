@@ -3,8 +3,6 @@ package com.georent.controller;
 
 import com.georent.service.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -47,15 +45,16 @@ public class LotController {
 
 
     /**
-     * Processes the GET request to "/lot/page/{number}/{count}" URI.
+     * Processes the GET request to "/lot/page/{number}/{itemsPerPage}/{rel}" URI.
      * @param numberPage
-     * @param count
-     * @return Response, containing the list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
+     * @param itemsPerPage
+     * @param rel
+     * @return Response, containing the list of all lots one page in the format of List<LotPageDTO> with pageNumber, totalPages.
      */
-    @GetMapping ("/page/{number}/{count}/{metod}")
+    @GetMapping ("/page/{number}/{itemsPerPage}/{rel}")
     public ResponseEntity<?> getPage(@PathVariable(value = "number") int numberPage,
-                                     @PathVariable(value = "count") int count,
-                                     @PathVariable(value = "metod") String metodPage) {
-        return status(OK).body(lotService.getPage(numberPage-1, count, metodPage, null));
+                                     @PathVariable(value = "itemsPerPage") int itemsPerPage,
+                                     @PathVariable(value = "rel") String rel) {
+        return status(OK).body(lotService.getPage(numberPage-1, itemsPerPage, rel, null));
     }
 }
