@@ -122,7 +122,7 @@ public class DescriptionSearchService {
      * @param methodPage
      * @param address
      * @param lotName    List<Long> ids - result all lotId after search with filters: "address" and "lotname"
-     * @return list of all lots one page in the format of List<LotPageDTO> with pageNumber  (LotPageable).
+     * @return list of all lots (filter) one page in the format of List<LotPageDTO> with pageNumber, totalPages..
      */
     public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName) {
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);

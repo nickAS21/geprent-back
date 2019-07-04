@@ -8,10 +8,10 @@ public enum MethodPage {
 
     FIRST("first"),
     NEXT("next"),
-    PREVIOUS("previous"),
+    PREV("prev"),
     PREVIOUS_OR_FIRST("previousOrFirst"),
     LAST("last"),
-    CURRENT("current");
+    CUR("cur");
 
     private String typeValue;
 
@@ -25,7 +25,7 @@ public enum MethodPage {
                 return type;
             }
         }
-        return MethodPage.valueOf("CURRENT");
+        return MethodPage.valueOf("CUR");
     }
 
     public String getTypeValue() {
