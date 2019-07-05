@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.georent.dto.RentOrderRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,8 @@ public class MappingTests {
         dto.setEndTime(then);
 
         ObjectMapper mapper = new ObjectMapper()
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.registerModule(new JavaTimeModule());
 
         String string = mapper.writeValueAsString(dto);
 
@@ -71,6 +73,8 @@ public class MappingTests {
         Path path = Paths.get("src/test/resources/rent_order.json");
 
         ObjectMapper mapper = new ObjectMapper();
+
+        mapper.registerModule(new JavaTimeModule());
 
         RentOrderRequestDTO dto = mapper.readValue(path.toFile(), RentOrderRequestDTO.class);
 
