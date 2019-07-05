@@ -24,18 +24,19 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RentOrderRenteeService {
+public class RentOrderService {
     private final GeoRentUserService userService;
     private final RentOrderRepository rentOrderRepository;
     private final GeoRentUserRepository userRepository;
     private final LotRepository lotRepository;
 
     @Autowired
-    public RentOrderRenteeService(GeoRentUserService userService,
+    public RentOrderService(GeoRentUserService userService,
                                   RentOrderRepository rentOrderRepository,
                                   GeoRentUserRepository userRepository,
                                   LotRepository lotRepository) {
@@ -84,7 +85,9 @@ public class RentOrderRenteeService {
      */
     public List<RentOrderDTO> getRenteeOrders(Principal principal) {
         GeoRentUser rentee = findUserByPrincipal(principal);
-        List<RentOrder> renteeOrders = findOrdersByRentee(rentee);
+
+        List<RentOrder> renteeOrders = rentOrderRepository.findByRentee_Id(rentee.getId());
+
         return renteeOrders
                 .stream()
                 .map(this::mapToRentOrderDTO)
@@ -98,13 +101,14 @@ public class RentOrderRenteeService {
      * @param lotId lot identifier.
      * @return The list of user (rentee) orders in the RentOrderDTO format.
      */
-    public List<RentOrderDTO> getRenteeOrdersToLot(Long lotId, Principal principal) {
+    public List<RentOrderDTO> getRenteeOrdersByLotId(Long lotId, Principal principal) {
         GeoRentUser rentee = findUserByPrincipal(principal);
         Lot lot = findLotById(lotId);
 
-        List<RentOrder> renteeOrdersToLot = findOrdersByLotAndRentee(lot, rentee);
+        List<RentOrder> renteeOrdersByLotId =
+                rentOrderRepository.findByLot_IdAndRentee_Id(lot.getId(), rentee.getId());
 
-        return renteeOrdersToLot
+        return renteeOrdersByLotId
                 .stream()
                 .map(this::mapToRentOrderDTO)
                 .collect(Collectors.toList());
@@ -167,14 +171,7 @@ public class RentOrderRenteeService {
         return responseDTO;
     }
 
-    public List<RentOrder> findOrdersByRentee(GeoRentUser rentee) {
-        return rentOrderRepository.findByRentee_Id(rentee.getId());
-    }
-
-    public List<RentOrder> findOrdersByLotAndRentee(Lot lot, GeoRentUser rentee) {
-        return rentOrderRepository.findByLot_IdAndRentee_Id(lot.getId(), rentee.getId());
-    }
-
+//--------------------Rentee DELETE service--------------------------------------------------------------
 
     /**
      * Deletes the order with provided id from the database.
@@ -229,51 +226,120 @@ public class RentOrderRenteeService {
         return response;
     }
 
+// ------------------------Owner GET service----------------------------------
 
-    // TODO This method should be implemented as public in LotService or anywhere.
-    // Until then we use this dummy version.
-    private LotDTO mapToLotDto(Lot lot) {
-        LotDTO lotDTO = new LotDTO();
-        lotDTO.setId(lot.getId());
-        return lotDTO;
+    /**
+     * Retrieves all orders to the lots of this user (lot owner)
+     * @param principal Current user (lot owner) identifier
+     * @return the list of user (lot owner) orders in the RentOrderDTO format.
+     */
+    public List<RentOrderDTO> getLotOwnerOrders(Principal principal) {
+        GeoRentUser owner = findUserByPrincipal(principal);
+
+        List<RentOrder> ownerOrders = rentOrderRepository.findAllRentOrderByLot_GeoRentUser_Id(owner.getId());
+
+        return ownerOrders
+                .stream()
+                .map(this::mapToRentOrderDTO)
+                .collect(Collectors.toList());
     }
 
-    // TODO This method should be implemented as public in GeoRentUserService or anywhere.
-    public GeoRentUser findUserByPrincipal(Principal principal) {
+    /**
+     * Reads the order with provided id from the database,
+     * and maps it to the RentOrderDTO format.
+     * Checks if this user has the access to this order, if not,
+     * throws OrderNotFoundException.
+     * @param orderId the id of the order.
+     * @param principal current user (lot owner) identifier.
+     * @return the order in the RentOrderDTO format.
+     */
+    public RentOrderDTO getLotOwnerOrderByOrderId(Long orderId, Principal principal) {
+        GeoRentUser owner = findUserByPrincipal(principal);
+
+        RentOrder order = findOrderById(orderId);
+
+        if(!orderIsToLotOwnedByUser(order, owner)) {
+            throw new OrderNotFoundException();
+        }
+
+        return mapToRentOrderDTO(order);
+    }
+
+    /**
+     * Reads the list of user (lot owner) orders to the specified lot from the database
+     * and maps them to the RentOrderDTO format.
+     * Checks if this user has the access to this lot, if not,
+     * throws LotNotFoundException.
+     *
+     * @param principal Current user (lot owner) identifier.
+     * @param lotId lot identifier.
+     * @return The list of user (lot owner) orders in the RentOrderDTO format.
+     */
+    public List<RentOrderDTO> getLotOwnerOrdersByLotId(Long lotId, Principal principal) {
+        GeoRentUser owner = findUserByPrincipal(principal);
+        Lot lot = findLotById(lotId);
+
+        if(!lotIsOwnedByUser(lot, owner)) {
+            throw new LotNotFoundException();
+        }
+
+        List<RentOrder> ownerOrdersByLotId =
+                rentOrderRepository.findByLot_Id(lotId);
+
+        return ownerOrdersByLotId
+                .stream()
+                .map(this::mapToRentOrderDTO)
+                .collect(Collectors.toList());
+    }
+
+//---------Find Or Else Throw---------------------------------------------------------------------------
+
+    private GeoRentUser findUserByPrincipal(Principal principal) {
         return userRepository
                 .findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(
                         Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
     }
 
-    // TODO This method should be implemented as public in GeoRentUserService or anywhere.
-    public GeoRentUser findUserById(Long userId) {
+    private GeoRentUser findUserById(Long userId) {
         return userRepository
                 .findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         Message.INVALID_GET_USER_ID.getDescription() + userId));
     }
 
-    // TODO This method should be implemented as public in LotService or anywhere.
-    public Lot findLotById(Long lotId) {
+    private Lot findLotById(Long lotId) {
         return lotRepository
                 .findById(lotId)
                 .orElseThrow(() -> new LotNotFoundException(
                         Message.INVALID_GET_LOT_ID.getDescription() + lotId));
     }
 
-    // TODO This method should be implemented as public in LotService or anywhere.
-    public boolean lotIsOwnedByUser(final Lot lot, final GeoRentUser user) {
-        return user.getId() == lot.getGeoRentUser().getId();
+    private RentOrder findOrderById(Long orderId) {
+        return rentOrderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(
+                        Message.INVALID_GET_ORDER.getDescription() + orderId));
     }
 
     private RentOrder findByIdAndRentee(Long orderId, GeoRentUser rentee) {
         return rentOrderRepository
                 .findByOrderIdAndRentee(orderId, rentee)
                 .orElseThrow(() -> new OrderNotFoundException(
-                        Message.INVALID_GET_ORDER.getDescription() + orderId)
-                );
+                        Message.INVALID_GET_ORDER.getDescription() + orderId));
     }
+
+    private List<Long> findLotOwnerLotsId(GeoRentUser lotOwner) {
+
+        List<Lot> lotOwnerLots = lotRepository.findAllByGeoRentUser_Id(lotOwner.getId());
+
+        return lotOwnerLots
+                .stream()
+                .mapToLong(Lot::getId)
+                .boxed()
+                .collect(Collectors.toList());
+    }
+
+//----------Validation---------------------------------------------------------------------------
 
     /**
      * Checks if this order was submitted by this user.
@@ -283,6 +349,20 @@ public class RentOrderRenteeService {
      */
     public boolean orderWasSubmittedByUser(final RentOrder order, final GeoRentUser user) {
         return order.getRentee().getId() == user.getId();
+    }
+
+    /**
+     * Checks if this is to one of the user lots.
+     * @param order the order to check
+     * @param user the user to check
+     * @return true, if the order is to the lot of the user, false otherwise.
+     */
+    public boolean orderIsToLotOwnedByUser(final RentOrder order, final GeoRentUser user) {
+        return lotIsOwnedByUser(order.getLot(), user);
+    }
+
+    private boolean lotIsOwnedByUser(final Lot lot, final GeoRentUser user) {
+        return user.getId() == lot.getGeoRentUser().getId();
     }
 
     /**
@@ -309,6 +389,8 @@ public class RentOrderRenteeService {
                 .anyMatch( approvedOrderFromLot -> ordersOverlaps(order, approvedOrderFromLot));
     }
 
+//---DTO mapping---------------------------------------------------------------------------------
+
     private RentOrder mapFromRentOrderRequestDTO(
             final RentOrderRequestDTO requestDTO,
             final GeoRentUser rentee,
@@ -334,5 +416,9 @@ public class RentOrderRenteeService {
         return orderDTO;
     }
 
-
+    private LotDTO mapToLotDto(Lot lot) {
+        LotDTO lotDTO = new LotDTO();
+        lotDTO.setId(lot.getId());
+        return lotDTO;
+    }
 }
