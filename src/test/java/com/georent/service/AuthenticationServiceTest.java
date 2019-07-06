@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,7 +57,7 @@ public class AuthenticationServiceTest {
                 this.mockJwtProperties,
                 this.mockUserService,
 //                this.mockJavaMailSender,
-                this.mockMimeMessage);
+                this.mockMimeMessage, mailProps);
     }
 
     @Test
