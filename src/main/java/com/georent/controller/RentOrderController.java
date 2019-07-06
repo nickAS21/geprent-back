@@ -165,7 +165,7 @@ public class RentOrderController {
 //    DELETE	/owner/lot/{lotId}/order	Delete all orders for this lot
 
     /**
-     * Processes GET requests to the endpoint "rent/lotowner/order"
+     * Processes GET requests to the endpoint "rent/owner/order"
      * Retrieves the list of user (lot owner) orders from the database.
      * @param principal Current user (lot owner) identifier
      * @return response, containing the list
@@ -218,13 +218,13 @@ public class RentOrderController {
      * @param principal - user (lot owner) identifier.
      * @return response, containing the updated order.
      */
-//    @PatchMapping("/owner/order/{orderId}")
-//    public ResponseEntity<?> patchLotOwnerOrderById(
-//            @PathVariable(value = "orderId") Long orderId,
-//            @RequestBody final RentOrderDTO updateOrderDTO,
-//            Principal principal) {
-//        return ResponseEntity.ok(rentOrderService
-//                .patchLotOwnerOrderById(orderId, updateOrderDTO, principal));
-//    }
+    @PatchMapping("/owner/order/{orderId}")
+    public ResponseEntity<?> patchLotOwnerOrderById(
+            @PathVariable(value = "orderId") Long orderId,
+            @RequestBody final RentOrderDTO updateOrderDTO,
+            Principal principal) {
+        return ResponseEntity.ok(rentOrderService
+                .patchLotOwnerOrderById(orderId, updateOrderDTO, principal));
+    }
 
 }

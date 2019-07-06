@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.georent.domain.RentOrderStatus.APPROVED;
+import static com.georent.domain.RentOrderStatus.COMPLETED;
+import static com.georent.domain.RentOrderStatus.PENDING;
+
 @Service
 public class RentOrderService {
     private final GeoRentUserService userService;
@@ -131,6 +135,8 @@ public class RentOrderService {
         return mapToRentOrderDTO(order);
     }
 
+//-----------Rentee update service---------------------------------------------------------------------
+
     /**
      * Updates start and end dates in the order with provided id.
      * Checks if this user has the access to this order.
@@ -149,7 +155,7 @@ public class RentOrderService {
 
         RentOrder orderToUpdate = findByIdAndRentee(orderId, rentee);
 
-        if (!RentOrderStatus.PENDING.equals(orderToUpdate.getStatus())) {
+        if (!PENDING.equals(orderToUpdate.getStatus())) {
             throw new RentOrderUpdateException(Message.INVALID_UPDATE_ORDER.getDescription());
         }
 
@@ -292,6 +298,53 @@ public class RentOrderService {
                 .collect(Collectors.toList());
     }
 
+//------------Owner update service----------------------------------------------------------------------------
+
+    /**
+     * Updates status of the order.
+     * Checks if this user has the access to this order.
+     * If not, throws OrderNotFoundException.
+     * Checks if status update is valid.
+     * PENDING -> APPROVED
+     * APPROVED -> COMPLETED
+     * If not, throws RentOrderUpdateException.
+     * @param orderId the id of the order to update.
+     * @param updateOrderDTO - the new values.
+     * @param principal - user (lot owner) identifier.
+     * @return generic response with the updated order
+     * in the format of RentOrderDTO.
+     */
+    public GenericResponseDTO<RentOrderDTO> patchLotOwnerOrderById(
+            Long orderId, RentOrderDTO updateOrderDTO, Principal principal) {
+
+        GeoRentUser owner = findUserByPrincipal(principal);
+
+        RentOrder orderToUpdate = findOrderById(orderId);
+
+        if(!orderIsToLotOwnedByUser(orderToUpdate, owner)) {
+            throw new OrderNotFoundException();
+        }
+
+        RentOrderStatus oldStatus = orderToUpdate.getStatus();
+        RentOrderStatus newStatus = RentOrderStatus.valueOf(updateOrderDTO.getStatus());
+
+        if (! ((PENDING.equals(oldStatus) && APPROVED.equals(newStatus))
+                || (APPROVED.equals(oldStatus) && COMPLETED.equals(newStatus)))) {
+            throw new RentOrderUpdateException("Invalid status change");
+        }
+
+        orderToUpdate.setStatus(newStatus);
+
+        rentOrderRepository.save(orderToUpdate);
+
+        GenericResponseDTO<RentOrderDTO> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_UPDATE_ORDER.getDescription());
+        responseDTO.setBody(mapToRentOrderDTO(orderToUpdate));
+
+        return responseDTO;
+    }
+
+
 //---------Find Or Else Throw---------------------------------------------------------------------------
 
     private GeoRentUser findUserByPrincipal(Principal principal) {
@@ -400,7 +453,7 @@ public class RentOrderService {
         order.setRentee(rentee);
         order.setStartTime(requestDTO.getStartTime());
         order.setEndTime(requestDTO.getEndTime());
-        order.setStatus(RentOrderStatus.PENDING);
+        order.setStatus(PENDING);
 
         return order;
     }
@@ -421,4 +474,5 @@ public class RentOrderService {
         lotDTO.setId(lot.getId());
         return lotDTO;
     }
+
 }
