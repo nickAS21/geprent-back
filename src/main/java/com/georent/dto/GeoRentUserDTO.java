@@ -1,6 +1,6 @@
 package com.georent.dto;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
 public class GeoRentUserDTO {

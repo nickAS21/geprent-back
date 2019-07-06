@@ -14,6 +14,14 @@ app:
     secretKey: glutton-oversight-rare-shine-unchain-unboxed
     expiresIn: 3600000
 ---
+mail:
+  host: smtp.gmail.com
+  port: 587
+  user-name: prokatradom@gmail.com
+  pass: procatAS2107
+  #  URL: link to the server to reconstruct the user's password
+  url: ec2-52-206-69-68.compute-1.amazonaws.com:8080
+
 spring:
   profiles: test
 

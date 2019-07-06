@@ -16,11 +16,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +43,8 @@ public class AuthenticationServiceTest {
     private JwtProvider mockJwtProvider = mock(JwtProvider.class);
     private JwtConfigurationProperties mockJwtProperties = mock(JwtConfigurationProperties.class);
     private GeoRentUserService mockUserService = mock(GeoRentUserService.class);
+//    private JavaMailSender mockJavaMailSender = mock(JavaMailSender.class);
+    private MimeMessage mockMimeMessage = mock(MimeMessage.class);
 
     private String passPrincipal = "$2a$10$2O/w2twGJFNoLcnlOyJp0..IeZ2Wn3JXNts2wC62FT/TgTlQ9oqO6";
     private String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTU4NTM5MDQ0LCJleHAiOjE1NTg1NDI2NDN9.Kev4frNcpJNL6XhhFq5vdkN0qzsGfLPwTGGA7mLOtmv3e4YXMuXXnFMdhArxVV1qidu_7Z7wjQ2uxq6vyLJgTg";
@@ -52,7 +56,9 @@ public class AuthenticationServiceTest {
                 this.mockAuthManager,
                 this.mockJwtProvider,
                 this.mockJwtProperties,
-                this.mockUserService);
+                this.mockUserService,
+//                this.mockJavaMailSender,
+                this.mockMimeMessage);
     }
 
     @Test

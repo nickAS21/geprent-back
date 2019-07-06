@@ -26,6 +26,7 @@ import static com.georent.service.ServiceTestUtils.createTestShortLotDTO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 public class LotServiceTest {
     private static final Lot    TEST_LOT = createTestLot();
     private static final LotDTO TEST_LOT_DTO = createTestLotDTO();

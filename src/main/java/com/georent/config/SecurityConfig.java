@@ -79,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/search/**",
                         "/register**",
                         "/lot/**",
+                        "/forgotpassword/**",
                         "/console/**",
                         "/v2/api-docs",
                         "/webjars/**",

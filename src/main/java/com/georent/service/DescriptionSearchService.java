@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@SuppressWarnings("unchecked")
 public class DescriptionSearchService {
 
     private final EntityManagerFactory entityManagerFactory;
@@ -216,11 +217,6 @@ public class DescriptionSearchService {
     private URL getUrl(Long lotId) {
         List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lotId);
         return (keys.size() > 0) ? this.awss3Service.generatePresignedURL(keys.get(0).getKey()) : null;
-//        if (keys.size() > 0) {
-//            return this.awss3Service.generatePresignedURL(keys.get(0).getKey());
-//
-//        }
-//        return null;
     }
 
 }
