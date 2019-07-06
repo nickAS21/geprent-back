@@ -1,6 +1,7 @@
 package com.georent.exception;
 
 import com.georent.message.GeoRentIHttpStatus;
+import com.georent.message.Message;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class BasicExceptionHandler {
         response.setMethod(method);
         response.setCause(message);
         response.setPath(requestURI);
-        response.setBody("ERROR!");
+        response.setBody(Message.ERROR.getDescription());
         response.setStatusCode(HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
@@ -52,7 +53,7 @@ public class BasicExceptionHandler {
         response.setMethod(method);
         response.setCause(message);
         response.setPath(requestURI);
-        response.setBody("ERROR!");
+        response.setBody(Message.ERROR.getDescription());
         response.setStatusCode(statusCode);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
@@ -75,10 +76,31 @@ public class BasicExceptionHandler {
         response.setMethod(method);
         response.setCause(message);
         response.setPath(requestURI);
-        response.setBody("ERROR!");
+        response.setBody(Message.ERROR.getDescription());
         response.setStatusCode(statusCode);
         return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(response);
     }
+
+    /**
+     * if failed, redirects user-agent to "error.jsp", with return code of 301.
+     * @param ex
+     * @param request
+     * @return
+     */
+
+    @ExceptionHandler({ForgotException.class})
+    protected ResponseEntity<?> handleForgotException(ForgotException ex,
+                                                      HttpServletRequest request){
+
+        GenericResponse<String> response = new GenericResponse<>();
+        response.setMethod(request.getMethod());
+        response.setCause(ex.getMessage());
+        response.setPath(request.getRequestURI());
+        response.setBody(Message.MAIL_NOT_SENT.getDescription());
+        response.setStatusCode(HttpStatus.MOVED_PERMANENTLY.value());
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).body(response);
+    }
+
 
     @Data
     public static class GenericResponse<T> {

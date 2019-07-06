@@ -15,6 +15,22 @@ app:
     secretKey: glutton-oversight-rare-shine-unchain-unboxed
     expiresIn: 3600000
 ---
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  user-name: prokatradom@gmail.com
+  pass: procatAS2107
+  # port = 465
+  ssl: true
+  # port = 587
+  starttls: true
+  auth: false
+  timeout: 5000
+  writetimeout: 5000
+  debug: true
+
+
 spring:
   profiles: test
 

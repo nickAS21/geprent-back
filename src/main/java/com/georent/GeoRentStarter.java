@@ -1,10 +1,17 @@
 package com.georent;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @SpringBootApplication
 public class GeoRentStarter {
+
     public static void main(String[] args) {
         SpringApplication.run(GeoRentStarter.class, args);
     }
@@ -31,9 +38,11 @@ public class GeoRentStarter {
 //                    .limit(5)
 //                    .collect(Collectors.toSet());
 //            lotRepository.saveAll(collect);
+
+
 //        };
 //    }
-//
+
 //    private static Lot generateLot(GeoRentUser user) {
 //        Lot lot = new Lot();
 //        Coordinates coordinates = new Coordinates();
