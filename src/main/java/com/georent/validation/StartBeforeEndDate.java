@@ -1,5 +1,7 @@
 package com.georent.validation;
 
+import com.georent.dto.RentOrderDTO;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Documented;
@@ -12,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ TYPE, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = { StartBeforeEndDateValidator.class })
+@Constraint(validatedBy = { StartBeforeEndDateValidator.class})
 @Documented
 public @interface StartBeforeEndDate {
     String message() default "Start date should be before end date";

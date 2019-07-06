@@ -9,7 +9,7 @@ import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @Data
-public class RentOrderDTO {
+public class RentOrderDTO implements TimeRangeable {
     private Long orderId;
     private LotDTO lotDTO;
     private Long renteeId;

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @StartBeforeEndDate
-public class RentOrderRequestDTO {
+public class RentOrderRequestDTO implements TimeRangeable {
 
     @NotNull
     private Long lotId;
