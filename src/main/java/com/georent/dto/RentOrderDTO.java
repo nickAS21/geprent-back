@@ -1,14 +1,12 @@
 package com.georent.dto;
 
-import com.georent.domain.RentOrderStatus;
+import com.georent.validation.StartBeforeEndDate;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @Data
+@StartBeforeEndDate
 public class RentOrderDTO implements TimeRangeable {
     private Long orderId;
     private LotDTO lotDTO;
