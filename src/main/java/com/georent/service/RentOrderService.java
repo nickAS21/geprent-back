@@ -8,7 +8,6 @@ import com.georent.dto.GenericResponseDTO;
 import com.georent.dto.LotDTO;
 import com.georent.dto.RentOrderDTO;
 import com.georent.dto.RentOrderRequestDTO;
-import com.georent.exception.BasicExceptionHandler;
 import com.georent.exception.LotNotFoundException;
 import com.georent.exception.OrderNotFoundException;
 import com.georent.exception.OrderOverlapsApprovedOrdersException;
@@ -18,13 +17,11 @@ import com.georent.repository.GeoRentUserRepository;
 import com.georent.repository.LotRepository;
 import com.georent.repository.RentOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -187,14 +184,14 @@ public class RentOrderService {
      * @param principal current user (rentee) identifier.
      * @return the response with delete successful message.
      */
-    public GenericResponseDTO<RentOrderDTO> deleteRenteeOrderById(Long orderId, Principal principal) {
+    public GenericResponseDTO<String> deleteRenteeOrderById(Long orderId, Principal principal) {
         GeoRentUser rentee = findUserByPrincipal(principal);
 
         RentOrder orderToDelete = findByIdAndRentee(orderId, rentee);
 
         rentOrderRepository.delete(orderToDelete);
 
-        GenericResponseDTO<RentOrderDTO> response = new GenericResponseDTO<>();
+        GenericResponseDTO<String> response = new GenericResponseDTO<>();
         response.setMessage(Message.SUCCESS_DELETE_ORDER.getDescription());
         return  response;
     }
@@ -204,12 +201,12 @@ public class RentOrderService {
      * @param principal current user (rentee) identifier.
      * @return the response with delete successful message.
      */
-    public GenericResponseDTO<RentOrderDTO> deleteRenteeOrders(Principal principal) {
+    public GenericResponseDTO<String> deleteRenteeOrders(Principal principal) {
         GeoRentUser rentee = findUserByPrincipal(principal);
 
         rentOrderRepository.deleteAllByRentee_Id(rentee.getId());
 
-        GenericResponseDTO<RentOrderDTO> response = new GenericResponseDTO<>();
+        GenericResponseDTO<String> response = new GenericResponseDTO<>();
         response.setMessage(Message.SUCCESS_DELETE_ORDERS.getDescription());
         return response;
     }
@@ -220,14 +217,14 @@ public class RentOrderService {
      * @param principal current user (rentee) identifier.
      * @return the response with delete successful message.
      */
-    public GenericResponseDTO<RentOrderDTO> deleteRenteeOrdersToLot(
+    public GenericResponseDTO<String> deleteRenteeOrdersToLot(
             Long lotId, Principal principal) {
 
         GeoRentUser rentee = findUserByPrincipal(principal);
 
         rentOrderRepository.deleteAllByLot_IdAndRentee_Id(lotId, rentee.getId());
 
-        GenericResponseDTO<RentOrderDTO> response = new GenericResponseDTO<>();
+        GenericResponseDTO<String> response = new GenericResponseDTO<>();
         response.setMessage(Message.SUCCESS_DELETE_ORDERS.getDescription());
         return response;
     }
@@ -239,7 +236,7 @@ public class RentOrderService {
      * @param principal Current user (lot owner) identifier
      * @return the list of user (lot owner) orders in the RentOrderDTO format.
      */
-    public List<RentOrderDTO> getLotOwnerOrders(Principal principal) {
+    public List<RentOrderDTO> getOwnerOrders(Principal principal) {
         GeoRentUser owner = findUserByPrincipal(principal);
 
         List<RentOrder> ownerOrders = rentOrderRepository.findAllRentOrderByLot_GeoRentUser_Id(owner.getId());
@@ -259,12 +256,12 @@ public class RentOrderService {
      * @param principal current user (lot owner) identifier.
      * @return the order in the RentOrderDTO format.
      */
-    public RentOrderDTO getLotOwnerOrderByOrderId(Long orderId, Principal principal) {
+    public RentOrderDTO getOwnerOrderByOrderId(Long orderId, Principal principal) {
         GeoRentUser owner = findUserByPrincipal(principal);
 
         RentOrder order = findOrderById(orderId);
 
-        if(!orderIsToLotOwnedByUser(order, owner)) {
+        if(!lotIsOwnedByUser(order.getLot(), owner)) {
             throw new OrderNotFoundException();
         }
 
@@ -281,7 +278,7 @@ public class RentOrderService {
      * @param lotId lot identifier.
      * @return The list of user (lot owner) orders in the RentOrderDTO format.
      */
-    public List<RentOrderDTO> getLotOwnerOrdersByLotId(Long lotId, Principal principal) {
+    public List<RentOrderDTO> getOwnerOrdersByLotId(Long lotId, Principal principal) {
         GeoRentUser owner = findUserByPrincipal(principal);
         Lot lot = findLotById(lotId);
 
@@ -314,14 +311,14 @@ public class RentOrderService {
      * @return generic response with the updated order
      * in the format of RentOrderDTO.
      */
-    public GenericResponseDTO<RentOrderDTO> patchLotOwnerOrderById(
+    public GenericResponseDTO<RentOrderDTO> patchOwnerOrderById(
             Long orderId, RentOrderDTO updateOrderDTO, Principal principal) {
 
         GeoRentUser owner = findUserByPrincipal(principal);
 
         RentOrder orderToUpdate = findOrderById(orderId);
 
-        if(!orderIsToLotOwnedByUser(orderToUpdate, owner)) {
+        if(!lotIsOwnedByUser(orderToUpdate.getLot(), owner)) {
             throw new OrderNotFoundException();
         }
 
@@ -344,21 +341,76 @@ public class RentOrderService {
         return responseDTO;
     }
 
+//---------Owner Delete service------------------------------------------------------------------------
 
-//---------Find Or Else Throw---------------------------------------------------------------------------
+    /**
+     * Deletes all the orders to the lots of this user.
+     * @param principal current user (lot owner) identifier.
+     * @return the response with delete successful message.
+     */
+    public GenericResponseDTO<String> deleteAllOrdersToOwnerLots(Principal principal) {
+        GeoRentUser owner = findUserByPrincipal(principal);
+
+        rentOrderRepository.deleteAllRentOrderByLot_GeoRentUser_Id(owner.getId());
+
+        GenericResponseDTO<String> response = new GenericResponseDTO<>();
+        response.setMessage(Message.SUCCESS_DELETE_ORDERS.getDescription());
+        return response;
+    }
+
+    /**
+     * Deletes the order with provided id from the database.
+     * Checks if this user has the access to this order.
+     * If not, throws OrderNotFoundException.
+     * @param orderId the id of the order to delete.
+     * @param principal current user (lot owner) identifier.
+     * @return the response with delete successful message.
+     */
+    public GenericResponseDTO<String> deleteOwnerOrderById(Long orderId, Principal principal) {
+        GeoRentUser owner = findUserByPrincipal(principal);
+
+        RentOrder order = findOrderById(orderId);
+
+        if(!lotIsOwnedByUser(order.getLot(), owner)) {
+            throw new OrderNotFoundException();
+        }
+
+        rentOrderRepository.delete(order);
+
+        GenericResponseDTO<String> response = new GenericResponseDTO<>();
+        response.setMessage(Message.SUCCESS_DELETE_ORDERS.getDescription());
+        return response;
+    }
+
+    /**
+     * Deletes all the orders to the lot with provided id.
+     * @param lotId the id of the lot, from which to delete the orders.
+     * @param principal current user (lot owner) identifier.
+     * @return the response with delete successful message.
+     */
+    public GenericResponseDTO<String> deleteOwnerOrderByLotId(Long lotId, Principal principal) {
+        GeoRentUser owner = findUserByPrincipal(principal);
+
+        Lot lot = findLotById(lotId);
+
+        if(!lotIsOwnedByUser(lot, owner)) {
+            throw new LotNotFoundException();
+        }
+
+        rentOrderRepository.deleteAllByLot_Id(lotId);
+
+        GenericResponseDTO<String> response = new GenericResponseDTO<>();
+        response.setMessage(Message.SUCCESS_DELETE_ORDER.getDescription());
+        return response;
+    }
+
+//---------Find User, Lot, Order Or Else Throw---------------------------------------------------------------
 
     private GeoRentUser findUserByPrincipal(Principal principal) {
         return userRepository
                 .findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(
                         Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
-    }
-
-    private GeoRentUser findUserById(Long userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        Message.INVALID_GET_USER_ID.getDescription() + userId));
     }
 
     private Lot findLotById(Long lotId) {
@@ -381,17 +433,6 @@ public class RentOrderService {
                         Message.INVALID_GET_ORDER.getDescription() + orderId));
     }
 
-    private List<Long> findLotOwnerLotsId(GeoRentUser lotOwner) {
-
-        List<Lot> lotOwnerLots = lotRepository.findAllByGeoRentUser_Id(lotOwner.getId());
-
-        return lotOwnerLots
-                .stream()
-                .mapToLong(Lot::getId)
-                .boxed()
-                .collect(Collectors.toList());
-    }
-
 //----------Validation---------------------------------------------------------------------------
 
     /**
@@ -400,20 +441,16 @@ public class RentOrderService {
      * @param user the user to check
      * @return true, if the order was submitted by the user, false otherwise.
      */
-    public boolean orderWasSubmittedByUser(final RentOrder order, final GeoRentUser user) {
+    private boolean orderWasSubmittedByUser(final RentOrder order, final GeoRentUser user) {
         return order.getRentee().getId() == user.getId();
     }
 
     /**
-     * Checks if this is to one of the user lots.
-     * @param order the order to check
-     * @param user the user to check
-     * @return true, if the order is to the lot of the user, false otherwise.
+     * Cheks if this lot is owned by this user.
+     * @param lot lot to check.
+     * @param user user to check.
+     * @return true, if this lot is owned by this user.
      */
-    public boolean orderIsToLotOwnedByUser(final RentOrder order, final GeoRentUser user) {
-        return lotIsOwnedByUser(order.getLot(), user);
-    }
-
     private boolean lotIsOwnedByUser(final Lot lot, final GeoRentUser user) {
         return user.getId() == lot.getGeoRentUser().getId();
     }
@@ -424,7 +461,7 @@ public class RentOrderService {
      * @param orderB Order to check against another.
      * @return true orders overlaps, false otherwise.
      */
-    public boolean ordersOverlaps(final RentOrder orderA, final RentOrder orderB) {
+    private boolean ordersOverlaps(final RentOrder orderA, final RentOrder orderB) {
         return orderA.getStartTime().isBefore(orderB.getEndTime())
                 && orderB.getStartTime().isBefore(orderA.getEndTime());
     }
@@ -435,7 +472,7 @@ public class RentOrderService {
      * @param order the order to check
      * @return true if overlaps, false otherwise.
      */
-    public boolean orderOverlapsAtLeastOneApprovedOrderFromTheLot(final RentOrder order) {
+    private boolean orderOverlapsAtLeastOneApprovedOrderFromTheLot(final RentOrder order) {
         return rentOrderRepository
                 .findByLotAndStatus(order.getLot(), RentOrderStatus.APPROVED)
                 .stream()
@@ -474,5 +511,4 @@ public class RentOrderService {
         lotDTO.setId(lot.getId());
         return lotDTO;
     }
-
 }

@@ -88,7 +88,7 @@ public class RentOrderController {
      * @return response, containing the list of user (rentee) orders in the RentOrderDTO format.
      */
     @GetMapping("/rentee/order/lot/{lotId}")
-    public ResponseEntity<?> getRenteeOrdersToLot(
+    public ResponseEntity<?> getRenteeOrdersByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.getRenteeOrdersByLotId(lotId, principal));
@@ -109,7 +109,7 @@ public class RentOrderController {
     @PatchMapping("/rentee/order/{orderId}")
     public ResponseEntity<?> patchRenteeOrderById(
             @PathVariable(value = "orderId") Long orderId,
-            @RequestBody final RentOrderDTO updateOrderDTO,
+            @Valid @RequestBody final RentOrderDTO updateOrderDTO,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService
                 .patchRenteeOrderById(orderId, updateOrderDTO, principal));
@@ -150,7 +150,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/rentee/order/lot/{lotId}")
-    public ResponseEntity<?> deleteRenteeOrderToLot(
+    public ResponseEntity<?> deleteRenteeOrdersByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.deleteRenteeOrdersToLot(lotId, principal));
@@ -172,8 +172,8 @@ public class RentOrderController {
      * of user (lot owner) orders in the RentOrderDTO format.
      */
     @GetMapping("/owner/order")
-    public ResponseEntity<?> getLotOwnerOrdersByOwnerId(Principal principal){
-        return ResponseEntity.ok(rentOrderService.getLotOwnerOrders(principal));
+    public ResponseEntity<?> getOwnerOrdersByOwnerId(Principal principal){
+        return ResponseEntity.ok(rentOrderService.getOwnerOrders(principal));
     }
 
     /**
@@ -186,10 +186,10 @@ public class RentOrderController {
      * @return response, containing the order in the RentOrderDTO format.
      */
     @GetMapping("/owner/order/{orderId}")
-    public ResponseEntity<?> getLotOwnerOrderByOrderId(
+    public ResponseEntity<?> getOwnerOrderByOrderId(
             @PathVariable(value = "orderId") Long orderId,
             Principal principal) {
-        return ResponseEntity.ok(rentOrderService.getLotOwnerOrderByOrderId(orderId, principal));
+        return ResponseEntity.ok(rentOrderService.getOwnerOrderByOrderId(orderId, principal));
     }
 
     /**
@@ -200,10 +200,10 @@ public class RentOrderController {
      * @return response, containing the list of user (lot owner) orders in the RentOrderDTO format.
      */
     @GetMapping("/owner/order/lot/{lotId}")
-    public ResponseEntity<?> getLotOwnerOrdersByLotId(
+    public ResponseEntity<?> getOwnerOrdersByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
-        return ResponseEntity.ok(rentOrderService.getLotOwnerOrdersByLotId(lotId, principal));
+        return ResponseEntity.ok(rentOrderService.getOwnerOrdersByLotId(lotId, principal));
     }
 
     /**
@@ -219,12 +219,54 @@ public class RentOrderController {
      * @return response, containing the updated order.
      */
     @PatchMapping("/owner/order/{orderId}")
-    public ResponseEntity<?> patchLotOwnerOrderById(
+    public ResponseEntity<?> patchOwnerOrderById(
             @PathVariable(value = "orderId") Long orderId,
             @RequestBody final RentOrderDTO updateOrderDTO,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService
-                .patchLotOwnerOrderById(orderId, updateOrderDTO, principal));
+                .patchOwnerOrderById(orderId, updateOrderDTO, principal));
+    }
+
+    /**
+     * Processes DELETE requests to the endpoint "rent/owner/order"
+     * Deletes all the orders to the lots of this user.
+     * @param principal current user (lot owner) identifier.
+     * @return the response with delete successful message.
+     */
+    @DeleteMapping("/owner/order")
+    public ResponseEntity<?> deleteAllOrdersToOwnerLots(Principal principal){
+        return ResponseEntity.ok(rentOrderService.deleteAllOrdersToOwnerLots(principal));
+    }
+
+    /**
+     * Processes DELETE requests to the endpoint "rent/owner/order/{id}"
+     * Deletes the order with provided id from the database.
+     * Checks if this user has the access to this order.
+     * If not, throws OrderNotFoundException.
+     * @param orderId the id of the order to delete.
+     * @param principal current user (lot owner) identifier.
+     * @return the response with delete successful message.
+     */
+    @DeleteMapping("/owner/order/{orderId}")
+    public ResponseEntity<?> deleteOwnerOrderById(
+            @PathVariable(value = "orderId") Long orderId,
+            Principal principal) {
+        return ResponseEntity.ok(rentOrderService.deleteOwnerOrderById(orderId, principal));
+    }
+
+    /**
+     * Processes DELETE requests to the endpoint "rent/owner/order/lot/{id}"
+     * Deletes all the orders to the lot with provided id.
+     * If the user is not the owner of this lot, throws LotNotFoundException.
+     * @param lotId the id of the lot, from which to delete the orders
+     * @param principal current user (lot owner) identifier.
+     * @return the response with delete successful message.
+     */
+    @DeleteMapping("/owner/order/lot/{lotId}")
+    public ResponseEntity<?> deleteOrderByLotId(
+            @PathVariable(value = "lotId") Long lotId,
+            Principal principal) {
+        return ResponseEntity.ok(rentOrderService.deleteOwnerOrderByLotId(lotId, principal));
     }
 
 }

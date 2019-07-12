@@ -33,4 +33,5 @@ public interface RentOrderRepository extends JpaRepository<RentOrder, Long> {
 
     List<RentOrder> findAllRentOrderByLot_IdIn(List<Long> lotIds);
 
+    void deleteAllRentOrderByLot_GeoRentUser_Id(Long id);
 }
