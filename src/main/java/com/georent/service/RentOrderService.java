@@ -446,7 +446,7 @@ public class RentOrderService {
     }
 
     /**
-     * Cheks if this lot is owned by this user.
+     * Checks if this lot is owned by this user.
      * @param lot lot to check.
      * @param user user to check.
      * @return true, if this lot is owned by this user.
