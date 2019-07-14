@@ -143,6 +143,7 @@ public class AuthenticationService {
         userService.updateUserPasswordTmp(geoRentUser);
 
 //        String url = "http://localhost:8080/user/signup";
+//        String url = "http://localhost:8080/user/signup";
         String url = "http://localhost:8080/forgotpassword";
         url += "/signup";
 
