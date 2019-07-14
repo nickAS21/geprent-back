@@ -14,7 +14,4 @@ public class LoginForgotPasswordDTO {
     @Pattern(regexp="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message="Invalid email format")
     @Size(min = 6, max = 40)
     private String email;
-
-    private String url;
-
 }
