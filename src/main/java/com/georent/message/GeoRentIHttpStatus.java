@@ -5,7 +5,7 @@ import org.springframework.lang.Nullable;
 public enum GeoRentIHttpStatus  {
 
     /**
-     * {@code 452 Request Header Fields HttpStatus.CONFLICT}.
+     * {@code 452 Request Header Fields HttpStatus.CONFLICT == 409}.
      */
     REGISTRATION_USER_ERROR(452, "Email address already in use!"),
 

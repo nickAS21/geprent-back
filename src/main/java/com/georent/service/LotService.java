@@ -173,6 +173,7 @@ public class LotService {
             case FIRST:
                 break;
             case PREV:
+            case PREVIOUS:
                 isLast = (pageNumber) > (totalPages - 1) ? true : false;
                 break;
             case PREVIOUS_OR_FIRST:

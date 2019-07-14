@@ -9,11 +9,15 @@ public enum Message {
 
     ERROR("Error..."),
     USER_NOT_FOUND_ERROR("User not found!"),
+
     MAIL_SENT("Mail sent to successfully!"),
+    MAIL_START_BROWSER("Browser start to successfully!"),
     MAIL_NOT_SENT("Mail not sent!"),
-    MAIL_SENT_SUB_TXT("Если вы забыли пароль, мы отправим вам ссылку для создания нового пароля, чтобы вы могли восстановить доступ к cвоей  учетой записи на сайте \"Прокат рядом\""),
-    MAIL_SENT_BODY_TXT("Если Вы не запрашивали обновление пароля, ничего не делайте"),
-    MAIL_SENT_BODY_TXT_LINK(" <br />Для изменения пароля перейти по ссылке <br /> "),
+    MAIL_SENT_SUB_TXT_FORGOT("Восстановление доступа к cвоей  учетой записи на сайте \"Прокат рядом\""),
+    MAIL_SENT_TXT_FORGOT("Если вы забыли пароль, мы отправим вам ссылку для создания нового пароля, чтобы вы могли восстановить доступ к cвоей  учетой записи на сайте \"Прокат рядом\"<br>"),
+    MAIL_SENT_TXT_FORGOT_LINK(" Для изменения пароля перейти по ссылке <br> "),
+    MAIL_SENT_TXT_FORGOT_NOTHING(" Если Вы не запрашивали обновление пароля, ничего не делайте <br>"),
+
     SECURITY_CONTEXT_ERROR("Could not set user authentication in security context!"),
     ACTIVATION_USER_ERROR("The account has already been activated!"),
     LOGIN_USER_ERROR("User is not activated!"),

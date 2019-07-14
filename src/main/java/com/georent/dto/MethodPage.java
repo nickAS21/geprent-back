@@ -9,6 +9,7 @@ public enum MethodPage {
     FIRST("first"),
     NEXT("next"),
     PREV("prev"),
+    PREVIOUS("previous"),
     PREVIOUS_OR_FIRST("previousOrFirst"),
     LAST("last"),
     CUR("cur");

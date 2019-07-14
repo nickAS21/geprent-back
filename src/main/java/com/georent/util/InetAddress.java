@@ -7,7 +7,7 @@ import java.util.Enumeration;
 
 public class InetAddress {
 
-    public void hostAdr() {
+    public  static void hostAdr() {
         Enumeration e = null;
         try {
             e = NetworkInterface.getNetworkInterfaces();

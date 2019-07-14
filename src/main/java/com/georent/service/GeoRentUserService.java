@@ -88,18 +88,6 @@ public class GeoRentUserService {
     }
 
     /**
-     * Reads user info from the database and maps it to GeoRentUserInfoDto object.
-     *
-     * @param principal Current user identifier.
-     * @return The user info in the format of GeoRentUserInfoDto.
-     */
-    public GeoRentUserInfoDto getUserInfo(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
-        return mapToUserInfoDTO(geoRentUser);
-    }
-
-    /**
      * Updates user info in the database.
      *
      * @param principal            Current user identifier.
@@ -115,6 +103,26 @@ public class GeoRentUserService {
         responseDTO.setBody(geoRentUserUpdateDto);
         return responseDTO;
     }
+
+
+    @Transactional
+    public GeoRentUser updateUserPasswordTmp(final GeoRentUser user) {
+        user.setPasswordTmp(passwordEncoder.encode(user.getPasswordTmp()));
+        return userRepository.save(user);
+    }
+
+    /**
+     * Reads user info from the database and maps it to GeoRentUserInfoDto object.
+     *
+     * @param principal Current user identifier.
+     * @return The user info in the format of GeoRentUserInfoDto.
+     */
+    public GeoRentUserInfoDto getUserInfo(Principal principal) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        return mapToUserInfoDTO(geoRentUser);
+    }
+
 
     /**
      * Reads the list of user lots from the database and maps them to the LotDTO format.
