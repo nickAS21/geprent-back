@@ -1,5 +1,6 @@
 package com.georent.controller;
 
+import com.georent.dto.GenericResponseDTO;
 import com.georent.dto.RentOrderDTO;
 import com.georent.dto.RentOrderRequestDTO;
 import com.georent.service.RentOrderService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("rent")
@@ -46,7 +48,7 @@ public class RentOrderController {
      * @return Response, containing the saved order in the RentOrderDTO format.
      */
     @PostMapping("/rentee/order")
-    public ResponseEntity<?> saveRentOrder(
+    public ResponseEntity<GenericResponseDTO<RentOrderDTO>> saveRentOrder(
             @Valid @RequestBody final RentOrderRequestDTO orderRequestDTO,
             Principal principal){
         return ResponseEntity.ok(rentOrderService.saveRentOrder(principal, orderRequestDTO));
@@ -60,7 +62,7 @@ public class RentOrderController {
      * of user (rentee) orders in the RentOrderDTO format.
      */
     @GetMapping("/rentee/order")
-    public ResponseEntity<?> getRenteeOrders(Principal principal){
+    public ResponseEntity<List<RentOrderDTO>> getRenteeOrders(Principal principal){
         return ResponseEntity.ok(rentOrderService.getRenteeOrders(principal));
     }
 
@@ -74,7 +76,7 @@ public class RentOrderController {
      * @return response, containing the order in the RentOrderDTO format.
      */
     @GetMapping("/rentee/order/{orderId}")
-    public ResponseEntity<?> getRenteeOrderById(
+    public ResponseEntity<RentOrderDTO> getRenteeOrderById(
             @PathVariable(value = "orderId") Long orderId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.getRenteeOrderById(orderId, principal));
@@ -88,7 +90,7 @@ public class RentOrderController {
      * @return response, containing the list of user (rentee) orders in the RentOrderDTO format.
      */
     @GetMapping("/rentee/order/lot/{lotId}")
-    public ResponseEntity<?> getRenteeOrdersByLotId(
+    public ResponseEntity<List<RentOrderDTO>> getRenteeOrdersByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.getRenteeOrdersByLotId(lotId, principal));
@@ -107,7 +109,7 @@ public class RentOrderController {
      * @return response, containing the updated order.
      */
     @PatchMapping("/rentee/order/{orderId}")
-    public ResponseEntity<?> patchRenteeOrderById(
+    public ResponseEntity<GenericResponseDTO<RentOrderDTO>> patchRenteeOrderById(
             @PathVariable(value = "orderId") Long orderId,
             @Valid @RequestBody final RentOrderDTO updateOrderDTO,
             Principal principal) {
@@ -122,7 +124,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/rentee/order")
-    public ResponseEntity<?> deleteRenteeOrders(Principal principal){
+    public ResponseEntity<GenericResponseDTO<String>> deleteRenteeOrders(Principal principal){
         return ResponseEntity.ok(rentOrderService.deleteRenteeOrders(principal));
     }
 
@@ -136,7 +138,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/rentee/order/{orderId}")
-    public ResponseEntity<?> deleteRenteeOrderById(
+    public ResponseEntity<GenericResponseDTO<String>> deleteRenteeOrderById(
             @PathVariable(value = "orderId") Long orderId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.deleteRenteeOrderById(orderId, principal));
@@ -150,7 +152,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/rentee/order/lot/{lotId}")
-    public ResponseEntity<?> deleteRenteeOrdersByLotId(
+    public ResponseEntity<GenericResponseDTO<String>> deleteRenteeOrdersByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.deleteRenteeOrdersToLot(lotId, principal));
@@ -172,7 +174,7 @@ public class RentOrderController {
      * of user (lot owner) orders in the RentOrderDTO format.
      */
     @GetMapping("/owner/order")
-    public ResponseEntity<?> getOwnerOrdersByOwnerId(Principal principal){
+    public ResponseEntity<List<RentOrderDTO>> getOwnerOrdersByOwnerId(Principal principal){
         return ResponseEntity.ok(rentOrderService.getOwnerOrders(principal));
     }
 
@@ -186,7 +188,7 @@ public class RentOrderController {
      * @return response, containing the order in the RentOrderDTO format.
      */
     @GetMapping("/owner/order/{orderId}")
-    public ResponseEntity<?> getOwnerOrderByOrderId(
+    public ResponseEntity<RentOrderDTO> getOwnerOrderByOrderId(
             @PathVariable(value = "orderId") Long orderId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.getOwnerOrderByOrderId(orderId, principal));
@@ -200,7 +202,7 @@ public class RentOrderController {
      * @return response, containing the list of user (lot owner) orders in the RentOrderDTO format.
      */
     @GetMapping("/owner/order/lot/{lotId}")
-    public ResponseEntity<?> getOwnerOrdersByLotId(
+    public ResponseEntity<List<RentOrderDTO>> getOwnerOrdersByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.getOwnerOrdersByLotId(lotId, principal));
@@ -219,7 +221,7 @@ public class RentOrderController {
      * @return response, containing the updated order.
      */
     @PatchMapping("/owner/order/{orderId}")
-    public ResponseEntity<?> patchOwnerOrderById(
+    public ResponseEntity<GenericResponseDTO<RentOrderDTO>> patchOwnerOrderById(
             @PathVariable(value = "orderId") Long orderId,
             @RequestBody final RentOrderDTO updateOrderDTO,
             Principal principal) {
@@ -234,7 +236,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/owner/order")
-    public ResponseEntity<?> deleteAllOrdersToOwnerLots(Principal principal){
+    public ResponseEntity<GenericResponseDTO<String>> deleteAllOrdersToOwnerLots(Principal principal){
         return ResponseEntity.ok(rentOrderService.deleteAllOrdersToOwnerLots(principal));
     }
 
@@ -248,7 +250,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/owner/order/{orderId}")
-    public ResponseEntity<?> deleteOwnerOrderById(
+    public ResponseEntity<GenericResponseDTO<String>> deleteOwnerOrderById(
             @PathVariable(value = "orderId") Long orderId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.deleteOwnerOrderById(orderId, principal));
@@ -263,7 +265,7 @@ public class RentOrderController {
      * @return the response with delete successful message.
      */
     @DeleteMapping("/owner/order/lot/{lotId}")
-    public ResponseEntity<?> deleteOrderByLotId(
+    public ResponseEntity<GenericResponseDTO<String>> deleteOrderByLotId(
             @PathVariable(value = "lotId") Long lotId,
             Principal principal) {
         return ResponseEntity.ok(rentOrderService.deleteOwnerOrderByLotId(lotId, principal));
