@@ -2,11 +2,9 @@ package com.georent.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.awt.Desktop;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 

@@ -48,6 +48,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+//    Thymeleaf
+//    implementation 'org.springframework.boot:spring-boot-starter-parent'
+//    наш старый добрый thymeleaf шаблонизатор
+//    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//    орячая подмена, выключенный кеш для шаблонов, включенный live reload
+//    implementation 'org.springframework.boot:spring-boot-devtools'
+//    опционально, библиотека добавит полезные теги для SPRING SECURITY в Thymeleaf шаблонах
+//    compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
+
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.548'

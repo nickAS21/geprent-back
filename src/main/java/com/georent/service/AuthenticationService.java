@@ -12,7 +12,6 @@ import com.georent.exception.RegistrationSuchUserExistsException;
 import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import com.georent.security.JwtProvider;
-import com.sun.tools.javac.Main;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,14 +32,12 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import javax.transaction.Transactional;
 import java.io.IOException;
-import java.io.InputStream;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
-
-import static com.georent.util.CommonUtil.*;
 
 @Service
 public class AuthenticationService {
@@ -115,44 +112,39 @@ public class AuthenticationService {
         return userService.saveNewUser(user);
     }
 
-
-    public ResponseEntity<?> forgotRunBrowser(HttpServletRequest request) {
-
-        String path = "src/main/resources/forgotInEmail.html";
-        File fileHtml = new File(path);
-        String absPath = fileHtml.getAbsolutePath();
-        runBrowser(absPath);
+    public ResponseEntity<?> forgotPasswordUser(String email,
+                                                String serverApi,
+                                                HttpServletRequest request) {
+        GeoRentUser geoRentUser = userService.getUserByEmail(email)
+                .orElseThrow(() -> new ForgotException(Message.USER_NOT_FOUND_ERROR.getDescription()));
+        String accessToken = jwtProvider.generateAccessToken(GeoRentUserDetails.create(geoRentUser));
+        String tokenType = "Bearer";
+        String url = serverApi + "/forgot" +
+                "?tokenType=" + tokenType +
+                "&accessToken=" + accessToken;
+        sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot (url));
         BasicExceptionHandler.GenericResponse<String> response = new BasicExceptionHandler.GenericResponse<>();
         response.setMethod(request.getMethod());
-        response.setCause(Message.MAIL_START_BROWSER.getDescription());
+        response.setCause(Message.MAIL_SENT_FORGOT.getDescription());
         response.setPath(request.getRequestURI());
-        response.setBody(Message.MAIL_START_BROWSER.getDescription());
+        response.setBody(Message.MAIL_SENT.getDescription());
         response.setStatusCode(HttpStatus.MOVED_PERMANENTLY.value());
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).body(response);
     }
 
-    public ResponseEntity<?> forgotUser(String email,
-                                        HttpServletRequest request) {
 
-        GeoRentUser geoRentUser = userService.getUserByEmail(email)
-                .orElseThrow(() -> new ForgotException(Message.USER_NOT_FOUND_ERROR.getDescription()));
+    @Transactional
+    public ResponseEntity<?> forgotPasswordSave(Principal principal, String newPassword, HttpServletRequest request) {
+        GeoRentUser geoRentUser = userService.getUserByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        geoRentUser.setPassword(newPassword);
+        userService.saveNewUser(geoRentUser);
 
-        String passwordTmp = generatingRandomString();
-        System.out.println(passwordTmp);
-        geoRentUser.setPasswordTmp(passwordTmp);
-        userService.updateUserPasswordTmp(geoRentUser);
-
-//        String url = "http://localhost:8080/user/signup";
-//        String url = "http://localhost:8080/user/signup";
-        String url = "http://localhost:8080/forgotpassword";
-        url += "/signup";
-
-
-
-        sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot (url));
+        // send email
+        sendmail(geoRentUser.getEmail(), Message.SUCCESS_UPDATE_PASSWORD.getDescription(), Message.MAIL_SENT_FORGOT_AFTER_NOT.getDescription());
         BasicExceptionHandler.GenericResponse<String> response = new BasicExceptionHandler.GenericResponse<>();
         response.setMethod(request.getMethod());
-        response.setCause(Message.MAIL_SENT.getDescription());
+        response.setCause(Message.MAIL_SENT_FORGOT_AFTER.getDescription());
         response.setPath(request.getRequestURI());
         response.setBody(Message.MAIL_SENT.getDescription());
         response.setStatusCode(HttpStatus.MOVED_PERMANENTLY.value());
