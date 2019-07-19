@@ -64,7 +64,7 @@ public class SearchController {
                                                        @PathVariable(value = "count") int count,
                                                        @PathVariable(value = "method") String methodPage,
                                                        @RequestParam(name = "address") String address,
-                                                       @RequestParam(name = "lotName") String lotName) {
+                                                       @RequestParam(name = "lotname") String lotName) {
         return status(OK)
                 .body(searchService
                 .fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName));
