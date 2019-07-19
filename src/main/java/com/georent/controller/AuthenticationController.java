@@ -1,5 +1,7 @@
 package com.georent.controller;
 
+import com.georent.dto.ForgotEmailDto;
+import com.georent.dto.ForgotPasswordDTO;
 import com.georent.dto.LoginRequestDTO;
 import com.georent.dto.RegistrationRequestDTO;
 import com.georent.service.AuthenticationService;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import java.security.Principal;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.status;
@@ -46,28 +50,25 @@ public class AuthenticationController {
         return status(CREATED).body(authService.registerUser(signUpRequest));
     }
 
-    @PostMapping(value = "/forgotpassword/runbrowser")
-    public ResponseEntity<?> forgotRunBrowser(HttpServletRequest request) {
-        return authService.forgotRunBrowser(request);
-    }
-
     @PostMapping(value = "/forgotpassword")
-    public ResponseEntity<?>  forgot (@RequestParam(name = "login") String login,
-                                      HttpServletRequest request) {
-        return authService.forgotUser(login, request);
-    }
-
-    @PostMapping(value = "/forgotpassword/signup")
-    public ResponseEntity<?> forgotSignUp(HttpServletRequest request) {
-        return authService.forgotRunBrowser(request);
+    public ResponseEntity<?>  forgot (@Valid @RequestBody ForgotEmailDto forgotEmailDto,
+                                      final HttpServletRequest request) {
+        return authService.forgotPasswordUser(forgotEmailDto.getEmail(), forgotEmailDto.getApi(), request);
     }
 
 
-    @PostMapping(value = "/forgotpassword/save")
-    public ResponseEntity<?>  forgotSave (@RequestParam(name = "login") String login,
-                                          @RequestParam(name = "message") String message,
-                                      HttpServletRequest request) {
-        return authService.forgotUser(login, request);
+    /**
+     * Processes FORGOT PASSWORD requests to endpoint "/user/forgotpassword/save"
+     * @param forgotPasswordDTO
+     * @param principal
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "user/forgotpassword/save")
+    public ResponseEntity<?> forgotSave(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO,
+                                        Principal principal,
+                                        HttpServletRequest request) {
+        return authService.forgotPasswordSave(principal, forgotPasswordDTO.getPassword(), request);
     }
 
 }

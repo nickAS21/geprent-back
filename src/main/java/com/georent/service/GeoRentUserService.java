@@ -7,6 +7,7 @@ import com.georent.domain.Description;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
 import com.georent.dto.*;
+import com.georent.exception.BasicExceptionHandler;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URL;
@@ -58,6 +60,16 @@ public class GeoRentUserService {
         this.descriptionRepository = descriptionRepository;
         this.awss3Service = awss3Service;
     }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Optional<GeoRentUser> getUserById(final Long id) {
+        return userRepository.findById(id);
+    }
+
 
     /**
      * @param email
@@ -102,13 +114,6 @@ public class GeoRentUserService {
         responseDTO.setMessage(Message.SUCCESS_UPDATE_USER.getDescription());
         responseDTO.setBody(geoRentUserUpdateDto);
         return responseDTO;
-    }
-
-
-    @Transactional
-    public GeoRentUser updateUserPasswordTmp(final GeoRentUser user) {
-        user.setPasswordTmp(passwordEncoder.encode(user.getPasswordTmp()));
-        return userRepository.save(user);
     }
 
     /**

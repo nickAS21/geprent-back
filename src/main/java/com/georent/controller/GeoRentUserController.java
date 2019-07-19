@@ -1,5 +1,6 @@
 package com.georent.controller;
 
+import com.georent.dto.ForgotPasswordDTO;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.RegistrationLotDto;
 import com.georent.service.GeoRentUserService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 
