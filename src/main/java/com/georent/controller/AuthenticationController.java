@@ -50,6 +50,12 @@ public class AuthenticationController {
         return status(CREATED).body(authService.registerUser(signUpRequest));
     }
 
+    /**
+     * Start FORGOT PASSWORD requests to endpoint "/forgotpassword" input param email
+     * @param forgotEmailDto
+     * @param request
+     * @return
+     */
     @PostMapping(value = "/forgotpassword")
     public ResponseEntity<?>  forgot (@Valid @RequestBody ForgotEmailDto forgotEmailDto,
                                       final HttpServletRequest request) {

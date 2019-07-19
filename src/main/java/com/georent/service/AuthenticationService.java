@@ -118,10 +118,11 @@ public class AuthenticationService {
         GeoRentUser geoRentUser = userService.getUserByEmail(email)
                 .orElseThrow(() -> new ForgotException(Message.USER_NOT_FOUND_ERROR.getDescription()));
         String accessToken = jwtProvider.generateAccessToken(GeoRentUserDetails.create(geoRentUser));
+//        {API}/?main=""&path=forgot&tokentype=Bearer&accesstoken=12345
         String tokenType = "Bearer";
-        String url = serverApi + "/forgot" +
-                "?tokenType=" + tokenType +
-                "&accessToken=" + accessToken;
+        String url = serverApi + "/?main=\"\"&path=forgot" +
+                "&tokentype=" + tokenType +
+                "&accesstoken=" + accessToken;
         sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot (url));
         BasicExceptionHandler.GenericResponse<String> response = new BasicExceptionHandler.GenericResponse<>();
         response.setMethod(request.getMethod());
