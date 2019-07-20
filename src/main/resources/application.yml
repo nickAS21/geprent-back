@@ -50,9 +50,9 @@ spring:
   profiles: dev
 
   datasource:
-    url: jdbc:mysql://localhost:3306/georentdb
+    url: jdbc:mysql://localhost:3306/test
     username: root
-    password: admin
+    password: root
 
     hikari:
       maximum-pool-size: 10
