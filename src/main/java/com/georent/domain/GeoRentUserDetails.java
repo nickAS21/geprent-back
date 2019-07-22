@@ -28,7 +28,9 @@ public class GeoRentUserDetails implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public static GeoRentUserDetails create(final GeoRentUser user) {
-        final Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(UserRole.USER.name()));
+//        final Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(UserRole.USER.name()));
+        final Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRole().getAuthority()));
+//        final Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"));
         return new GeoRentUserDetails(
                 user.getId(),
                 user.getEmail(),

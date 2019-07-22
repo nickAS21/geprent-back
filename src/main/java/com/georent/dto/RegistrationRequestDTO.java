@@ -1,7 +1,10 @@
 package com.georent.dto;
 
+import com.georent.domain.UserRole;
 import lombok.Data;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -26,5 +29,9 @@ public class RegistrationRequestDTO {
     @Size(min = 12, max = 12)
     @Pattern(regexp="[0-9-]+", message="Invalid phoneNumber format.")
     private String phoneNumber;
+
+    @Enumerated (value = EnumType.STRING)
+    UserRole role = UserRole.USER;
+//    String role;
 
 }

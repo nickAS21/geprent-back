@@ -79,13 +79,15 @@ public class AuthenticationService {
         GeoRentUserDetails userPrincipal = (GeoRentUserDetails) authentication.getPrincipal();
         String accessToken = jwtProvider.generateAccessToken(userPrincipal);
         response.setHeader(HttpHeaders.AUTHORIZATION, BEARER + accessToken);
+        String role = userPrincipal.getAuthorities().iterator().next().getAuthority();
         return AuthenticationResponseDTO
                 .builder()
                 .accessToken(accessToken)
                 .tokenType(BEARER.trim())
                 .dateCreate(LocalDate.now())
                 .expiresIn(jwtProperties.getExpiresIn())
-                .role(Collections.singleton(UserRole.USER))
+                .role(Collections.singleton(role))
+//                .role(Collections.singleton("ROLE_ADMIN"))
                 .build();
 
     }
@@ -109,6 +111,7 @@ public class AuthenticationService {
         user.setEmail(registerUserRequest.getEmail());
         user.setPassword(registerUserRequest.getPassword());
         user.setPhoneNumber(registerUserRequest.getPhoneNumber());
+        user.setRole(registerUserRequest.getRole());
         return userService.saveNewUser(user);
     }
 
@@ -157,6 +160,7 @@ public class AuthenticationService {
         dto.setEmail(user.getEmail());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
+        dto.setRole(user.getRole());
         return dto;
     }
 

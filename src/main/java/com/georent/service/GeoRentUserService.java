@@ -2,12 +2,8 @@ package com.georent.service;
 
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.georent.domain.Coordinates;
-import com.georent.domain.Description;
-import com.georent.domain.GeoRentUser;
-import com.georent.domain.Lot;
+import com.georent.domain.*;
 import com.georent.dto.*;
-import com.georent.exception.BasicExceptionHandler;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
@@ -17,12 +13,12 @@ import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URL;
@@ -127,6 +123,21 @@ public class GeoRentUserService {
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         return mapToUserInfoDTO(geoRentUser);
     }
+
+    /**
+     *
+     * @param principal
+     * @return
+     */
+    public List<GeoRentUserInfoDto> getUserAll(Principal principal) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        return userRepository.findAll()
+                .stream()
+                .map(this::mapToUserInfoDTO)
+                .collect(Collectors.toList());
+    }
+
 
 
     /**

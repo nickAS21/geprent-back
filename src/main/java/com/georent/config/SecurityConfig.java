@@ -63,31 +63,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors()
-                .and()
+                    .cors()
+                    .and()
                 .csrf()
-                .disable()
+                    .disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(authEntryPoint)
-                .and()
+                    .authenticationEntryPoint(authEntryPoint)
+                    .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
                 .authorizeRequests()
-                .antMatchers(
-                        "/login**",
-                        "/search/**",
-                        "/register**",
-                        "/lot/**",
-                        "/forgotpassword/**",
-                        "/console/**",
-                        "/v2/api-docs",
-                        "/webjars/**",
-                        "/swagger-resources/**",
-                        "/swagger-ui.html")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and().headers().frameOptions().sameOrigin();
+                    .antMatchers(
+                            "/login**",
+                            "/search/**",
+                            "/register**",
+                            "/lot/**",
+                            "/forgotpassword/**",
+                            "/console/**",
+                            "/v2/api-docs",
+                            "/webjars/**",
+                            "/swagger-resources/**",
+                            "/swagger-ui.html")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                .headers()
+                    .frameOptions()
+                    .sameOrigin();
     }
 }

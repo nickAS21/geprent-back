@@ -1,15 +1,18 @@
 package com.georent.controller;
 
+import com.georent.domain.UserRole;
 import com.georent.dto.ForgotPasswordDTO;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.RegistrationLotDto;
 import com.georent.service.GeoRentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
@@ -34,6 +37,7 @@ public class GeoRentUserController {
      * @param principal current user identifier.
      * @return Response, containing the user information in the format of GeoRentUserInfoDTO.
      */
+
     @GetMapping
     public ResponseEntity<?> getUserInfo(Principal principal){
         return ResponseEntity.ok(userService.getUserInfo(principal));
@@ -69,7 +73,9 @@ public class GeoRentUserController {
      * @param principal current user identifier.
      * @return Response, containing the list of user lots in the format of LotDTO.
      */
+
     @GetMapping("/lots")
+//    @Secured({UserRole.Code.ADMIN, UserRole.Code.USER })
     public ResponseEntity<?> getUserLots(Principal principal){
         return ResponseEntity.ok(userService.getUserLots(principal));
     }
@@ -146,6 +152,13 @@ public class GeoRentUserController {
     @DeleteMapping ("/lots")
     public ResponseEntity<?> deletetLots(Principal principal){
         return ResponseEntity.ok(userService.deleteteUserLotAll(principal));
+    }
+
+    @GetMapping("/userAll")
+//    @Secured(UserRole.Code.ADMIN)
+    @RolesAllowed(UserRole.Code.ADMIN)
+    public ResponseEntity<?> getUserAll(Principal principal){
+        return ResponseEntity.ok(userService.getUserAll(principal));
     }
 
 }

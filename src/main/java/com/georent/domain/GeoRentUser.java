@@ -1,10 +1,8 @@
 package com.georent.domain;
 
 import lombok.Data;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
+
 @Data
 @Entity
 public class GeoRentUser {
@@ -17,4 +15,7 @@ public class GeoRentUser {
     private String email;
     private String password;
     private String phoneNumber;
+    private UserRole role;
+//    private String role;
+
 }

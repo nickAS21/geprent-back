@@ -17,5 +17,6 @@ public class AuthenticationResponseDTO {
     private String tokenType;
     private LocalDate dateCreate;
     private Long expiresIn;
-    private Set<UserRole> role;
+//    private Set<UserRole> role;
+    private Set<String> role;
 }
