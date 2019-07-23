@@ -32,6 +32,4 @@ public class RegistrationRequestDTO {
 
     @Enumerated (value = EnumType.STRING)
     UserRole role = UserRole.USER;
-//    String role;
-
 }

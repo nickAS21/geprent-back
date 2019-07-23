@@ -14,6 +14,10 @@ import javax.persistence.FetchType;
 import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -24,6 +28,7 @@ public class Lot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message="{register.lot.price.invalid}")
     private Long price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

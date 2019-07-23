@@ -14,6 +14,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 
 @Indexed
@@ -34,9 +37,11 @@ public class Description {
 
     @Field
     @Column(name = "lot_name")
+    @NotBlank(message="{register.lot.Name.invalid}")
     private String lotName;
 
     @Field
     @Column(name = "lot_description")
+    @NotBlank(message="{register.lot.Description.invalid}")
     private String lotDescription;
 }

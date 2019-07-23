@@ -16,6 +16,4 @@ public class GeoRentUser {
     private String password;
     private String phoneNumber;
     private UserRole role;
-//    private String role;
-
 }

@@ -27,6 +27,7 @@ public enum Message {
     UNAUTHORIZED_ERROR("You are not authorized to access this resource!"),
     INVALID_TOKEN_ERROR("Invalid JWT token!"),
     INVALID_PASSWORD("Invalid password!"),
+    INVALID_VALIDATE("Invalid validate!"),
 
     SUCCESS_REGISTRATION("User registered successfully!"),
     SUCCESS_UPDATE_USER("User data updated successfully!"),

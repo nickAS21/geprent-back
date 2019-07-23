@@ -13,6 +13,8 @@ import javax.persistence.FetchType;
 import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Indexed
 @Data
@@ -23,12 +25,15 @@ public class Coordinates {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message="{register.lot.longitude.invalid}")
     private Float longitude;
 
+    @NotNull(message="{register.lot.latitude.invalid}")
     private Float latitude;
 
     @Field
     @Column(name = "address")
+    @NotBlank(message="{register.lot.address.invalid}")
     private String address;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)

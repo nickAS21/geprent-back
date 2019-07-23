@@ -30,7 +30,8 @@ public class LotController {
      */
     @GetMapping
     public ResponseEntity<?> getLots(){
-        return ResponseEntity.ok(lotService.getLotsDto());
+        ResponseEntity<?> re = ResponseEntity.ok(lotService.getLotsDto());
+        return re;
     }
 
     /**

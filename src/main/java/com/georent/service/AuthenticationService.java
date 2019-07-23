@@ -4,10 +4,9 @@ import com.georent.config.JwtConfigurationProperties;
 import com.georent.config.MailConfigurationProperties;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.GeoRentUserDetails;
-import com.georent.domain.UserRole;
 import com.georent.dto.*;
-import com.georent.exception.BasicExceptionHandler;
 import com.georent.exception.ForgotException;
+import com.georent.exception.GenericResponse;
 import com.georent.exception.RegistrationSuchUserExistsException;
 import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
@@ -74,7 +73,6 @@ public class AuthenticationService {
 
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         GeoRentUserDetails userPrincipal = (GeoRentUserDetails) authentication.getPrincipal();
         String accessToken = jwtProvider.generateAccessToken(userPrincipal);
@@ -126,13 +124,14 @@ public class AuthenticationService {
         String url = serverApi + "/?main=\"\"&path=forgot" +
                 "&tokentype=" + tokenType +
                 "&accesstoken=" + accessToken;
-        sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot (url));
-        BasicExceptionHandler.GenericResponse<String> response = new BasicExceptionHandler.GenericResponse<>();
-        response.setMethod(request.getMethod());
-        response.setCause(Message.MAIL_SENT_FORGOT.getDescription());
-        response.setPath(request.getRequestURI());
-        response.setBody(Message.MAIL_SENT.getDescription());
-        response.setStatusCode(HttpStatus.MOVED_PERMANENTLY.value());
+        sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot(url));
+        GenericResponse<String> response = new GenericResponse<>(
+                request.getMethod(),
+                request.getRequestURI(),
+                Message.MAIL_SENT_FORGOT.getDescription(),
+                HttpStatus.MOVED_PERMANENTLY.value(),
+                Message.MAIL_SENT.getDescription());
+
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).body(response);
     }
 
@@ -146,12 +145,13 @@ public class AuthenticationService {
 
         // send email
         sendmail(geoRentUser.getEmail(), Message.SUCCESS_UPDATE_PASSWORD.getDescription(), Message.MAIL_SENT_FORGOT_AFTER_NOT.getDescription());
-        BasicExceptionHandler.GenericResponse<String> response = new BasicExceptionHandler.GenericResponse<>();
-        response.setMethod(request.getMethod());
-        response.setCause(Message.MAIL_SENT_FORGOT_AFTER.getDescription());
-        response.setPath(request.getRequestURI());
-        response.setBody(Message.MAIL_SENT.getDescription());
-        response.setStatusCode(HttpStatus.MOVED_PERMANENTLY.value());
+        GenericResponse<String> response = new GenericResponse<>(
+                request.getMethod(),
+                request.getRequestURI(),
+                Message.MAIL_SENT_FORGOT_AFTER.getDescription(),
+                HttpStatus.MOVED_PERMANENTLY.value(),
+                Message.MAIL_SENT.getDescription());
+
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).body(response);
     }
 
@@ -180,11 +180,11 @@ public class AuthenticationService {
         javaMailSender.send(msg);
     }
 
-    private String getSetTextForMailForgot (String url) {
-        String content = "<a href='" + url + "'>" +  Message.MAIL_SENT_TXT_FORGOT_LINK.getDescription() + "</a><br>";
+    private String getSetTextForMailForgot(String url) {
+        String content = "<a href='" + url + "'>" + Message.MAIL_SENT_TXT_FORGOT_LINK.getDescription() + "</a><br>";
         String setText = "<p> " + Message.MAIL_SENT_TXT_FORGOT.getDescription() + content + "  </p>";
         setText += "<p>" + Message.MAIL_SENT_TXT_FORGOT_NOTHING.getDescription() + "</p>";
-        return  setText;
+        return setText;
 
     }
 

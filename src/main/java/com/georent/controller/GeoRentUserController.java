@@ -154,6 +154,11 @@ public class GeoRentUserController {
         return ResponseEntity.ok(userService.deleteteUserLotAll(principal));
     }
 
+    /**
+     * Only with role === "ROLE_ADMIN"
+     * @param principal
+     * @return
+     */
     @GetMapping("/userAll")
 //    @Secured(UserRole.Code.ADMIN)
     @RolesAllowed(UserRole.Code.ADMIN)

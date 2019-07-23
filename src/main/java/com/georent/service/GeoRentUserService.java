@@ -349,6 +349,7 @@ public class GeoRentUserService {
         geoRentUserInfoDto.setFirstName(geoRentUser.getFirstName());
         geoRentUserInfoDto.setLastName(geoRentUser.getLastName());
         geoRentUserInfoDto.setPhoneNumber(geoRentUser.getPhoneNumber());
+        geoRentUserInfoDto.setRole(geoRentUser.getRole());
         return geoRentUserInfoDto;
     }
 
