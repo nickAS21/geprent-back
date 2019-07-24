@@ -4,6 +4,7 @@ import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -134,7 +135,7 @@ public class BasicExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    //
+
 //    @ExceptionHandler(ConstraintViolationException.class)
 //    public void springHandleConstraintExceptions(HttpServletResponse response) throws IOException {
 //        response.sendError(HttpStatus.BAD_REQUEST.value());

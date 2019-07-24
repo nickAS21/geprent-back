@@ -23,7 +23,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -66,10 +65,10 @@ public class AuthenticationServiceTest {
     public void WhenRegisterUser_Ok_Return_GenericResponseDTO() {
         RegistrationRequestDTO registerUserRequest = getRegistrationRequestDTO();
         GeoRentUser user = mapFromRegDtoToUser(registerUserRequest);
-        when(mockUserService.saveNewUser(any(GeoRentUser.class))).thenReturn(user);
+        when(mockUserService.saveUser(any(GeoRentUser.class))).thenReturn(user);
         when(mockUserService.existsUserByEmail(any(String.class))).thenReturn(false);
         GenericResponseDTO responseDTO = authenticationService.registerUser(registerUserRequest);
-        verify(mockUserService, times(1)).saveNewUser(any(GeoRentUser.class));
+        verify(mockUserService, times(1)).saveUser(any(GeoRentUser.class));
         verify(mockUserService, times(1)).existsUserByEmail(any(String.class));
         Assert.assertEquals(Message.SUCCESS_REGISTRATION.getDescription(), responseDTO.getMessage());
         Assert.assertEquals(authenticationService.mapToGeoRentUserDTO(user), responseDTO.getBody());

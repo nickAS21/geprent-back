@@ -62,19 +62,15 @@ public class AuthenticationController {
         return authService.forgotPasswordUser(forgotEmailDto.getEmail(), forgotEmailDto.getApi(), request);
     }
 
-
     /**
-     * Processes FORGOT PASSWORD requests to endpoint "/user/forgotpassword/save"
+     * Processes FORGOT PASSWORD requests to endpoint "/forgotpassword/save"
      * @param forgotPasswordDTO
-     * @param principal
      * @param request
      * @return
      */
-    @PostMapping(value = "user/forgotpassword/save")
+    @PostMapping(value = "forgotpassword/save")
     public ResponseEntity<?> forgotSave(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO,
-                                        Principal principal,
                                         HttpServletRequest request) {
-        return authService.forgotPasswordSave(principal, forgotPasswordDTO.getPassword(), request);
+        return authService.forgotPasswordSave(forgotPasswordDTO.getPassword(), request);
     }
-
 }

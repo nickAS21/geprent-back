@@ -23,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -33,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
@@ -42,7 +42,7 @@ import java.util.Date;
 public class AuthenticationService {
 
     public static final String BEARER = "Bearer ";
-
+    private static final int tokenLen = 64;
     private final AuthenticationManager authManager;
     private final JwtProvider jwtProvider;
     private final JwtConfigurationProperties jwtProperties;
@@ -110,7 +110,7 @@ public class AuthenticationService {
         user.setPassword(registerUserRequest.getPassword());
         user.setPhoneNumber(registerUserRequest.getPhoneNumber());
         user.setRole(registerUserRequest.getRole());
-        return userService.saveNewUser(user);
+        return userService.saveUser(user);
     }
 
     public ResponseEntity<?> forgotPasswordUser(String email,
@@ -118,11 +118,16 @@ public class AuthenticationService {
                                                 HttpServletRequest request) {
         GeoRentUser geoRentUser = userService.getUserByEmail(email)
                 .orElseThrow(() -> new ForgotException(Message.USER_NOT_FOUND_ERROR.getDescription()));
+        Long userId = geoRentUser.getId();
+        geoRentUser.setId(0);
         String accessToken = jwtProvider.generateAccessToken(GeoRentUserDetails.create(geoRentUser));
+        geoRentUser.setId(userId);
+        geoRentUser.setRecoveryToken(accessToken);
+        userService.saveUser(geoRentUser);
 //        {API}/?main=""&path=forgot&tokentype=Bearer&accesstoken=12345
-        String tokenType = "Bearer";
+            // send email
         String url = serverApi + "/?main=\"\"&path=forgot" +
-                "&tokentype=" + tokenType +
+                "&tokentype=" + BEARER.trim() +
                 "&accesstoken=" + accessToken;
         sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot(url));
         GenericResponse<String> response = new GenericResponse<>(
@@ -137,14 +142,19 @@ public class AuthenticationService {
 
 
     @Transactional
-    public ResponseEntity<?> forgotPasswordSave(Principal principal, String newPassword, HttpServletRequest request) {
-        GeoRentUser geoRentUser = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
-        geoRentUser.setPassword(newPassword);
-        userService.saveNewUser(geoRentUser);
-
-        // send email
-        sendmail(geoRentUser.getEmail(), Message.SUCCESS_UPDATE_PASSWORD.getDescription(), Message.MAIL_SENT_FORGOT_AFTER_NOT.getDescription());
+    public ResponseEntity<?> forgotPasswordSave(String newPassword, HttpServletRequest request) {
+        final String accessToken = jwtProvider.getTokenFromRequest(request);
+        if (StringUtils.hasText(accessToken) && jwtProvider.tokenIsValid(accessToken)) {
+            Long userId = jwtProvider.getUserIdFromToken(accessToken);
+            if (userId != 0) throw new UsernameNotFoundException(Message.UNAUTHORIZED_ERROR.getDescription());
+            GeoRentUser geoRentUser = userService.getUserByRecoveryToken(accessToken)
+                    .orElseThrow(() -> new UsernameNotFoundException(Message.UNAUTHORIZED_ERROR.getDescription()));
+            geoRentUser.setPassword(newPassword);
+            geoRentUser.setRecoveryToken(null);
+            userService.saveUser(geoRentUser);
+                // send email
+            sendmail(geoRentUser.getEmail(), Message.SUCCESS_UPDATE_PASSWORD.getDescription(), Message.MAIL_SENT_FORGOT_AFTER_NOT.getDescription());
+        }
         GenericResponse<String> response = new GenericResponse<>(
                 request.getMethod(),
                 request.getRequestURI(),

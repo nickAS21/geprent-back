@@ -28,6 +28,7 @@ public enum Message {
     INVALID_TOKEN_ERROR("Invalid JWT token!"),
     INVALID_PASSWORD("Invalid password!"),
     INVALID_VALIDATE("Invalid validate!"),
+    INVALID_HEADERS_JSON("Invalid headers: Content-Type not application/json!"),
 
     SUCCESS_REGISTRATION("User registered successfully!"),
     SUCCESS_UPDATE_USER("User data updated successfully!"),

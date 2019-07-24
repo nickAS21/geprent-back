@@ -7,8 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class GenericResponse<T> {
     private String method;
-    private String cause;
     private String path;
+    private String cause;
     private int statusCode;
     private T body;
 }

@@ -77,6 +77,15 @@ public class GeoRentUserService {
     }
 
     /**
+     *
+     * @param recoveryToken
+     * @return GeoRentUser if user with this recoveryToken is registered
+     */
+    public Optional<GeoRentUser> getUserByRecoveryToken(final String recoveryToken) {
+        return userRepository.findByRecoveryToken(recoveryToken);
+    }
+
+    /**
      * @param email
      * @return true if email is registered, false if email is not registered
      */
@@ -90,7 +99,7 @@ public class GeoRentUserService {
      */
 
     @Transactional
-    public GeoRentUser saveNewUser(final GeoRentUser user) {
+    public GeoRentUser saveUser(final GeoRentUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }

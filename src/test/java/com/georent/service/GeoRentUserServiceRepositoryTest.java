@@ -98,7 +98,7 @@ public class GeoRentUserServiceRepositoryTest {
     public void WhenSaveNewUser_Save_User_With_EncodePassword() {
         when(passwordEncoder.encode(any(String.class))).thenReturn(passPrincipal);
         when(mockUserRepository.save(any(GeoRentUser.class))).thenReturn(user);
-        GeoRentUser userOut = userService.saveNewUser(user);
+        GeoRentUser userOut = userService.saveUser(user);
         verify(mockUserRepository, times(1)).save(any(GeoRentUser.class));
         Assert.assertEquals(userOut, user);
     }

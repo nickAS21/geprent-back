@@ -9,5 +9,6 @@ public interface GeoRentUserRepository extends JpaRepository<GeoRentUser, Long> 
 
     Optional<GeoRentUser> findByEmail(String email);
     Boolean existsByEmail(String email);
+    Optional<GeoRentUser> findByRecoveryToken(String recoveryToken);
 
 }
