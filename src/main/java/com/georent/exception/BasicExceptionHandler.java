@@ -4,13 +4,11 @@ import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
@@ -101,6 +99,7 @@ public class BasicExceptionHandler {
 
     /**
      * Exception handler for fields with notBlank validation
+     *
      * @param ex
      * @param request
      * @return
@@ -120,6 +119,7 @@ public class BasicExceptionHandler {
 
     /**
      * Exception handler for fields with notNull validation
+     *
      * @param ex
      * @param request
      * @return
@@ -139,13 +139,14 @@ public class BasicExceptionHandler {
 
     /**
      * TransactionException (search)
+     *
      * @param ex
      * @param request
      * @return
      */
-   @ExceptionHandler(CannotCreateTransactionException.class)
+    @ExceptionHandler(CannotCreateTransactionException.class)
     protected ResponseEntity<?> handleTransactionExceptions(CannotCreateTransactionException ex,
-                                                           HttpServletRequest request) {
+                                                            HttpServletRequest request) {
         GenericResponse<String> response = new GenericResponse<>(
                 request.getMethod(),
                 request.getRequestURI(),
@@ -158,17 +159,18 @@ public class BasicExceptionHandler {
 
     /**
      * PersistenceException (search addpess, lotName)
+     *
      * @param ex
      * @param request
      * @return
      */
-   @ExceptionHandler(SearchConnectionNotAvailableException.class)
+    @ExceptionHandler(SearchConnectionNotAvailableException.class)
     protected ResponseEntity<?> handlerSearchConnectionNotAvailableException(SearchConnectionNotAvailableException ex,
-                                                           HttpServletRequest request) {
+                                                                             HttpServletRequest request) {
         GenericResponse<String> response = new GenericResponse<>(
                 request.getMethod(),
                 request.getRequestURI(),
-                ex.getCause().getMessage() + ": " +  ex.getCause().getCause().getMessage(),
+                ex.getCause().getMessage() + ": " + ex.getCause().getCause().getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 Message.INVALID_CONNECTION_SERCH.getDescription());
 
