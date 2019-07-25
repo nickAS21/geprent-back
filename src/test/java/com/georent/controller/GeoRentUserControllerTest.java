@@ -52,7 +52,7 @@ public class GeoRentUserControllerTest {
 
     @Test
     public void deletetUser_mapping_delete_user_Return_Status_ok () throws Exception {
-        mockMvc.perform(delete("/user")
+        mockMvc.perform(delete("/user/user2@gmail.com.ua")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andDo(print())

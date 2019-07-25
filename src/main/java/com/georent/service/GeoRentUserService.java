@@ -271,13 +271,15 @@ public class GeoRentUserService {
      * @return Generic response, containing  the proper message.
      */
     @Transactional
-    public GenericResponseDTO<LotDTO> deleteUser(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+    public GenericResponseDTO<LotDTO> deleteUser(String userName, Principal principal) {
+        userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        GeoRentUser geoRentUser = userRepository.findByEmail(userName)
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         deleteAllLotUser(geoRentUser);
         userRepository.delete(geoRentUser);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
-        responseDTO.setMessage(Message.SUCCESS_DELETE_USER.getDescription());
+        responseDTO.setMessage(userName + Message.SUCCESS_DELETE_USER.getDescription());
         return responseDTO;
     }
 

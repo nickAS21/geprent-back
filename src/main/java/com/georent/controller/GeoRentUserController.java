@@ -62,9 +62,10 @@ public class GeoRentUserController {
      * @param principal current user identifier.
      * @return Response, containing the user information in the format of GeoRentUserInfoDTO.
      */
-    @DeleteMapping
-    public ResponseEntity<?> deletetUser(Principal principal){
-        return ResponseEntity.ok(userService.deleteUser(principal));
+    @DeleteMapping ("/{userName}")
+    @RolesAllowed(UserRole.Code.ADMIN)
+    public ResponseEntity<?> deletetUser(@PathVariable(value = "userName") String userName, Principal principal){
+        return ResponseEntity.ok(userService.deleteUser(userName, principal));
     }
 
     /**

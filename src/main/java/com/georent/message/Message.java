@@ -35,7 +35,7 @@ public enum Message {
 
     SUCCESS_REGISTRATION("User registered successfully!"),
     SUCCESS_UPDATE_USER("User data updated successfully!"),
-    SUCCESS_DELETE_USER("User deleteed successfully!"),
+    SUCCESS_DELETE_USER(" as a user with all his lots deleted successfully!"),
     INVALID_GET_USER_EMAIL("No user with email:  "),
     INVALID_GET_USER_ID("No user with ID: "),
 

@@ -204,9 +204,10 @@ public class GeoRentUserServiceRepositoryTest {
 
     @Test
     public void WhenDeleteUser_DeleteUserLots_DeleteUser_Return_MsgMessage_SUCCESS_DELETE_USER() {
-        GenericResponseDTO responseDTO =  userService.deleteUser(principal);
-        verify(mockUserRepository, times(1)).findByEmail(any(String.class));
-        Assert.assertEquals(Message.SUCCESS_DELETE_USER.getDescription(), responseDTO.getMessage());
+        String userName = "user2@gmail.com.ua";
+        GenericResponseDTO responseDTO =  userService.deleteUser(userName, principal);
+        verify(mockUserRepository, times(2)).findByEmail(any(String.class));
+        Assert.assertEquals(userName + Message.SUCCESS_DELETE_USER.getDescription(), responseDTO.getMessage());
         Assert.assertNull(responseDTO.getBody());
     }
 
