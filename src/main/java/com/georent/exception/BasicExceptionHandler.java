@@ -137,19 +137,6 @@ public class BasicExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ExceptionHandler({SearchTransactionException.class})
-    protected ResponseEntity<?> handleSearchTransactionException(SearchTransactionException ex,
-                                                      HttpServletRequest request) {
-        GenericResponse<String> response = new GenericResponse<>(
-                request.getMethod(),
-                request.getRequestURI(),
-                ex.getMessage(),
-                HttpStatus.MOVED_PERMANENTLY.value(),
-                Message.MAIL_NOT_SENT.getDescription());
-
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).body(response);
-    }
-
     /**
      * TransactionException (search)
      * @param ex
@@ -163,10 +150,10 @@ public class BasicExceptionHandler {
                 request.getMethod(),
                 request.getRequestURI(),
                 ex.getCause().getCause().getMessage(),
-                HttpStatus.CONFLICT.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 Message.INVALID_CONNECTION.getDescription());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     /**
@@ -182,10 +169,10 @@ public class BasicExceptionHandler {
                 request.getMethod(),
                 request.getRequestURI(),
                 ex.getCause().getMessage() + ": " +  ex.getCause().getCause().getMessage(),
-                HttpStatus.CONFLICT.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 Message.INVALID_CONNECTION_SERCH.getDescription());
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
 

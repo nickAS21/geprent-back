@@ -7,7 +7,6 @@ import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotPageDTO;
 import com.georent.dto.LotPageable;
 import com.georent.exception.SearchConnectionNotAvailableException;
-import com.georent.exception.SearchTransactionException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
@@ -112,7 +111,7 @@ public class DescriptionSearchService {
         } catch (CannotCreateTransactionException e) {
             currentSession.clear();
             fullTextSession.close();
-            throw new SearchTransactionException(e.getMessage());
+            throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
         } finally {
             //            fullTextSession.close();
         }
@@ -162,7 +161,7 @@ public class DescriptionSearchService {
         } catch (CannotCreateTransactionException e) {
             currentSession.clear();
             fullTextSession.close();
-            throw new SearchTransactionException(e.getMessage());
+            throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
         }
     }
 
