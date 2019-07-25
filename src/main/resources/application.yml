@@ -25,6 +25,8 @@ app:
     expiresIn: 3600000
 ---
 
+
+
 spring:
   profiles: test
 
@@ -34,12 +36,21 @@ spring:
     username: geo
     password: geo
 
+    hikari:
+      maximum-pool-size: 10
+      connectionTimeout: 3000
+      leakDetectionThreshold: 30000
+#      minimum-idle: 1
+      max-lifetime: 120000
+
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+
     properties:
       hibernate:
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         show_sql: false
         use_sql_comments: false
         format_sql: true

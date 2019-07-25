@@ -1,6 +1,7 @@
 package com.georent.controller;
 
 import com.georent.service.DescriptionSearchService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("search")
+@Slf4j
 public class SearchController {
 
 
@@ -53,7 +55,7 @@ public class SearchController {
      *
      * @param numberPage
      * @param count
-     * @param methodPage
+     * @param methodPage            return null;
      * @param address
      * @param lotName
      * @return Response, containing the list of all lots with filters: "address" and "lotname"
@@ -66,8 +68,7 @@ public class SearchController {
                                                        @RequestParam(name = "address") String address,
                                                        @RequestParam(name = "lotname") String lotName) {
         return status(OK)
-                .body(searchService
-                .fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName));
+                .body(searchService.fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName));
     }
 
 }

@@ -30,6 +30,9 @@ public enum Message {
     INVALID_VALIDATE("Invalid validate!"),
     INVALID_HEADERS_JSON("Invalid headers: Content-Type not application/json!"),
 
+    INVALID_CONNECTION("Cannot create transaction!"),
+    INVALID_CONNECTION_SERCH("Connection not available!"),
+
     SUCCESS_REGISTRATION("User registered successfully!"),
     SUCCESS_UPDATE_USER("User data updated successfully!"),
     SUCCESS_DELETE_USER("User deleteed successfully!"),

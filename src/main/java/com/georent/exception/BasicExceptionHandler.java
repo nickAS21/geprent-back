@@ -5,10 +5,12 @@ import com.georent.message.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
@@ -133,6 +135,57 @@ public class BasicExceptionHandler {
                 Message.INVALID_VALIDATE.getDescription());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler({SearchTransactionException.class})
+    protected ResponseEntity<?> handleSearchTransactionException(SearchTransactionException ex,
+                                                      HttpServletRequest request) {
+        GenericResponse<String> response = new GenericResponse<>(
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage(),
+                HttpStatus.MOVED_PERMANENTLY.value(),
+                Message.MAIL_NOT_SENT.getDescription());
+
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).body(response);
+    }
+
+    /**
+     * TransactionException (search)
+     * @param ex
+     * @param request
+     * @return
+     */
+   @ExceptionHandler(CannotCreateTransactionException.class)
+    protected ResponseEntity<?> handleTransactionExceptions(CannotCreateTransactionException ex,
+                                                           HttpServletRequest request) {
+        GenericResponse<String> response = new GenericResponse<>(
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getCause().getCause().getMessage(),
+                HttpStatus.CONFLICT.value(),
+                Message.INVALID_CONNECTION.getDescription());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    /**
+     * PersistenceException (search addpess, lotName)
+     * @param ex
+     * @param request
+     * @return
+     */
+   @ExceptionHandler(SearchConnectionNotAvailableException.class)
+    protected ResponseEntity<?> handlerSearchConnectionNotAvailableException(SearchConnectionNotAvailableException ex,
+                                                           HttpServletRequest request) {
+        GenericResponse<String> response = new GenericResponse<>(
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getCause().getMessage() + ": " +  ex.getCause().getCause().getMessage(),
+                HttpStatus.CONFLICT.value(),
+                Message.INVALID_CONNECTION_SERCH.getDescription());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
 

@@ -81,4 +81,10 @@
         <appender-ref ref="Console" />
     </logger>
 
+    <!-- LOG "com.zaxxer.hikari" at DEBUG level -->
+    <logger name="com.zaxxer.hikari" level="debug" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
 </configuration>
