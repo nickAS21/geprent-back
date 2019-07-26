@@ -105,7 +105,7 @@ public class GeoRentUserService {
     }
 
     /**
-     * Updates user info in the database.
+     * Updates user info (only firstName, lastName,phoneNumber) in the database.
      *
      * @param principal            Current user identifier.
      * @param geoRentUserUpdateDto Information to update.
@@ -121,6 +121,12 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
+    /**
+     * update only Password User in the database
+     * @param principal
+     * @param forgotUpdatePasswordDTO
+     * @return
+     */
     @Transactional
     public GenericResponseDTO<GeoRentUserUpdateDto> updatePasswordUser(Principal principal,
                                                                final ForgotUpdatePasswordDTO forgotUpdatePasswordDTO) {

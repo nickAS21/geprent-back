@@ -27,6 +27,12 @@ public class AuthenticationController {
         this.authService = authService;
     }
 
+    /**
+     *
+     * @param authRequest
+     * @param response
+     * @return token user
+     */
     @PostMapping("/login")
 //    @RequestMapping(
 //            method = RequestMethod.POST,
@@ -38,6 +44,11 @@ public class AuthenticationController {
         return status(OK).body(authService.loginUser(authRequest, response));
     }
 
+    /**
+     * egister new user
+     * @param signUpRequest
+     * @return
+     */
     @PostMapping("/register")
 //    @RequestMapping(
 //            method = RequestMethod.POST,
