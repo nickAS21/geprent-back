@@ -1,19 +1,17 @@
 package com.georent.controller;
 
 import com.georent.domain.UserRole;
-import com.georent.dto.ForgotPasswordDTO;
+import com.georent.dto.ForgotUpdatePasswordDTO;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.RegistrationLotDto;
 import com.georent.service.GeoRentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 
@@ -52,8 +50,19 @@ public class GeoRentUserController {
      * @return Response, containing the updated user information in the format of GeoRentUserUpdateDto.
      */
     @PatchMapping
-    public ResponseEntity<?> updateUser(@RequestBody GeoRentUserUpdateDto geoRentUserUpdateDto, Principal principal) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody GeoRentUserUpdateDto geoRentUserUpdateDto, Principal principal) {
         return ResponseEntity.ok(userService.updateUser(principal, geoRentUserUpdateDto));
+    }
+
+    /**
+     * Processes PATCH requests to endpoint "/user/password".
+     * @param forgotUpdatePasswordDTO
+     * @param principal
+     * @return
+     */
+    @PatchMapping ("/password")
+    public ResponseEntity<?> updatePasswordUser(@Valid @RequestBody ForgotUpdatePasswordDTO forgotUpdatePasswordDTO, Principal principal) {
+        return ResponseEntity.ok(userService.updatePasswordUser(principal, forgotUpdatePasswordDTO));
     }
 
     /**

@@ -2,7 +2,10 @@ package com.georent.service;
 
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.georent.domain.*;
+import com.georent.domain.Coordinates;
+import com.georent.domain.Description;
+import com.georent.domain.GeoRentUser;
+import com.georent.domain.Lot;
 import com.georent.dto.*;
 import com.georent.exception.LotNotFoundException;
 import com.georent.message.Message;
@@ -13,7 +16,6 @@ import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,6 @@ public class GeoRentUserService {
     }
 
     /**
-     *
      * @param id
      * @return
      */
@@ -77,7 +78,6 @@ public class GeoRentUserService {
     }
 
     /**
-     *
      * @param recoveryToken
      * @return GeoRentUser if user with this recoveryToken is registered
      */
@@ -121,6 +121,18 @@ public class GeoRentUserService {
         return responseDTO;
     }
 
+    @Transactional
+    public GenericResponseDTO<GeoRentUserUpdateDto> updatePasswordUser(Principal principal,
+                                                               final ForgotUpdatePasswordDTO forgotUpdatePasswordDTO) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        geoRentUser.setPassword(forgotUpdatePasswordDTO.getPassword());
+        this.saveUser(geoRentUser);
+        GenericResponseDTO<GeoRentUserUpdateDto> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_UPDATE_USER.getDescription());
+        return responseDTO;
+    }
+
     /**
      * Reads user info from the database and maps it to GeoRentUserInfoDto object.
      *
@@ -134,7 +146,6 @@ public class GeoRentUserService {
     }
 
     /**
-     *
      * @param principal
      * @return
      */
@@ -146,7 +157,6 @@ public class GeoRentUserService {
                 .map(this::mapToUserInfoDTO)
                 .collect(Collectors.toList());
     }
-
 
 
     /**
@@ -391,8 +401,8 @@ public class GeoRentUserService {
         lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
                 .stream()
                 .collect(Collectors.toList())
-                    .stream()
-                    .forEach(lot -> this.awss3Service.deleteLotPictures(lot.getId()));
+                .stream()
+                .forEach(lot -> this.awss3Service.deleteLotPictures(lot.getId()));
         lotRepository.deleteAllByGeoRentUser_Id(geoRentUser.getId());
     }
 

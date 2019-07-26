@@ -1,7 +1,7 @@
 package com.georent.controller;
 
 import com.georent.dto.ForgotEmailDto;
-import com.georent.dto.ForgotPasswordDTO;
+import com.georent.dto.ForgotUpdatePasswordDTO;
 import com.georent.dto.LoginRequestDTO;
 import com.georent.dto.RegistrationRequestDTO;
 import com.georent.service.AuthenticationService;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
-import java.security.Principal;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.status;
@@ -64,13 +62,13 @@ public class AuthenticationController {
 
     /**
      * Processes FORGOT PASSWORD requests to endpoint "/forgotpassword/save"
-     * @param forgotPasswordDTO
+     * @param forgotUpdatePasswordDTO
      * @param request
      * @return
      */
     @PostMapping(value = "forgotpassword/save")
-    public ResponseEntity<?> forgotSave(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO,
+    public ResponseEntity<?> forgotSave(@Valid @RequestBody ForgotUpdatePasswordDTO forgotUpdatePasswordDTO,
                                         HttpServletRequest request) {
-        return authService.forgotPasswordSave(forgotPasswordDTO.getPassword(), request);
+        return authService.forgotPasswordSave(forgotUpdatePasswordDTO.getPassword(), request);
     }
 }
