@@ -43,6 +43,7 @@ spring:
       leakDetectionThreshold: 30000
 #      minimum-idle: 1
       max-lifetime: 120000
+    type: com.zaxxer.hikari.HikariDataSource
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -78,6 +79,10 @@ spring:
 
     hikari:
       maximum-pool-size: 10
+      connectionTimeout: 3000
+      leakDetectionThreshold: 30000
+      #      minimum-idle: 1
+      max-lifetime: 120000
     type: com.zaxxer.hikari.HikariDataSource
 
   jpa:
@@ -86,6 +91,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         show_sql: false
         use_sql_comments: false
         format_sql: true

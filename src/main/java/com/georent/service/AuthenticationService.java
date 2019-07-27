@@ -4,7 +4,12 @@ import com.georent.config.JwtConfigurationProperties;
 import com.georent.config.MailConfigurationProperties;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.GeoRentUserDetails;
-import com.georent.dto.*;
+import com.georent.domain.UserRole;
+import com.georent.dto.AuthenticationResponseDTO;
+import com.georent.dto.GenericResponseDTO;
+import com.georent.dto.GeoRentUserDTO;
+import com.georent.dto.LoginRequestDTO;
+import com.georent.dto.RegistrationRequestDTO;
 import com.georent.exception.ForgotException;
 import com.georent.exception.GenericResponse;
 import com.georent.exception.RegistrationSuchUserExistsException;
@@ -109,7 +114,7 @@ public class AuthenticationService {
         user.setEmail(registerUserRequest.getEmail());
         user.setPassword(registerUserRequest.getPassword());
         user.setPhoneNumber(registerUserRequest.getPhoneNumber());
-        user.setRole(registerUserRequest.getRole());
+        user.setRole(UserRole.USER);
         return userService.saveUser(user);
     }
 

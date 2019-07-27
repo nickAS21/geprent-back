@@ -16,5 +16,7 @@ public class GeoRentUser {
     private String password;
     private String recoveryToken;
     private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 }

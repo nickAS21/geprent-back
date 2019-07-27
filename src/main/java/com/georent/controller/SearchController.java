@@ -27,16 +27,6 @@ public class SearchController {
     }
 
     /**
-     * Search all lots with filters: "query" on Fields: "lotName" and "lotDescription" in class Description
-     * @param query
-     * @return Response, containing the all lots with filters: "query" on Fields: "lotName" and "lotDescription" in the format  List<DescriptionDTO>
-     */
-    @GetMapping
-    public ResponseEntity<?> findDescriptions(@RequestParam(name = "query") String query){
-        return ResponseEntity.ok(searchService.fuzzyLotSearch(query));
-    }
-
-    /**
      * Search allLots with filters: "address" to the field address in class Coordinates
      * Search allLots with filters: "lotname" to the field lotName in class Description
      * @param address

@@ -21,7 +21,15 @@ import org.springframework.transaction.CannotCreateTransactionException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -43,34 +51,6 @@ public class DescriptionSearchService {
     }
 
     /**
-     * Search all lots with filters: "query" on Fields: "lotName" and "lotDescription" in class Description
-     *
-     * @param searchTerm
-     * @return all lots with filters: "query" on Fields: "lotName" and "lotDescription" in the format  List<DescriptionDTO>
-     */
-    public List<DescriptionDTO> fuzzyLotSearch(String searchTerm) {
-        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-        Session currentSession = sessionFactory.openSession();
-        FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Description.class).get();
-        Query query = queryBuilder.keyword().fuzzy().withEditDistanceUpTo(2).withPrefixLength(10).onFields("lotName", "lotDescription")
-                .matching(searchTerm).createQuery();
-        javax.persistence.Query fullTextQuery = fullTextSession.createFullTextQuery(query, Description.class);
-        List<Description> resultList = fullTextQuery.getResultList();
-        return resultList
-                .stream()
-                .map(description -> {
-                    DescriptionDTO dto = new DescriptionDTO();
-                    dto.setLotDescription(description.getLotDescription());
-                    dto.setLotName(description.getLotName());
-                    dto.setPictureIds(description.getPictureIds());
-                    dto.setURLs(Collections.emptyList());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Search allLots with filters: "address" to the field address in class Coordinates
      * Search allLots with filters: "lotname" to the field lotName in class Description
      * and/or: if param equals !isBlank, not filters to this param
@@ -81,39 +61,41 @@ public class DescriptionSearchService {
      */
     public Set<LotPageDTO> fuzzyLotNameAndAddressSearch(String address, String lotName) {
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-        Session currentSession = sessionFactory.openSession();
-        FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
 
-        Map<Long, LotPageDTO> hm = new HashMap<>();
-        if (!StringUtils.isBlank(address)) {
-            List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
-            hm = coordinates
-                    .stream()
-                    .map(this::mapCoordinatesDTO)
-                    .collect(Collectors.toMap(LotPageDTO::getId, Function.identity()));
-        }
-        if (!StringUtils.isBlank(lotName)) {
-            List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
-            Map<Long, LotPageDTO> hmSrc = descriptions
-                    .stream()
-                    .map(this::mapDescriptionDTO)
-                    .collect(Collectors.toMap(LotPageDTO::getId, Function.identity()));
-            hm.putAll(hmSrc);
-        }
-        fullTextSession.close();
-        ;
-        Set<LotPageDTO> valueSet = new HashSet<>(hm.values());
-        try {
+        try (Session currentSession = sessionFactory.openSession();
+             FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
+
+            Map<Long, LotPageDTO> hm = new HashMap<>();
+            if (!StringUtils.isBlank(address)) {
+                List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
+                hm = coordinates
+                        .stream()
+                        .map(this::mapCoordinatesDTO)
+                        .collect(Collectors.toMap(LotPageDTO::getId, Function.identity()));
+            }
+            if (!StringUtils.isBlank(lotName)) {
+                List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
+                Map<Long, LotPageDTO> hmSrc = descriptions
+                        .stream()
+                        .map(this::mapDescriptionDTO)
+                        .collect(Collectors.toMap(LotPageDTO::getId, Function.identity()));
+                hm.putAll(hmSrc);
+            }
+
+            Set<LotPageDTO> valueSet = new HashSet<>(hm.values());
+
             return valueSet
                     .stream()
                     .sorted(Comparator.comparing(LotPageDTO::getId))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         } catch (CannotCreateTransactionException e) {
-            currentSession.clear();
-            fullTextSession.close();
+
             throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
-        } finally {
-            //            fullTextSession.close();
+
+        } catch (PersistenceException e) {
+
+            throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
+
         }
     }
 
@@ -132,36 +114,39 @@ public class DescriptionSearchService {
      */
     public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName) {
         SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-        Session currentSession = sessionFactory.openSession();
-        FullTextSession fullTextSession = Search.getFullTextSession(currentSession);
+        try (Session currentSession = sessionFactory.openSession();
+             FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
 
-        Set<Long> idSet = new HashSet<>();
-        if (!StringUtils.isBlank(address)) {
-            List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
-            idSet = coordinates
-                    .stream()
-                    .map(Coordinates::getId)
-                    .collect(Collectors.toSet());
-        }
+            Set<Long> idSet = new HashSet<>();
+            if (!StringUtils.isBlank(address)) {
+                List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
+                idSet = coordinates
+                        .stream()
+                        .map(Coordinates::getId)
+                        .collect(Collectors.toSet());
+            }
 
-        if (!StringUtils.isBlank(lotName)) {
-            List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
-            Set<Long> src = descriptions
-                    .stream()
-                    .map(Description::getId)
-                    .collect(Collectors.toSet());
-            idSet.addAll(src);
-        }
-        List<Long> ids = new ArrayList<>(idSet);
-        try {
-            LotPageable pageable = this.lotService.getPage(pageNumber, count, methodPage, ids);
-            fullTextSession.close();
-            currentSession.close();
-            return pageable;
+            if (!StringUtils.isBlank(lotName)) {
+                List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
+                Set<Long> src = descriptions
+                        .stream()
+                        .map(Description::getId)
+                        .collect(Collectors.toSet());
+                idSet.addAll(src);
+            }
+
+            List<Long> ids = new ArrayList<>(idSet);
+
+            return this.lotService.getPage(pageNumber, count, methodPage, ids);
+
         } catch (CannotCreateTransactionException e) {
-            currentSession.clear();
-            fullTextSession.close();
+
             throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
+
+        } catch (PersistenceException e) {
+
+            throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
+
         }
     }
 
@@ -172,7 +157,12 @@ public class DescriptionSearchService {
      */
     private List<Coordinates> getLotsSearchAdr(FullTextSession fullTextSession, String address) {
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Coordinates.class).get();
+        QueryBuilder queryBuilder = fullTextSession
+                .getSearchFactory()
+                .buildQueryBuilder()
+                .forEntity(Coordinates.class)
+                .get();
+
         Query query = queryBuilder
                 .keyword()
                 .fuzzy()
@@ -181,15 +171,10 @@ public class DescriptionSearchService {
                 .onFields("address")
                 .matching(address)
                 .createQuery();
+
         javax.persistence.Query fullTextQuery = fullTextSession.createFullTextQuery(query, Coordinates.class);
-        try {
-            List<Coordinates> result = fullTextQuery.getResultList();
-            return result;
-        } catch (PersistenceException e) {
-//        catch (java.lang.Exception e) {
-            fullTextSession.close();
-            throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
-        }
+
+        return (List<Coordinates>) fullTextQuery.getResultList();
     }
 
     /**
@@ -199,7 +184,10 @@ public class DescriptionSearchService {
      */
     private List<Description> getLotsSearchLotName(FullTextSession fullTextSession, String lotName) {
 
-        QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Description.class).get();
+        QueryBuilder queryBuilder = fullTextSession
+                .getSearchFactory()
+                .buildQueryBuilder()
+                .forEntity(Description.class).get();
 
         Query query = queryBuilder
                 .keyword()
@@ -210,13 +198,9 @@ public class DescriptionSearchService {
                 .matching(lotName)
                 .createQuery();
         javax.persistence.Query fullTextQuery = fullTextSession.createFullTextQuery(query, Description.class);
-        try {
-            List<Description> result = fullTextQuery.getResultList();
-            return result;
-        } catch (PersistenceException e) {
-            fullTextSession.close();
-            throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
-        }
+
+        return (List<Description>) fullTextQuery.getResultList();
+
     }
 
     private LotPageDTO mapCoordinatesDTO(Coordinates coordinates) {

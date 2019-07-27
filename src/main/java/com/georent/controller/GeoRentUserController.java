@@ -72,7 +72,7 @@ public class GeoRentUserController {
      * @return Response, containing the user information in the format of GeoRentUserInfoDTO.
      */
     @DeleteMapping ("/{userName}")
-    @RolesAllowed(UserRole.Code.ADMIN)
+    @RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<?> deletetUser(@PathVariable(value = "userName") String userName, Principal principal){
         return ResponseEntity.ok(userService.deleteUser(userName, principal));
     }
@@ -171,7 +171,7 @@ public class GeoRentUserController {
      */
     @GetMapping("/userAll")
 //    @Secured(UserRole.Code.ADMIN)
-    @RolesAllowed(UserRole.Code.ADMIN)
+    @RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<?> getUserAll(Principal principal){
         return ResponseEntity.ok(userService.getUserAll(principal));
     }
