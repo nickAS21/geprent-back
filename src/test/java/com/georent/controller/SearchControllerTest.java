@@ -22,16 +22,6 @@ public class SearchControllerTest {
     }
 
     @Test
-    public void findDescriptions_mapping_get_query_Return_Status_ok() throws Exception {
-        mockMvc.perform(get("/search/?query=lotName23")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    @Test
     public void findLotsAdrName_mapping_get_FiltersAddressAndLotName_Return_Status_ok() throws Exception {
         mockMvc.perform(get("/search/filters/?address=Kuiv&lotname=lotName")
                 .contentType(MediaType.APPLICATION_JSON)

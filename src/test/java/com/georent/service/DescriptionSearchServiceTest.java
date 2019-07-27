@@ -1,6 +1,5 @@
 package com.georent.service;
 
-import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotPageDTO;
 import com.georent.dto.LotPageable;
 import com.georent.dto.MethodPage;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -30,12 +28,6 @@ public class DescriptionSearchServiceTest {
     @Test
     void descriptionSearchServiceSuccessfullyStarted() {
         assertThat(descriptionSearchService != null);
-    }
-
-    @Test
-    void whenFuzzyLotSearchSuccessfully_Return_ListDescriptionDTO() {
-        List<DescriptionDTO> actualLotDTOS = descriptionSearchService.fuzzyLotSearch(searchTerm);
-        assertThat(actualLotDTOS != null);
     }
 
     @Test
