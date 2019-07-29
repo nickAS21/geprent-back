@@ -110,43 +110,55 @@ public class DescriptionSearchService {
      * @param methodPage
      * @param address
      * @param lotName    List<Long> ids - result all lotId after search with filters: "address" and "lotname"
+     * @param andOr filtre search:  value == true - "&&" ; value = false "||"
      * @return list of all lots (filter) one page in the format of List<LotPageDTO> with pageNumber, totalPages..
      */
-    public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName) {
-        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-        try (Session currentSession = sessionFactory.openSession();
-             FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
-
-            Set<Long> idSet = new HashSet<>();
-            if (!StringUtils.isBlank(address)) {
-                List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
-                idSet = coordinates
-                        .stream()
-                        .map(Coordinates::getId)
-                        .collect(Collectors.toSet());
+    public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName, boolean andOr) {
+        if (StringUtils.isBlank(address) && StringUtils.isBlank(lotName)) {
+            return this.lotService.getPage(pageNumber, count, methodPage, null);
+        }
+        else {
+            if (andOr) {
+                return this.lotService.getPage(pageNumber, count, methodPage, null);
             }
+            else {
 
-            if (!StringUtils.isBlank(lotName)) {
-                List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
-                Set<Long> src = descriptions
-                        .stream()
-                        .map(Description::getId)
-                        .collect(Collectors.toSet());
-                idSet.addAll(src);
+                SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+                try (Session currentSession = sessionFactory.openSession();
+                     FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
+
+                    Set<Long> idSet = new HashSet<>();
+                    if (!StringUtils.isBlank(address)) {
+                        List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
+                        idSet = coordinates
+                                .stream()
+                                .map(Coordinates::getId)
+                                .collect(Collectors.toSet());
+                    }
+
+                    if (!StringUtils.isBlank(lotName)) {
+                        List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
+                        Set<Long> src = descriptions
+                                .stream()
+                                .map(Description::getId)
+                                .collect(Collectors.toSet());
+                        idSet.addAll(src);
+                    }
+
+                    List<Long> ids = new ArrayList<>(idSet);
+
+                    return this.lotService.getPage(pageNumber, count, methodPage, ids);
+
+                } catch (CannotCreateTransactionException e) {
+
+                    throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
+
+                } catch (PersistenceException e) {
+
+                    throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
+
+                }
             }
-
-            List<Long> ids = new ArrayList<>(idSet);
-
-            return this.lotService.getPage(pageNumber, count, methodPage, ids);
-
-        } catch (CannotCreateTransactionException e) {
-
-            throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
-
-        } catch (PersistenceException e) {
-
-            throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
-
         }
     }
 

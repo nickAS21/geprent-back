@@ -4,7 +4,6 @@ package com.georent;
 import com.georent.domain.GeoRentUser;
 import com.georent.domain.UserRole;
 import com.georent.repository.GeoRentUserRepository;
-import com.georent.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

@@ -58,7 +58,27 @@ public class SearchController {
                                                        @RequestParam(name = "address") String address,
                                                        @RequestParam(name = "lotname") String lotName) {
         return status(OK)
-                .body(searchService.fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName));
+                .body(searchService.fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName, false));
+    }
+    /**
+     *
+     * @param numberPage
+     * @param count
+     * @param methodPage            return null;
+     * @param address
+     * @param lotName
+     * @return Response, containing the list of all lots with filters: "address" and "lotname"
+     * one page in the format  of List<LotPageDTO>  with pageNumber (LotPageable).
+     */
+    @GetMapping ("/page/andor/{number}/{count}/{method}")
+    public ResponseEntity<?> searchByAddressAndLotNameAndOr(@PathVariable(value = "number") int numberPage,
+                                                       @PathVariable(value = "count") int count,
+                                                       @PathVariable(value = "method") String methodPage,
+                                                       @RequestParam(name = "address") String address,
+                                                       @RequestParam(name = "lotname") String lotName,
+                                                       @RequestParam(name = "andor") boolean andOr) {
+        return status(OK)
+                .body(searchService.fuzzyLotPageNameAndAddressSearch(numberPage-1, count, methodPage, address, lotName, andOr));
     }
 
 }

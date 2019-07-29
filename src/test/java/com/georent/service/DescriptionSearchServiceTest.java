@@ -48,7 +48,8 @@ public class DescriptionSearchServiceTest {
                         3,
                         type.getTypeValue(),
                         searchTerm,
-                        lotName);
+                        lotName,
+                        false);
                 Assert.assertNotNull(actualLotPageable);
                 Assert.assertEquals(0, actualLotPageable.getTotalPages());
                 Assert.assertEquals(1, actualLotPageable.getPageNumber());
