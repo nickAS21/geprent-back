@@ -33,8 +33,8 @@ public class GeoRentStarter {
 
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             GeoRentUser user = new GeoRentUser();
-            user.setFirstName("Albert");
-            user.setLastName("Bubbleschmidt");
+            user.setFirstName("ПетручіоqqZ");
+            user.setLastName("їєіыюфввrr");
             user.setEmail("email@email.com");
             user.setPhoneNumber("380951111111");
             user.setPassword(encoder.encode("MyPassw0rd"));

@@ -112,40 +112,48 @@ public class DescriptionSearchService {
             try (Session currentSession = sessionFactory.openSession();
                  FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
                 Set<Long> idSet = new HashSet<>();
-                    if (!StringUtils.isBlank(address)) {
-                        List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
-                        idSet = coordinates
-                                .stream()
-                                .map(Coordinates::getId)
-                                .collect(Collectors.toSet());
-                    }
-                    if (!StringUtils.isBlank(lotName)) {
-                        List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
-                        Set<Long> src = descriptions
-                                .stream()
-                                .map(Description::getId)
-                                .collect(Collectors.toSet());
-                        if (andOr) {
-//                                ? && == true
+                Set<Long> src = new HashSet<>();
+                List<Long> ids = new ArrayList<>();
+                if (!StringUtils.isBlank(address)) {
+                    List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
+                    idSet = coordinates
+                            .stream()
+                            .map(Coordinates::getId)
+                            .collect(Collectors.toSet());
+                }
+                if (!StringUtils.isBlank(lotName)) {
+                    List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
+                    src = descriptions
+                            .stream()
+                            .map(Description::getId)
+                            .collect(Collectors.toSet());
+                }
+                if (andOr && !StringUtils.isBlank(lotName) && !StringUtils.isBlank(address)) {    //? && == true !StringUtils.isBlank(lotName) - ok !StringUtils.isBlank(address) - ok
+                    if (idSet.size() > 0 && src.size() > 0) {
+                        Iterator iteratorIdSet = idSet.iterator();
+                        while (iteratorIdSet.hasNext()) {
+                            Long id = (Long) iteratorIdSet.next();
+                            System.out.println(id);
+                            Iterator iteratorsrc = src.iterator();
+                            while (iteratorsrc.hasNext()) {
+                                Long idSrc = (Long) iteratorsrc.next();
+                                System.out.println(idSrc);
+                                if (id == idSrc) {
+                                    ids.add(id);
+                                    break;
+                                }
+                            }
                         }
-                        else {
-                            idSet.addAll(src);
-                        }
                     }
-
-
-                List<Long> ids = new ArrayList<>(idSet);
-
+                } else {          //? || == false;  StringUtils.isBlank(lotName) - ok; StringUtils.isBlank(address) - ok
+                    idSet.addAll(src);
+                    ids = new ArrayList<>(idSet);
+                }
                 return this.lotService.getPage(pageNumber, count, methodPage, ids);
-
             } catch (CannotCreateTransactionException e) {
-
                 throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
-
             } catch (PersistenceException e) {
-
                 throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
-
             }
 
         }

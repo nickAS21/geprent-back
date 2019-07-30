@@ -15,7 +15,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.security.Principal;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
  * Request controllers to the user and lot endpoints, that do require authentication.
@@ -48,7 +48,6 @@ public class GeoRentUserController {
         return ResponseEntity.ok(userService.getUserInfo(principal));
     }
 
-
     /**
      * Processes PATCH requests to endpoint "/user".
      * Updates user information in the database.
@@ -56,7 +55,12 @@ public class GeoRentUserController {
      * @param principal current user identifier.
      * @return Response, containing the updated user information in the format of GeoRentUserUpdateDto.
      */
-    @PatchMapping
+//    @PatchMapping
+    @RequestMapping(
+            method = PATCH,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> updateUser(@Valid @RequestBody GeoRentUserUpdateDto geoRentUserUpdateDto, Principal principal) {
         return ResponseEntity.ok(userService.updateUser(principal, geoRentUserUpdateDto));
     }
@@ -67,7 +71,13 @@ public class GeoRentUserController {
      * @param principal
      * @return
      */
-    @PatchMapping ("/password")
+//    @PatchMapping ("/password")
+    @RequestMapping(
+            value = "/password",
+            method = PATCH,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> updatePasswordUser(@Valid @RequestBody ForgotUpdatePasswordDTO forgotUpdatePasswordDTO, Principal principal) {
         return ResponseEntity.ok(userService.updatePasswordUser(principal, forgotUpdatePasswordDTO));
     }
@@ -146,7 +156,13 @@ public class GeoRentUserController {
      * @param principal Current user identifier.
      * @return Response, containing the saved lot in the LotDTO format.
      */
-    @PostMapping("/lot")
+//    @PostMapping("/lot")
+    @RequestMapping(
+            value = "/lot",
+            method = POST,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> setUserLot(@Valid @RequestBody final RegistrationLotDto registrationLotDto, Principal principal){
         return ResponseEntity.ok(userService.saveUserLotWithoutPicture(principal, registrationLotDto));
     }
@@ -159,7 +175,13 @@ public class GeoRentUserController {
      * @param principal Current user identifier.
      * @return Response, containing the saved lot in the LotDTO format.
      */
-    @PostMapping("/lot/upload-picture")
+//    @PostMapping("/lot/upload-picture")
+    @RequestMapping(
+            value = "/lot/upload-picture",
+            method = POST,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> setUploadPicture(@Valid @RequestParam("files") MultipartFile[] multipartFiles,
                                               @RequestParam(name = "lot") String registrationLotDtoStr,
                                               Principal principal)  {

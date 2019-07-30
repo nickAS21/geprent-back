@@ -38,11 +38,9 @@ public class SearchController {
             produces = "application/json; charset=UTF-8")
     @ResponseBody
     public ResponseEntity<?> findLotsAdrName(@RequestParam(name = "address") String address,
-                                             @RequestParam(name = "lotname") String lotName
-    ){
+                                             @RequestParam(name = "lotname") String lotName ){
         return status(OK).body(searchService.fuzzyLotNameAndAddressSearch(address, lotName));
     }
-
 
     /**
      *

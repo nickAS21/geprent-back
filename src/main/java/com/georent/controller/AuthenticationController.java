@@ -15,6 +15,8 @@ import javax.validation.Valid;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.status;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/")
@@ -49,12 +51,13 @@ public class AuthenticationController {
      * @param signUpRequest
      * @return
      */
-    @PostMapping("/register")
-//    @RequestMapping(
-//            method = RequestMethod.POST,
-//            value = "/register",
-//            produces = "application/json"
-//    )
+//    @PostMapping("/register")
+    @RequestMapping(
+            value = "/register",
+            method = POST,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> registerUser(@Valid @RequestBody final RegistrationRequestDTO signUpRequest) {
         return status(CREATED).body(authService.registerUser(signUpRequest));
     }
