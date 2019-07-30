@@ -76,6 +76,7 @@ public class AuthenticationService {
         GeoRentUser geoRentUser = userService.getUserByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException(Message.USER_NOT_FOUND_ERROR.getDescription()));
 
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -128,10 +129,11 @@ public class AuthenticationService {
         String accessToken = jwtProvider.generateAccessToken(GeoRentUserDetails.create(geoRentUser));
         geoRentUser.setId(userId);
         geoRentUser.setRecoveryToken(accessToken);
-        userService.saveUser(geoRentUser);
+        userService.saveRecoveryTokenUser(geoRentUser);
 //        {API}/?main=""&path=forgot&tokentype=Bearer&accesstoken=12345
             // send email
-        String url = serverApi + "/?main=\"\"&path=forgot" +
+//        String url = serverApi + "/?main=\"\"&path=forgot" +
+        String url = serverApi + "/forgot/?main=\"\"&path=forgot" +
                 "&tokentype=" + BEARER.trim() +
                 "&accesstoken=" + accessToken;
         sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot(url));

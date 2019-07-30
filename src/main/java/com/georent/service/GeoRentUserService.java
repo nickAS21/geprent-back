@@ -8,6 +8,8 @@ import com.georent.domain.GeoRentUser;
 import com.georent.domain.Lot;
 import com.georent.dto.*;
 import com.georent.exception.LotNotFoundException;
+import com.georent.exception.RegistrationSuchUserExistsException;
+import com.georent.message.GeoRentIHttpStatus;
 import com.georent.message.Message;
 import com.georent.repository.CoordinatesRepository;
 import com.georent.repository.DescriptionRepository;
@@ -105,6 +107,16 @@ public class GeoRentUserService {
     }
 
     /**
+     *
+     * @param user
+     * @return
+     */
+    @Transactional
+    public GeoRentUser saveRecoveryTokenUser(final GeoRentUser user) {
+         return userRepository.save(user);
+    }
+
+    /**
      * Updates user info (only firstName, lastName,phoneNumber) in the database.
      *
      * @param principal            Current user identifier.
@@ -156,8 +168,9 @@ public class GeoRentUserService {
      * @return
      */
     public List<GeoRentUserInfoDto> getUserAll(Principal principal) {
-        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        if (userRepository.existsByEmail(principal.getName())) {
+            throw new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName());
+        }
         return userRepository.findAll()
                 .stream()
                 .map(this::mapToUserInfoDTO)
@@ -288,8 +301,9 @@ public class GeoRentUserService {
      */
     @Transactional
     public GenericResponseDTO<LotDTO> deleteUser(String userName, Principal principal) {
-        userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        if (userRepository.existsByEmail(principal.getName())) {
+            throw new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName());
+        }
         GeoRentUser geoRentUser = userRepository.findByEmail(userName)
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         deleteAllLotUser(geoRentUser);
