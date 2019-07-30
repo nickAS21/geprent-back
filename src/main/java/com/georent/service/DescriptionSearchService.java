@@ -3,7 +3,6 @@ package com.georent.service;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.georent.domain.Coordinates;
 import com.georent.domain.Description;
-import com.georent.dto.DescriptionDTO;
 import com.georent.dto.LotPageDTO;
 import com.georent.dto.LotPageable;
 import com.georent.exception.SearchConnectionNotAvailableException;
@@ -21,15 +20,7 @@ import org.springframework.transaction.CannotCreateTransactionException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -110,24 +101,17 @@ public class DescriptionSearchService {
      * @param methodPage
      * @param address
      * @param lotName    List<Long> ids - result all lotId after search with filters: "address" and "lotname"
-     * @param andOr filtre search:  value == true - "&&" ; value = false "||"
+     * @param andOr      filtre search:  value == true - "&&" ; value = false "||"
      * @return list of all lots (filter) one page in the format of List<LotPageDTO> with pageNumber, totalPages..
      */
     public LotPageable fuzzyLotPageNameAndAddressSearch(int pageNumber, int count, String methodPage, String address, String lotName, boolean andOr) {
         if (StringUtils.isBlank(address) && StringUtils.isBlank(lotName)) {
             return this.lotService.getPage(pageNumber, count, methodPage, null);
-        }
-        else {
-            if (andOr) {
-                return this.lotService.getPage(pageNumber, count, methodPage, null);
-            }
-            else {
-
-                SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-                try (Session currentSession = sessionFactory.openSession();
-                     FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
-
-                    Set<Long> idSet = new HashSet<>();
+        } else {
+            SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+            try (Session currentSession = sessionFactory.openSession();
+                 FullTextSession fullTextSession = Search.getFullTextSession(currentSession)) {
+                Set<Long> idSet = new HashSet<>();
                     if (!StringUtils.isBlank(address)) {
                         List<Coordinates> coordinates = getLotsSearchAdr(fullTextSession, address);
                         idSet = coordinates
@@ -135,30 +119,35 @@ public class DescriptionSearchService {
                                 .map(Coordinates::getId)
                                 .collect(Collectors.toSet());
                     }
-
                     if (!StringUtils.isBlank(lotName)) {
                         List<Description> descriptions = getLotsSearchLotName(fullTextSession, lotName);
                         Set<Long> src = descriptions
                                 .stream()
                                 .map(Description::getId)
                                 .collect(Collectors.toSet());
-                        idSet.addAll(src);
+                        if (andOr) {
+//                                ? && == true
+                        }
+                        else {
+                            idSet.addAll(src);
+                        }
                     }
 
-                    List<Long> ids = new ArrayList<>(idSet);
 
-                    return this.lotService.getPage(pageNumber, count, methodPage, ids);
+                List<Long> ids = new ArrayList<>(idSet);
 
-                } catch (CannotCreateTransactionException e) {
+                return this.lotService.getPage(pageNumber, count, methodPage, ids);
 
-                    throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
+            } catch (CannotCreateTransactionException e) {
 
-                } catch (PersistenceException e) {
+                throw new CannotCreateTransactionException(e.getMessage(), e.getCause());
 
-                    throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
+            } catch (PersistenceException e) {
 
-                }
+                throw new SearchConnectionNotAvailableException(e.getMessage(), e.getCause());
+
             }
+
         }
     }
 

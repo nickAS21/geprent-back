@@ -4,14 +4,11 @@ import com.georent.service.DescriptionSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.status;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping("search")
@@ -33,7 +30,13 @@ public class SearchController {
      * @param lotName
      * @return Response, containing the all lots with filters: "address" and "lotname" in the format  Set<LotPageDTO>
      */
-    @GetMapping ("/filters")
+//    @GetMapping ("/filters")
+    @RequestMapping(
+            value = "/filters",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> findLotsAdrName(@RequestParam(name = "address") String address,
                                              @RequestParam(name = "lotname") String lotName
     ){
@@ -45,13 +48,19 @@ public class SearchController {
      *
      * @param numberPage
      * @param count
-     * @param methodPage            return null;
+     * @param methodPage
      * @param address
      * @param lotName
      * @return Response, containing the list of all lots with filters: "address" and "lotname"
      * one page in the format  of List<LotPageDTO>  with pageNumber (LotPageable).
      */
-    @GetMapping ("/page/{number}/{count}/{method}")
+//    @GetMapping ("/page/{number}/{count}/{method}")
+    @RequestMapping(
+            value = "/page/{number}/{count}/{method}",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> searchByAddressAndLotName(@PathVariable(value = "number") int numberPage,
                                                        @PathVariable(value = "count") int count,
                                                        @PathVariable(value = "method") String methodPage,
@@ -64,13 +73,20 @@ public class SearchController {
      *
      * @param numberPage
      * @param count
-     * @param methodPage            return null;
+     * @param methodPage
      * @param address
      * @param lotName
-     * @return Response, containing the list of all lots with filters: "address" and "lotname"
+     * @param andOr
+     * @return Response, containing the list of all lots with filters: "address" and "lotname" adn "abdOr"
      * one page in the format  of List<LotPageDTO>  with pageNumber (LotPageable).
      */
-    @GetMapping ("/page/andor/{number}/{count}/{method}")
+//    @GetMapping ("/page/andor/{number}/{count}/{method}")
+    @RequestMapping(
+            value = "/page/andor/{number}/{count}/{method}",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> searchByAddressAndLotNameAndOr(@PathVariable(value = "number") int numberPage,
                                                        @PathVariable(value = "count") int count,
                                                        @PathVariable(value = "method") String methodPage,

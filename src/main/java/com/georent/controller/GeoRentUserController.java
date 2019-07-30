@@ -15,6 +15,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.security.Principal;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 /**
  * Request controllers to the user and lot endpoints, that do require authentication.
  */
@@ -36,7 +38,12 @@ public class GeoRentUserController {
      * @return Response, containing the user information in the format of GeoRentUserInfoDTO.
      */
 
-    @GetMapping
+//    @GetMapping
+    @RequestMapping(
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> getUserInfo(Principal principal){
         return ResponseEntity.ok(userService.getUserInfo(principal));
     }
@@ -84,8 +91,14 @@ public class GeoRentUserController {
      * @return Response, containing the list of user lots in the format of LotDTO.
      */
 
-    @GetMapping("/lots")
+//    @GetMapping("/lots")
 //    @Secured({UserRole.Code.ADMIN, UserRole.Code.USER })
+    @RequestMapping(
+            value = "/lots",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> getUserLots(Principal principal){
         return ResponseEntity.ok(userService.getUserLots(principal));
     }
@@ -97,7 +110,13 @@ public class GeoRentUserController {
      * @param lotId The id of the specified lot.
      * @return Response, containing the requested lot in the format of LotDTO.
      */
-    @GetMapping("/lot/{id}")
+//    @GetMapping("/lot/{id}")
+    @RequestMapping(
+            value = "/lot/{id}",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> getUserLotId(@PathVariable(value = "id") Long lotId, Principal principal){
         return ResponseEntity.ok(userService.getUserLotId(principal, lotId));
     }
@@ -109,7 +128,13 @@ public class GeoRentUserController {
      * @param principal Current user identifier.
      * @return Response, containing the lot with specified id in the format of LotDTO.
      */
-    @GetMapping("/lot/upload-picture/{id}")
+//    @GetMapping("/lot/upload-picture/{id}")
+    @RequestMapping(
+            value = "/lot/upload-picture/{id}",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public ResponseEntity<?> getUploadPicture(@PathVariable(value = "id") Long lotId, Principal principal){
         return ResponseEntity.ok(userService.getUserLotIdUploadPicture(principal, lotId));
     }
@@ -169,8 +194,14 @@ public class GeoRentUserController {
      * @param principal
      * @return
      */
-    @GetMapping("/userAll")
+//    @GetMapping("/userAll")
 //    @Secured(UserRole.Code.ADMIN)
+    @RequestMapping(
+            value = "/userAll",
+            method = GET,
+            headers = "Accept=application/json; charset=UTF-8",
+            produces = "application/json; charset=UTF-8")
+    @ResponseBody
     @RolesAllowed("ROLE_ADMIN")
     public ResponseEntity<?> getUserAll(Principal principal){
         return ResponseEntity.ok(userService.getUserAll(principal));

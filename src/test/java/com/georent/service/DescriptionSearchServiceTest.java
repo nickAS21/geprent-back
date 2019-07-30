@@ -51,7 +51,7 @@ public class DescriptionSearchServiceTest {
                         lotName,
                         false);
                 Assert.assertNotNull(actualLotPageable);
-                Assert.assertEquals(0, actualLotPageable.getTotalPages());
+                Assert.assertEquals(1, actualLotPageable.getTotalPages());
                 Assert.assertEquals(1, actualLotPageable.getPageNumber());
                 msg = "Ok: " + "Method: " + type.getTypeValue() + " pageNumber: " + i;
                 System.out.println(msg);

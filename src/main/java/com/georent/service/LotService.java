@@ -87,6 +87,7 @@ public class LotService {
             page = lotRepository.findByIdIn(ids, pageable);
         }
         else {
+
             page = lotRepository.findAll(pageable);
         }
         pageNumber = page.getPageable().getPageNumber();
