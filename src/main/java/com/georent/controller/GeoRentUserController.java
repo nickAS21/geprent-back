@@ -1,6 +1,5 @@
 package com.georent.controller;
 
-import com.georent.domain.UserRole;
 import com.georent.dto.ForgotUpdatePasswordDTO;
 import com.georent.dto.GeoRentUserUpdateDto;
 import com.georent.dto.RegistrationLotDto;
