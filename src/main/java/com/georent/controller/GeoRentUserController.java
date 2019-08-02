@@ -171,7 +171,7 @@ public class GeoRentUserController {
      * Uploads the lot picture to the pictures repository.
      * @param multipartFiles The files to upload.
      * @param registrationLotDtoStr JSON new lot
-     * @param principal Current user identifier.
+     * @param principal Current user identifier.ForgotUpdatePasswordDTO
      * @return Response, containing the saved lot in the LotDTO format.
      */
 //    @PostMapping("/lot/upload-picture")

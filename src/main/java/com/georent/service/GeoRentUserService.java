@@ -168,7 +168,7 @@ public class GeoRentUserService {
      * @return
      */
     public List<GeoRentUserInfoDto> getUserAll(Principal principal) {
-        if (userRepository.existsByEmail(principal.getName())) {
+        if (!userRepository.existsByEmail(principal.getName())) {
             throw new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName());
         }
         return userRepository.findAll()
@@ -301,7 +301,7 @@ public class GeoRentUserService {
      */
     @Transactional
     public GenericResponseDTO<LotDTO> deleteUser(String userName, Principal principal) {
-        if (userRepository.existsByEmail(principal.getName())) {
+        if (!userRepository.existsByEmail(principal.getName())) {
             throw new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName());
         }
         GeoRentUser geoRentUser = userRepository.findByEmail(userName)
