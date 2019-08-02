@@ -50,7 +50,6 @@ spring:
 
     properties:
       hibernate:
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         show_sql: false
         use_sql_comments: false
         format_sql: true
@@ -74,7 +73,7 @@ spring:
 #    url: jdbc:mysql://localhost:3306/test
     url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
-    password: admin
+    password: root
 
     hikari:
       maximum-pool-size: 10
@@ -85,12 +84,12 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
 
   jpa:
-    database-platform: org.hibernate.dialect.MySQL5Dialect
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: update
+      use-new-id-generator-mappings: true
     properties:
       hibernate:
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         show_sql: false
         use_sql_comments: false
         format_sql: true
