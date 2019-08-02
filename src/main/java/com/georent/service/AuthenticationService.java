@@ -132,8 +132,8 @@ public class AuthenticationService {
         userService.saveRecoveryTokenUser(geoRentUser);
 //        {API}/?main=""&path=forgot&tokentype=Bearer&accesstoken=12345
             // send email
-//        String url = serverApi + "/?main=\"\"&path=forgot" +
-        String url = serverApi + "/forgot/?main=\"\"&path=forgot" +
+        String url = serverApi + "/?main=\"\"&path=forgot" +
+//        String url = serverApi + "/forgot/?main=\"\"&path=forgot" +
                 "&tokentype=" + BEARER.trim() +
                 "&accesstoken=" + accessToken;
         sendmail(email, Message.MAIL_SENT_SUB_TXT_FORGOT.getDescription(), getSetTextForMailForgot(url));
