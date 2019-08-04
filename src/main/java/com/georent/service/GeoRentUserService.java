@@ -184,12 +184,12 @@ public class GeoRentUserService {
      * @param principal Current user identifier.
      * @return The list of user lots in the LotDTO format.
      */
-    public List<LotDTO> getUserLots(Principal principal) {
+    public List<LotPageDTO> getUserLots(Principal principal) {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         return lotRepository.findAllByGeoRentUser_Id(geoRentUser.getId())
                 .stream()
-                .map(this::mapToLotDTO)
+                .map(this::mapToLotDTOAddPicture)
                 .collect(Collectors.toList());
     }
 
@@ -372,6 +372,26 @@ public class GeoRentUserService {
             dto.setDescription(descriptionDTO);
         }
         return dto;
+    }
+
+    private LotPageDTO mapToLotDTOAddPicture(Lot lot) {
+
+        LotPageDTO dto = new LotPageDTO();
+        dto.setId(lot.getId());
+        dto.setPrice(lot.getPrice());
+        dto.setAddress(lot.getCoordinates().getAddress());
+        dto.setLotName(lot.getDescription().getLotName());
+        List<DeleteObjectsRequest.KeyVersion> keys = this.awss3Service.getKeysLot(lot.getId());
+        URL imageUrl = this.awss3Service.generatePresignedURL(lot.getId() + "/1");
+        if (imageUrl!= null)  dto.setImageUrl(imageUrl);
+        return dto;
+
+
+//        LotDTO dto = mapToLotDTO(lot);
+//        URL url = this.awss3Service.generatePresignedURL(lot.getId() + "/1");
+//        if (url != null) dto.getDescription().getURLs().add(url);
+//        return dto;
+
     }
 
     private GeoRentUser mapFromUpdateUserDTO(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
