@@ -385,13 +385,6 @@ public class GeoRentUserService {
         URL imageUrl = this.awss3Service.generatePresignedURL(lot.getId() + "/1");
         if (imageUrl!= null)  dto.setImageUrl(imageUrl);
         return dto;
-
-
-//        LotDTO dto = mapToLotDTO(lot);
-//        URL url = this.awss3Service.generatePresignedURL(lot.getId() + "/1");
-//        if (url != null) dto.getDescription().getURLs().add(url);
-//        return dto;
-
     }
 
     private GeoRentUser mapFromUpdateUserDTO(Principal principal, final GeoRentUserUpdateDto geoRentUserUpdateDto) {
