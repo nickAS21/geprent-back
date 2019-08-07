@@ -4,7 +4,7 @@ target=georent-back.jar
 jar_path=build/libs/${target}
 bucket=s3://geo-rent-bucket/server-jars
 
-#./gradlew clean build
+./gradlew clean build
 
 export AWS_ACCESS_KEY_ID=AKIA4BDR5OXQBHACLXU7
 export AWS_SECRET_ACCESS_KEY=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
