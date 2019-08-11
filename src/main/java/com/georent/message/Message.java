@@ -45,6 +45,7 @@ public enum Message {
     SUCCESS_DELETE_LOT("Lot deleted successfully!"),
     SUCCESS_DELETE_LOTS("All lots of user deleted successfully!"),
     INVALID_GET_LOT_ID("Not found lot with ID: "),
+    INVALID_DELETE_LOT_ID("Forbidden. Lot with ID: "),
     INVALID_GET_LOT_ID_USER(" for user with ID: "),
     INVALID_SAVE_FILE("Unable to save the file."),
 

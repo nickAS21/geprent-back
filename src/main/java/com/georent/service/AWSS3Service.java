@@ -26,8 +26,10 @@ import javax.validation.constraints.AssertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,6 +67,28 @@ public class AWSS3Service {
         return true;
     }
 
+    /**
+     *
+     * @param object
+     * @return
+     */
+    public String base64Validation(String object) {
+        int pos = (object.indexOf("image/jpeg", 0));
+        if (pos < 0) {
+            throw new MultiPartFileValidationException(GeoRentIHttpStatus.INVALID_FILE_EXTENSION_JPG.getReasonPhrase());
+        }
+        String objectStr = object.replaceAll("data:image/jpeg;base64", "");
+        if (objectStr.isEmpty()) {
+            return object;
+        }
+        String objectS = object.replaceAll("data:image/jpeg;base64,", "");
+        if (objectS.length() > this.s3Properties.getFileSizeMax()) {
+            throw new MultiPartFileValidationException(GeoRentIHttpStatus.INVALID_FILE_SIZE.getReasonPhrase());
+        }
+        return objectS;
+    }
+
+
     public String generateKeyFileName() {
         return UUID.randomUUID().toString();
     }
@@ -90,6 +114,26 @@ public class AWSS3Service {
             log.error("Unable to upload  File To S3bucket", e);
             return null;
         }
+    }
+
+    /**
+     *
+     * @param encodedString
+     * @param keyFileName
+     * @return
+     */
+    public String uploadFileBase64ToS3bucket(String encodedString, String keyFileName) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(new String(encodedString).getBytes("UTF-8"));
+            InputStream inputStream = new ByteArrayInputStream(decodedBytes);
+            ObjectMetadata meta = new ObjectMetadata();
+            meta.setContentLength(decodedBytes.length);
+            meta.setContentType(MediaType.IMAGE_JPEG_VALUE);
+            s3Client.putObject(new PutObjectRequest(s3Properties.getBucketName(), keyFileName, inputStream, meta));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return keyFileName;
     }
 
     /**

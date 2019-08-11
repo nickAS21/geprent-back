@@ -169,7 +169,8 @@ public class GeoRentUserController {
     /**
      * Processes POST requests to the endpoint "/lot/upload-picture".
      * Uploads the lot picture to the pictures repository.
-     * @param multipartFiles The files to upload.
+     * @param multipartFiles The files to upload format  multipart.
+     * @param base64Files    The files to upload format  bas64.
      * @param registrationLotDtoStr JSON new lot
      * @param principal Current user identifier.ForgotUpdatePasswordDTO
      * @return Response, containing the saved lot in the LotDTO format.
@@ -181,10 +182,14 @@ public class GeoRentUserController {
             headers = "Accept=application/json; charset=UTF-8",
             produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseEntity<?> setUploadPicture(@Valid @RequestParam("files") MultipartFile[] multipartFiles,
+    public ResponseEntity<?> setUploadPicture(@Valid
+                                              @RequestParam(name = "files") MultipartFile[] multipartFiles,
+                                              @RequestParam(name = "filesBase64") String[] base64Files,
                                               @RequestParam(name = "lot") String registrationLotDtoStr,
-                                              Principal principal)  {
-        return userService.saveUserLotUploadPicture(multipartFiles, principal, registrationLotDtoStr);
+                                              Principal principal) {
+        return (multipartFiles.length > 0) ?
+                userService.saveUserLotUploadPicture(multipartFiles, principal, registrationLotDtoStr) :
+                userService.saveUserLotUploadBase64(base64Files, principal, registrationLotDtoStr);
     }
 
     /**

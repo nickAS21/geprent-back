@@ -294,6 +294,54 @@ public class GeoRentUserService {
     }
 
     /**
+     *
+     * @param base64files
+     * @param principal
+     * @param registrationLotDtoStr
+     * @return
+     */
+    @Transactional
+    public ResponseEntity<?> saveUserLotUploadBase64(String[] base64files, Principal principal, String registrationLotDtoStr) {
+        GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationLotDto registrationLotDto = null;
+        try {
+            registrationLotDto = mapper.readValue(registrationLotDtoStr, RegistrationLotDto.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Message.INVALID_SAVE_LOT.getDescription() + " " + e.getMessage());
+        }
+        Lot lot = lotRepository.save(mapRegistrationLotDtoToLot(registrationLotDto, geoRentUser));
+        if (base64files != null) {
+            String base64Header = "";
+            for (String base64File : base64files) {
+                base64File = base64Header + base64File;
+                String objectStr = this.awss3Service.base64Validation(base64File);
+                if (objectStr.equals("data:image/jpeg;base64")) {
+                    base64Header =  "data:image/jpeg;base64,";
+                }
+                else {
+                    Long picrureIdNext = 1L;
+                    if (lot.getDescription().getPictureIds().size() > 0)
+                        picrureIdNext = Collections.max(lot.getDescription().getPictureIds()) + 1;
+                    String keyFileName = lot.getId() + "/" + picrureIdNext;
+                    String keyFileNameS3 = this.awss3Service.uploadFileBase64ToS3bucket(objectStr, keyFileName);
+                    if (keyFileNameS3 != null && !keyFileNameS3.isEmpty()) {
+                        lot.getDescription().getPictureIds().add(Long.valueOf(picrureIdNext));
+                        base64Header = "";
+                    }
+                }
+            }
+        }
+        lotRepository.save(lot);
+        GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
+        responseDTO.setMessage(Message.SUCCESS_SAVE_LOT.getDescription());
+        responseDTO.setBody(mapToLotDTO(lot));
+        return status(OK).body(responseDTO);
+    }
+
+    /**
      * Deletes the specified user and all its lots from the database.
      *
      * @param principal Current user identifier.
@@ -326,7 +374,7 @@ public class GeoRentUserService {
         GeoRentUser geoRentUser = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(Message.INVALID_GET_USER_EMAIL.getDescription() + principal.getName()));
         Lot lot = lotRepository.findByIdAndGeoRentUser_Id(id, geoRentUser.getId())
-                .orElseThrow(() -> new LotNotFoundException(Message.INVALID_GET_LOT_ID + Long.toString(id) +
+                .orElseThrow(() -> new LotNotFoundException(Message.INVALID_DELETE_LOT_ID.getDescription() + Long.toString(id) +
                         Message.INVALID_GET_LOT_ID_USER.getDescription(), geoRentUser.getId()));
         deleteOneLot(lot);
         GenericResponseDTO<LotDTO> responseDTO = new GenericResponseDTO<>();
