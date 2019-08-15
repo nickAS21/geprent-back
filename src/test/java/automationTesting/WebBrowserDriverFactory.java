@@ -1,8 +1,6 @@
 package automationTesting;
 
-import automationTesting.objects.LoginPage;
-import automationTesting.objects.RegisterPage;
-import automationTesting.objects.Search;
+import automationTesting.objects.*;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.WebDriver;
@@ -19,7 +17,8 @@ public class WebBrowserDriverFactory {
     RegisterPage registerPage;
     LoginPage loginPage;
     Search search;
-//    ColorTheme colorTheme;
+    Profile profile;
+    EditeProfile editeProfile;
 
 
     @Before
@@ -33,7 +32,8 @@ public class WebBrowserDriverFactory {
         registerPage = new RegisterPage(driver);
         loginPage = new LoginPage(driver);
         search = new Search(driver);
-//        colorTheme = new ColorTheme(driver);
+        profile = new Profile(driver);
+        editeProfile = new EditeProfile(driver);
     }
 
 
