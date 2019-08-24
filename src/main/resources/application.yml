@@ -2,19 +2,21 @@ spring:
   profiles:
 #    active: dev
     active: test
+#    active: postgre
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: prokatradom@gmail.com
-    password: procatAS2107
+    username: xxxxxxxxx@gmail.com
+    password: xxxxxxx
     properties.mail.smtp:
       auth: true
       starttls.enable: true
       ssl.trust: smtp.gmail.com
 
 aws:
-  secret-key: BquqVoXGV1U8Ok+wKNIIXxZaofCoOP9krSmFt0Im
-  access-key: AKIA4BDR5OXQH2D4ZQCQ
+  secret-key: xxxxxxxxxxx
+  access-key: xxxxxxxxxx
   bucket-name: geo-rent-bucket
   and-point-url: https://georent.ua/
   expires-in: 60000
@@ -22,7 +24,7 @@ aws:
 
 app:
   jwt:
-    secretKey: glutton-oversight-rare-shine-unchain-unboxed
+    secretKey: xxxxxxxxxxxxxxx
     expiresIn: 3600000
 ---
 
@@ -99,3 +101,41 @@ spring:
 
 logging:
   config: classpath:logback-dev.xml
+
+---
+spring:
+  profiles: postgre
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/test
+    username: root
+    password: root
+
+    hikari:
+      maximum-pool-size: 10
+      connectionTimeout: 3000
+      leakDetectionThreshold: 30000
+      #      minimum-idle: 1
+      max-lifetime: 120000
+    type: com.zaxxer.hikari.HikariDataSource
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    #    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    how-sql: false
+    hibernate:
+      ddl-auto: update
+      #      ddl-auto: create-drop
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        format_sql: true
+
+#logging:
+#  config: classpath:logback-postgre.xml

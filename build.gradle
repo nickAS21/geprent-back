@@ -67,6 +67,8 @@ dependencies {
 
     implementation "org.hibernate:hibernate-search-orm:$hibernateVer"
     implementation "org.hibernate:hibernate-search-engine:$hibernateVer"
+    compile  "org.postgresql:postgresql"
+//    compile group: 'org.postgresql', name: 'postgresql', version: '42.1.1'
 
 //    implementation 'org.liquibase:liquibase-core'
 
@@ -76,9 +78,10 @@ dependencies {
     runtime "com.h2database:h2:$h2Ver"
     runtime "mysql:mysql-connector-java:$mysqlConnectorVer"
 
+
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-    
+
     testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation "org.junit.jupiter:junit-jupiter:$jUnitVer"
     testImplementation "org.assertj:assertj-core:$assertJVer"
